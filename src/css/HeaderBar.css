@@ -1,0 +1,28 @@
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f5f5f5;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo-header {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #002462;
+    margin-right: 10px;
+  }
+  
+  .header-title {
+    font-size: 18px;
+    color: #002462;
+    margin: 0;
+  }
+  

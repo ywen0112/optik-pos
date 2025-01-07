@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Routes, Route, Outlet, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Routes, Route, Outlet, useNavigate, useLocation } from "react-router-dom";
 import HeaderBar from "../components/HeaderBar";
 import Sidebar from "../components/SideBar";
 import "../css/MainLayout.css";
@@ -18,7 +18,7 @@ import CreditorTypeMaintenance from "../pages/maintenance/CreditorTypeMaintenanc
 import ItemMaintenance from "../pages/maintenance/ItemMaintenance";
 import ItemGroupMaintenance from "../pages/maintenance/ItemGroupMaintenance";
 import ItemTypeMaintenance from "../pages/maintenance/ItemTypeMaintenance";
-import MemberMaintenance from "../pages/maintenance/MamberMaintenance";
+import MemberMaintenance from "../pages/maintenance/MemberMaintenance";
 import MemberTypeMaintenance from "../pages/maintenance/MemberTypeMaintenance";
 import LocationMaintenance from "../pages/maintenance/LocationMaintenance";
 import PWPMaintenance from "../pages/maintenance/PWPMaintenance";
@@ -27,10 +27,47 @@ import DebtorReport from "../pages/report/DebtorReport";
 import CreditorReport from "../pages/report/CreditorReport";
 import ItemReport from "../pages/report/ItemReport";
 import MemberReport from "../pages/report/MemberReport";
+import TransactionReport from "../pages/report/TransactionReport";
+import LocationReport from "../pages/report/LocationReport";
+import PWPReport from "../pages/report/PWPReport";
 
 const MainLayout = () => {
   const [selectedMenu, setSelectedMenu] = useState("Dashboard");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const menuMapping = {
+    "/main/dashboard": "Dashboard",
+    "/main/audit-logs": "Audit Logs",
+    "/main/inquiry-screen": "Inquiry Screen",
+    "/main/transaction": "Transaction",
+    "/maintenance/user-maintenance": "User Maintenance",
+    "/maintenance/access-right-maintenance": "Access Right Maintenance",
+    "/maintenance/debtor-maintenance": "Debtor Maintenance",
+    "/maintenance/debtor-type-maintenance": "Debtor Type Maintenance",
+    "/maintenance/creditor-maintenance": "Creditor Maintenance",
+    "/maintenance/creditor-type-maintenance": "Creditor Type Maintenance",
+    "/maintenance/item-maintenance-batch-no": "Item Maintenance",
+    "/maintenance/item-group-maintenance": "Item Group Maintenance",
+    "/maintenance/item-type-maintenance": "Item Type Maintenance",
+    "/maintenance/member-maintenance": "Member Maintenance",
+    "/maintenance/member-type-maintenance": "Member Type Maintenance",
+    "/maintenance/location-maintenance": "Location Maintenance",
+    "/maintenance/pwp-maintenance": "PWP Maintenance",
+    "/report/debtor-report": "Debtor Report",
+    "/report/creditor-report": "Creditor Report",
+    "/report/item-report": "Item Report",
+    "/report/member-report": "Member Report",
+    "/report/transaction-report": "Transaction Report",
+    "/report/location-report": "Location Report",
+    "/report/pwp-report": "PWP Report",
+  };
+
+  useEffect(() => {
+    // Update selectedMenu based on the current route
+    const currentMenu = menuMapping[location.pathname] || "Dashboard";
+    setSelectedMenu(currentMenu);
+  }, [location.pathname]);
 
   const handleMenuClick = (menuName, routePath) => {
     setSelectedMenu(menuName);
@@ -48,13 +85,13 @@ const MainLayout = () => {
             <button className="sync-button">Sync Data</button>
           </div>
           <div className="main-layout-content">
-          <Routes>
+            <Routes>
               <Route path="/main/dashboard" element={<Dashboard />} />
               <Route path="/main/audit-logs" element={<AuditLogs />} />
               <Route path="/main/inquiry-screen" element={<InquiryScreen />} />
               <Route path="/main/transaction" element={<Transaction />} />
               {/* Maintenance Routes */}
-              <Route path="/maintenance/user-maintenance" element={<UserMaintenance />} /> 
+              <Route path="/maintenance/user-maintenance" element={<UserMaintenance />} />
               <Route path="/maintenance/access-right-maintenance" element={<AccessRightMaintenance />} />
               <Route path="/maintenance/debtor-maintenance" element={<DebtorMaintenance />} />
               <Route path="/maintenance/debtor-type-maintenance" element={<DebtorTypeMaintenance />} />
@@ -72,9 +109,12 @@ const MainLayout = () => {
               <Route path="/report/creditor-report" element={<CreditorReport />} />
               <Route path="/report/item-report" element={<ItemReport />} />
               <Route path="/report/member-report" element={<MemberReport />} />
+              <Route path="/report/transaction-report" element={<TransactionReport />} />
+              <Route path="/report/location-report" element={<LocationReport />} />
+              <Route path="/report/pwp-report" element={<PWPReport />} />
               {/* Catch-All Redirect */}
               <Route path="*" element={<Dashboard />} />
-              </Routes>
+            </Routes>
             <Outlet />
           </div>
         </div>

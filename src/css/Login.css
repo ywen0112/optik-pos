@@ -60,6 +60,25 @@
     border-radius: 4px;
     font-size: 14px;
   }
+
+  .password-input {
+    display: flex;
+    position: relative;
+  }
+  
+  .password-toggle-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    color: #555;   
+    top: 5px; 
+  }
+  
+  .password-toggle-button:hover {
+    color: #000;
+  }  
   
   /* Login Button */
   .login-button {

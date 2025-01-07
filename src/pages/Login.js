@@ -1,22 +1,47 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/Login.css";
+import ErrorModal from "../components/ErrorModal"; 
 
 const Login = ({ logo }) => {
-  const [userId, setUserId] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState({ isOpen: false, message: "" }); 
   const navigate = useNavigate();
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (userId === "admin" && password === "password") {
-      localStorage.setItem("isLoggedIn", "true"); 
+
+    // Email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      setError({
+        isOpen: true,
+        message: "Please enter a valid email address.",
+      });
+      return;
+    }
+
+    if (email === "admin@example.com" && password === "password") {
+      localStorage.setItem("isLoggedIn", "true");
       navigate("/dashboard");
     } else {
-      alert("Invalid credentials. Use admin/password.");
+      setError({
+        isOpen: true,
+        message: "Invalid credentials. Use admin@example.com/password.",
+      });
     }
-  };  
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevState) => !prevState);
+  };
+
+  const closeErrorModal = () => {
+    setError({ isOpen: false, message: "" }); 
+  };
 
   return (
     <div className="login-container">
@@ -28,26 +53,36 @@ const Login = ({ logo }) => {
         <h2 className="title">OPTIK POS</h2>
 
         <form onSubmit={handleSubmit}>
-          <label htmlFor="userId" className="input-label">User ID</label>
+          <label htmlFor="email" className="input-label">Email</label>
           <input
-            type="text"
-            id="userId"
-            placeholder="Enter your User ID"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
 
           <label htmlFor="password" className="input-label">Password</label>
           <div className="password-input">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
-              placeholder="Enter your Password"
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <button
+              type="button"
+              className="password-toggle-button"
+              onClick={togglePasswordVisibility}
+              aria-label="Toggle password visibility"
+            >
+              <span className="material-icons">
+                {showPassword ? "visibility" : "visibility_off"}
+              </span>
+            </button>
           </div>
 
           <button type="submit" className="login-button">LOGIN</button>
@@ -57,6 +92,14 @@ const Login = ({ logo }) => {
           <p>&copy; 2025 OPTIK POS. All rights reserved.</p>
         </div>
       </div>
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={error.isOpen}
+        title="Error"
+        message={error.message}
+        onClose={closeErrorModal}
+      />
     </div>
   );
 };

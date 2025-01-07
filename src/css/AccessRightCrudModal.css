@@ -1,0 +1,104 @@
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .popup-form {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .form-group label {
+    font-weight: bold;
+  }
+  
+  .access-rights {
+    margin-top: 15px;
+  }
+  
+  .modules {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .module-group {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    width: 250px;
+  }
+
+  
+  .module-title {
+    display: flex;
+    gap: 5px;
+    font-weight: bold;
+  }
+
+  .module-checkbox {
+    padding: 0;
+  }
+
+  .access-rights label {
+    font-weight: bold;
+  }
+  
+  .permissions label {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+    font-weight: normal;
+  }
+
+  .popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .save-button {
+    background-color: #002462;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .save-button:hover {
+    background-color: #001a4a;
+  }
+  
+  .cancel-button {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .cancel-button:hover {
+    background-color: #b21f2d;
+  }
+  

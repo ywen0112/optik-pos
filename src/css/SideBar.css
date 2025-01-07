@@ -1,68 +1,105 @@
 .sidebar {
-    width: 250px;
-    background-color: #002462;
-    color: white;
-    height: 100vh;
-    overflow-y: auto;
-    transition: width 0.3s ease;
-    position: relative;
-  }
-  
-  .sidebar.collapsed {
-    width: 60px;
-  }
-  
-  .toggle-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #002462;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-  }
-  
-  .menu-list {
-    list-style: none;
-    padding: 0;
-    margin-top: 50px;
-  }
+  width: 250px;
+  background-color: #002462;
+  color: white;
+  height: 100vh;
+  overflow-y: auto;
+  transition: width 0.3s ease;
+  position: relative;
+}
 
-  .menu-section-title {
-    padding: 10px 15px;
-    font-size: 12px;
-    color: #b0c4de; 
-    text-transform: uppercase;
-    font-weight: bold;
-  }
-  
-  .menu-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .menu-item:hover {
-    background-color: #001a4d;
-  }
+.sidebar.collapsed {
+  width: 70px;
+}
 
-  .menu-item.active {
-    background-color: #001a4d;
-  }
-  
-  .menu-icon {
-    margin-right: 10px;
-    font-size: 18px;
-  }
-  
-  .sidebar.collapsed .menu-icon {
-    margin-right: 0;
-  }
-  
-  .menu-text {
-    font-size: 14px;
-  }
-  
+.toggle-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #002462;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 50px;
+}
+
+.menu-section-title {
+  padding: 10px 15px;
+  font-size: 12px;
+  color: #b0c4de;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.menu-item:hover {
+  background-color: #001a4d;
+}
+
+.menu-item.active {
+  background-color: #001a4d;
+}
+
+.menu-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.sidebar.collapsed .menu-icon {
+  margin-right: 5px;
+}
+
+.menu-text {
+  font-size: 14px;
+}
+
+.submenu-list {
+  list-style: none;
+  padding-left: 20px;
+  margin-top: 5px;
+  transition: height 0.3s ease;
+}
+
+.submenu-item {
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.submenu-item:hover {
+  background-color: #00308f;
+}
+
+.submenu-item.active {
+  background-color: #00308f;
+}
+
+.submenu-text {
+  font-size: 13px;
+  margin-left: 5px;
+  color: #ffffff;
+}
+
+.sidebar.collapsed .submenu-list {
+  display: none;
+}
+
+.sidebar.collapsed .submenu-toggle {
+  display: none;
+}

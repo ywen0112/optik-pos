@@ -9,6 +9,10 @@ const Sidebar = ({ onMenuClick }) => {
     setCollapsed(!collapsed);
   };
 
+  const handleExpandSidebar = () => {
+    if (collapsed) setCollapsed(false);
+  };
+
   const sections = [
     {
       title: null,
@@ -16,7 +20,16 @@ const Sidebar = ({ onMenuClick }) => {
         { name: "Dashboard", icon: "🏠", path: "/main/dashboard/" },
         { name: "Audit Logs", icon: "📜", path: "/main/audit-logs" },
         { name: "Inquiry Screen", icon: "🔍", path: "/main/inquiry-screen" },
-        { name: "Transaction", icon: "💼", path: "/main/transaction" },
+        {
+          name: "Transaction",
+          icon: "💼",
+          path: "/main/transaction",
+          submenus: [
+            { name: "Sales Invoice", icon: "🧾", path: "/main/transaction/sales-invoice" },
+            { name: "Purchase Invoice", icon: "🧾", path: "/main/transaction/purchase-invoice" },
+            { name: "Credit Note", icon: "🧾", path: "/main/transaction/credit-note" },
+          ],
+        },
       ],
     },
     {
@@ -40,19 +53,23 @@ const Sidebar = ({ onMenuClick }) => {
     {
       title: "REPORT",
       items: [
-        { name: "Debtor Report", icon: "📑", path: "/report/debtor-report" },
+        { name: "Debtor Report", icon: "📄", path: "/report/debtor-report" },
         { name: "Creditor Report", icon: "📄", path: "/report/creditor-report" },
-        { name: "Item Report", icon: "📋", path: "/report/item-report" },
-        { name: "Member Report", icon: "📃", path: "/report/member-report" },
+        { name: "Item Report", icon: "📄", path: "/report/item-report" },
+        { name: "Member Report", icon: "📄", path: "/report/member-report" },
+        { name: "Transaction Report", icon: "📄", path: "/report/transaction-report" },
+        { name: "Location Report", icon: "📄", path: "/report/location-report" },
+        { name: "PWP Report", icon: "📄", path: "/report/pwp-report" },
       ],
     },
   ];
 
   const handleMenuClick = (menuName, path) => {
     setActiveMenu(menuName);
-    onMenuClick(menuName, path); 
+    onMenuClick(menuName, path);
+    handleExpandSidebar();
   };
-
+  
   return (
     <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
       <button className="toggle-button" onClick={toggleSidebar}>
@@ -67,16 +84,39 @@ const Sidebar = ({ onMenuClick }) => {
               </li>
             )}
             {section.items.map((item, idx) => (
-              <li
-                key={idx}
-                className={`menu-item ${
-                  activeMenu === item.name ? "active" : ""
-                }`}
-                onClick={() => handleMenuClick(item.name, item.path)}
-              >
-                <span className="menu-icon">{item.icon}</span>
-                {!collapsed && <span className="menu-text">{item.name}</span>}
-              </li>
+              <React.Fragment key={idx}>
+                <li
+                  className={`menu-item ${
+                    activeMenu === item.name ? "active" : ""
+                  }`}
+                  onClick={() =>
+                    item.path
+                      ? handleMenuClick(item.name, item.path)
+                      : null
+                  }
+                >
+                  <span className="menu-icon">{item.icon}</span>
+                  {!collapsed && <span className="menu-text">{item.name}</span>}
+                </li>
+                {item.submenus && !collapsed && (
+                  <ul className="submenu-list">
+                    {item.submenus.map((submenu, subIdx) => (
+                      <li
+                        key={subIdx}
+                        className={`submenu-item ${
+                          activeMenu === submenu.name ? "active" : ""
+                        }`}
+                        onClick={() =>
+                          handleMenuClick(submenu.name, submenu.path)
+                        }
+                      >
+                        <span>{submenu.icon}</span>
+                        <span className="submenu-text">{submenu.name}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </React.Fragment>
             ))}
           </React.Fragment>
         ))}

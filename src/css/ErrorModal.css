@@ -8,7 +8,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 2000;
   }
   
   .error-modal {
@@ -24,6 +24,7 @@
     color: #d9534f;
     font-size: 20px;
     margin-bottom: 10px;
+    text-align: center;
   }
   
   .error-modal-message {

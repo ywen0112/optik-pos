@@ -1,24 +1,36 @@
 import React, { useEffect, useState } from "react";
-import "../../css/AuditLogs.css"; 
+import "../../css/AuditLogs.css";
+import ErrorModal from "../../components/ErrorModal"; // Assuming ErrorModal is in the components folder
 
 const AuditLogs = () => {
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5); // Default items per page
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const response = await fetch(`/api/audit-logs?page=${currentPage}&itemsPerPage=${itemsPerPage}`); // Replace with actual API endpoint
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch audit logs");
+        }
+        
         const data = await response.json();
 
         setUsers(data.items); // Assuming API response includes an "items" array
         setTotalPages(data.totalPages); // Assuming API response includes "totalPages"
       } catch (error) {
         console.error("Error fetching audit logs:", error);
+        setErrorModal({
+          isOpen: true,
+          title: "Error Fetching Data",
+          message: error.message,
+        });
       } finally {
         setLoading(false);
       }
@@ -40,8 +52,20 @@ const AuditLogs = () => {
     }
   };
 
+  // Close the error modal
+  const closeErrorModal = () => {
+    setErrorModal({ isOpen: false, title: "", message: "" });
+  };
+
   return (
     <div className="audit-maintenance-container">
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        title={errorModal.title}
+        message={errorModal.message}
+        onClose={closeErrorModal}
+      />
+
       <div className="audit-header">
         <label>
           Show:

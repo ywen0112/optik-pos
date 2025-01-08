@@ -3,6 +3,7 @@ import "../../css/Maintenance.css";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import CrudModal from "../../components/CrudModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import ErrorModal from "../../components/ErrorModal";
 
 const UserMaintenance = () => {
   const [users, setUsers] = useState([]);
@@ -17,27 +18,27 @@ const UserMaintenance = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/users?page=${currentPage}&itemsPerPage=${itemsPerPage}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch users.");
+      }
+      const data = await response.json();
+      setUsers(data.items);
+      setTotalPages(data.totalPages);
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error", message: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Replace `/api/users` with your actual API endpoint
-        const response = await fetch(
-          `/api/users?page=${currentPage}&itemsPerPage=${itemsPerPage}`
-        );
-        const data = await response.json();
-
-        setUsers(data.items); // Assuming API returns `items` array
-        setTotalPages(data.totalPages); // Assuming API returns `totalPages`
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    fetchUsers();
 
     setFields([
       { name: "name", label: "Name", type: "text", required: true },
@@ -81,22 +82,43 @@ const UserMaintenance = () => {
     setIsPopupOpen(false);
   };
 
-  const handleSave = () => {
-    const action = () => {
-      if (newUser.id) {
-        setUsers(users.map((user) => (user.id === newUser.id ? newUser : user)));
-      } else {
-        setUsers([...users, { ...newUser, id: users.length + 1 }]);
-      }
-      handleCloseModal();
-    };
+  const handleSave = async () => {
+    try {
+      const method = newUser.id ? "PUT" : "POST";
+      const endpoint = newUser.id ? `/api/users/${newUser.id}` : "/api/users";
+      const response = await fetch(endpoint, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
 
-    handleOpenConfirmModal(action);
+      if (!response.ok) {
+        throw new Error(newUser.id ? "Failed to update user." : "Failed to add user.");
+      }
+
+      const data = await response.json();
+      setUsers(data.items); // Update table with API response
+      setTotalPages(data.totalPages); // Update pagination
+      handleCloseModal();
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error", message: error.message });
+    }
   };
 
-  const handleDelete = (id) => {
-    const action = () => {
-      setUsers(users.filter((user) => user.id !== id));
+  const handleDelete = async (id) => {
+    const action = async () => {
+      try {
+        const response = await fetch(`/api/users/${id}`, { method: "DELETE" });
+        if (!response.ok) {
+          throw new Error("Failed to delete user.");
+        }
+
+        const data = await response.json();
+        setUsers(data.items); // Update table with API response
+        setTotalPages(data.totalPages); // Update pagination
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error", message: error.message });
+      }
     };
 
     handleOpenConfirmModal(action);
@@ -107,13 +129,24 @@ const UserMaintenance = () => {
     setIsConfirmOpen(true);
   };
 
-  const handleConfirmAction = () => {
-    if (confirmAction) confirmAction();
+  const handleConfirmAction = async () => {
+    if (confirmAction) await confirmAction();
     setIsConfirmOpen(false);
+  };
+
+  const closeErrorModal = () => {
+    setErrorModal({ isOpen: false, title: "", message: "" });
   };
 
   return (
     <div className="maintenance-container">
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        title={errorModal.title}
+        message={errorModal.message}
+        onClose={closeErrorModal}
+      />
+
       <div className="maintenance-header">
         <div className="pagination-controls">
           <label>

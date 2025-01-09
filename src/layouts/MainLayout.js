@@ -8,6 +8,7 @@ import Dashboard from "../pages/main/Dashboard";
 import AuditLogs from "../pages/main/AuditLogs";
 import InquiryScreen from "../pages/main/InquiryScreen";
 import Transaction from "../pages/main/Transaction";
+import CashManagement from "../pages/main/CashManagement";
 
 import UserMaintenance from "../pages/maintenance/UserMaintenance";
 import AccessRightMaintenance from "../pages/maintenance/AccessRightMaintenance";
@@ -41,6 +42,7 @@ const MainLayout = () => {
     "/main/audit-logs": "Audit Logs",
     "/main/inquiry-screen": "Inquiry Screen",
     "/main/transaction": "Transaction",
+    "/main/transaction/cash-management": "CashManagement",
     "/maintenance/user-maintenance": "User Maintenance",
     "/maintenance/access-right-maintenance": "Access Right Maintenance",
     "/maintenance/debtor-maintenance": "Debtor Maintenance",
@@ -89,7 +91,9 @@ const MainLayout = () => {
               <Route path="/main/dashboard" element={<Dashboard />} />
               <Route path="/main/audit-logs" element={<AuditLogs />} />
               <Route path="/main/inquiry-screen" element={<InquiryScreen />} />
-              <Route path="/main/transaction" element={<Transaction />} />
+              <Route path="/main/transaction" element={<Transaction />}>
+                <Route path="cash-management" element={<CashManagement />} />
+              </Route>
               {/* Maintenance Routes */}
               <Route path="/maintenance/user-maintenance" element={<UserMaintenance />} />
               <Route path="/maintenance/access-right-maintenance" element={<AccessRightMaintenance />} />

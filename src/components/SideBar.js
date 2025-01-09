@@ -20,16 +20,7 @@ const Sidebar = ({ onMenuClick }) => {
         { name: "Dashboard", icon: "🏠", path: "/main/dashboard/" },
         { name: "Audit Logs", icon: "📜", path: "/main/audit-logs" },
         { name: "Inquiry Screen", icon: "🔍", path: "/main/inquiry-screen" },
-        {
-          name: "Transaction",
-          icon: "💼",
-          path: "/main/transaction",
-          submenus: [
-            { name: "Sales Invoice", icon: "🧾", path: "/main/transaction/sales-invoice" },
-            { name: "Purchase Invoice", icon: "🧾", path: "/main/transaction/purchase-invoice" },
-            { name: "Credit Note", icon: "🧾", path: "/main/transaction/credit-note" },
-          ],
-        },
+        { name: "Transaction", icon: "💼", path: "/main/transaction" },
       ],
     },
     {

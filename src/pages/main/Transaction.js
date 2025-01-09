@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../../css/Transaction.css";
-import ErrorModal from "../../components/ErrorModal"; // Import the ErrorModal component
+import ErrorModal from "../../components/ErrorModal"; 
 
 const Transaction = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +12,8 @@ const Transaction = () => {
     cashOutDescription: "",
   });
   const [historyData, setHistoryData] = useState([]);
+  const [isOpenCounterSubmitted, setIsOpenCounterSubmitted] = useState(false);
+  const [isCloseCounterSubmitted, setIsCloseCounterSubmitted] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
 
   useEffect(() => {
@@ -54,26 +56,33 @@ const Transaction = () => {
           ? formData.cashInValue
           : transactionType === "Cash Out"
           ? formData.cashOutValue
-          : formData[transactionType.toLowerCase().replace(" ", "")],
+          : transactionType === "Open Counter"
+          ? formData.openCounter
+          : formData.closeCounter,
     };
-  
-    console.log("Data being sent to API:", transactionData);
-  
+
     try {
       const response = await fetch("/api/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(transactionData),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to submit transaction");
       }
-  
+
       const updatedData = await response.json();
       setHistoryData(updatedData);
-  
-      //After a successful API call, setFormData is used to clear only the relevant fields
+
+      // Manage field enable/disable states
+      if (transactionType === "Open Counter") {
+        setIsOpenCounterSubmitted(true);
+      } else if (transactionType === "Close Counter") {
+        setIsCloseCounterSubmitted(true);
+      }
+
+      // Clear only the relevant fields
       setFormData((prevData) => ({
         ...prevData,
         [transactionType === "Open Counter" ? "openCounter" : 
@@ -110,9 +119,15 @@ const Transaction = () => {
                 value={formData.openCounter}
                 onChange={handleInputChange}
                 placeholder="Enter amount"
+                disabled={isOpenCounterSubmitted}
               />
               <span className="transaction-button">
-                <button onClick={() => handleSubmit("Open Counter")}>Submit</button>
+                <button
+                  onClick={() => handleSubmit("Open Counter")}
+                  disabled={!formData.openCounter}
+                >
+                  Submit
+                </button>
               </span>
             </div>
           </div>
@@ -125,9 +140,15 @@ const Transaction = () => {
                 value={formData.closeCounter}
                 onChange={handleInputChange}
                 placeholder="Enter amount"
+                disabled={!isOpenCounterSubmitted || isCloseCounterSubmitted}
               />
               <span className="transaction-button">
-                <button onClick={() => handleSubmit("Close Counter")}>Submit</button>
+                <button
+                  onClick={() => handleSubmit("Close Counter")}
+                  disabled={!formData.closeCounter}
+                >
+                  Submit
+                </button>
               </span>
             </div>
           </div>
@@ -143,9 +164,15 @@ const Transaction = () => {
                 value={formData.cashInValue}
                 onChange={handleInputChange}
                 placeholder="Enter amount"
+                disabled={!isOpenCounterSubmitted || isCloseCounterSubmitted}
               />
               <span className="transaction-button">
-                <button onClick={() => handleSubmit("Cash In")}>Submit</button>
+                <button
+                  onClick={() => handleSubmit("Cash In")}
+                  disabled={!formData.cashInValue}
+                >
+                  Submit
+                </button>
               </span>
             </div>
             <input
@@ -154,6 +181,7 @@ const Transaction = () => {
               value={formData.cashInDescription}
               onChange={handleInputChange}
               placeholder="Description"
+              disabled={!isOpenCounterSubmitted || isCloseCounterSubmitted}
             />
           </div>
           <div className="form-group">
@@ -165,9 +193,15 @@ const Transaction = () => {
                 value={formData.cashOutValue}
                 onChange={handleInputChange}
                 placeholder="Enter amount"
+                disabled={!isOpenCounterSubmitted || isCloseCounterSubmitted}
               />
               <span className="transaction-button">
-                <button onClick={() => handleSubmit("Cash Out")}>Submit</button>
+                <button
+                  onClick={() => handleSubmit("Cash Out")}
+                  disabled={!formData.cashOutValue}
+                >
+                  Submit
+                </button>
               </span>
             </div>
             <input
@@ -176,6 +210,7 @@ const Transaction = () => {
               value={formData.cashOutDescription}
               onChange={handleInputChange}
               placeholder="Description"
+              disabled={!isOpenCounterSubmitted || isCloseCounterSubmitted}
             />
           </div>
         </div>

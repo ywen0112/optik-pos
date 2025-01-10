@@ -1,3 +1,7 @@
+.open-counter-container {
+  padding: 10px 10px;
+}
+
 .open-counter-button {
   background-color: #002462;
   color: white;

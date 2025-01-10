@@ -9,6 +9,7 @@ import AuditLogs from "../pages/main/AuditLogs";
 import InquiryScreen from "../pages/main/InquiryScreen";
 import Transaction from "../pages/main/Transaction";
 import CashManagement from "../pages/main/CashManagement";
+import SalesInvoice from "../pages/main/SalesInvoice";
 
 import UserMaintenance from "../pages/maintenance/UserMaintenance";
 import AccessRightMaintenance from "../pages/maintenance/AccessRightMaintenance";
@@ -42,7 +43,8 @@ const MainLayout = () => {
     "/main/audit-logs": "Audit Logs",
     "/main/inquiry-screen": "Inquiry Screen",
     "/main/transaction": "Transaction",
-    "/main/transaction/cash-management": "CashManagement",
+    "/main/transaction/cash-management": "Transaction",
+    "/main/transaction/sales-invoice": "Transaction",
     "/maintenance/user-maintenance": "User Maintenance",
     "/maintenance/access-right-maintenance": "Access Right Maintenance",
     "/maintenance/debtor-maintenance": "Debtor Maintenance",
@@ -72,6 +74,10 @@ const MainLayout = () => {
   }, [location.pathname]);
 
   const handleMenuClick = (menuName, routePath) => {
+    const currentPath = location.pathname;
+    if (menuName === "Transaction" && currentPath.startsWith("/main/transaction")) {
+      return;
+    }
     setSelectedMenu(menuName);
     navigate(routePath);
   };
@@ -93,6 +99,7 @@ const MainLayout = () => {
               <Route path="/main/inquiry-screen" element={<InquiryScreen />} />
               <Route path="/main/transaction" element={<Transaction />}>
                 <Route path="cash-management" element={<CashManagement />} />
+                <Route path="sales-invoice" element={<SalesInvoice />} />
               </Route>
               {/* Maintenance Routes */}
               <Route path="/maintenance/user-maintenance" element={<UserMaintenance />} />

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Outlet } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import "../../css/Transaction.css";
 import ErrorModal from "../../components/ErrorModal";
 
@@ -8,6 +8,7 @@ const Transaction = () => {
   const [openCounterAmount, setOpenCounterAmount] = useState("");
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleOpenCounter = () => {
     if (!openCounterAmount || parseFloat(openCounterAmount) <= 0) {
@@ -19,7 +20,7 @@ const Transaction = () => {
       return;
     }
     setIsCounterOpen(true);
-    navigate("/main/transaction/cash-management"); 
+    navigate("/main/transaction/cash-management"); // Navigate to cash management by default
   };
 
   const handleCloseErrorModal = () => {
@@ -52,22 +53,29 @@ const Transaction = () => {
     );
   }
 
+  // Step 2: Transaction Management Screen
   return (
     <div className="transaction-container">
       <div className="sidebar">
         <button
-          className="sidebar-button"
+          className={`sidebar-button ${
+            location.pathname === "/main/transaction/cash-management" ? "active" : ""
+          }`}
           onClick={() => navigate("/main/transaction/cash-management")}
         >
           Cash Management
         </button>
-        <button className="sidebar-button">Sales Invoice</button>
-        <button className="sidebar-button">Purchase Invoice</button>
-        <button className="sidebar-button">Credit Note</button>
-        <button className="sidebar-button">Close Counter</button>
+        <button
+          className={`sidebar-button ${
+            location.pathname === "/main/transaction/sales-invoice" ? "active" : ""
+          }`}
+          onClick={() => navigate("/main/transaction/sales-invoice")}
+        >
+          Sales Invoice
+        </button>
       </div>
       <div className="main-content">
-       <Outlet />  
+        <Outlet /> 
       </div>
     </div>
   );

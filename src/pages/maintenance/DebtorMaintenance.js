@@ -1,47 +1,54 @@
 import React, { useEffect, useState } from "react";
 import "../../css/Maintenance.css";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
-import CrudModal from "../../components/CrudModal";
+import DebtorModal from "../../components/DebtorModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 
 const DebtorMaintenance = () => {
-  const [users, setUsers] = useState([]);
+  const [debtors, setDebtors] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
-  const [newUser, setNewUser] = useState({});
+  const [newDebtor, setNewDebtor] = useState({});
   const [modalTitle, setModalTitle] = useState("");
-  const [fields, setFields] = useState([]);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
 
   useEffect(() => {
     const mockData = [
-      { id: 1, name: "Yiwei Lee", role: "Super Admin", email: "yw@gmail.com" },
-      { id: 2, name: "Tikta Lee", role: "Admin", email: "tk@gmail.com" },
-    ];
-    setUsers(mockData);
-    setTotalPages(Math.ceil(mockData.length / itemsPerPage));
-    setFields([
-      { name: "name", label: "Name", type: "text", required: true },
-      { name: "email", label: "Email", type: "email", required: true },
       {
-        name: "role",
-        label: "User Role",
-        type: "select",
-        options: [
-          { label: "Admin", value: "Admin" },
-          { label: "User", value: "User" },
-          { label: "Super Admin", value: "Super Admin" },
-        ],
-        required: true,
+        id: 1,
+        name: "Yiwei Lee",
+        debtorCode: "C001",
+        debtorTypeId: "DT001",
+        email: "yw@gmail.com",
+        phoneNumber: "123456789",
+        tin: "TIN12345",
+        debtorInfo: {
+          address1: "123 Main St",
+          address2: "",
+          address3: "",
+          address4: "",
+          postCode: "12345",
+        },
+        taxEntity: {
+          ic: "IC001",
+          nameOnIC: "Yiwei Lee",
+        },
+        latestRx: {
+          spectacles: "SPH -2.5, CYL -1.0, AXIS 90",
+          contactLens: "SPH -2.5, DIA 14.2",
+          kReading: "Hm 7.5, Vm 7.2",
+        },
       },
-    ]);
+    ];
+    setDebtors(mockData);
+    setTotalPages(Math.ceil(mockData.length / itemsPerPage));
   }, [itemsPerPage]);
 
-  const currentUsers = users.slice(
+  const currentDebtors = debtors.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -57,11 +64,11 @@ const DebtorMaintenance = () => {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setNewUser({ ...newUser, [name]: value });
+    setNewDebtor({ ...newDebtor, [name]: value });
   };
 
-  const handleOpenModal = (user = {}, title = "", viewing = false) => {
-    setNewUser(user);
+  const handleOpenModal = (debtor = {}, title = "", viewing = false) => {
+    setNewDebtor(debtor);
     setModalTitle(title);
     setIsViewing(viewing);
     setIsPopupOpen(true);
@@ -73,10 +80,12 @@ const DebtorMaintenance = () => {
 
   const handleSave = () => {
     const action = () => {
-      if (newUser.id) {
-        setUsers(users.map((user) => (user.id === newUser.id ? newUser : user)));
+      if (newDebtor.id) {
+        setDebtors(
+          debtors.map((debtor) => (debtor.id === newDebtor.id ? newDebtor : debtor))
+        );
       } else {
-        setUsers([...users, { ...newUser, id: users.length + 1 }]);
+        setDebtors([...debtors, { ...newDebtor, id: debtors.length + 1 }]);
       }
       handleCloseModal();
     };
@@ -86,7 +95,7 @@ const DebtorMaintenance = () => {
 
   const handleDelete = (id) => {
     const action = () => {
-      setUsers(users.filter((user) => user.id !== id));
+      setDebtors(debtors.filter((debtor) => debtor.id !== id));
     };
 
     handleOpenConfirmModal(action);
@@ -122,9 +131,9 @@ const DebtorMaintenance = () => {
         </div>
         <button
           className="add-button"
-          onClick={() => handleOpenModal({}, "Add User")}
+          onClick={() => handleOpenModal({}, "Add Debtor")}
         >
-          Add User
+          Add Debtor
         </button>
       </div>
       <table className="table">
@@ -132,33 +141,39 @@ const DebtorMaintenance = () => {
           <tr>
             <th>No</th>
             <th>Name</th>
-            <th>User Role</th>
+            <th>Debtor Code</th>
+            <th>Debtor Type ID</th>
             <th>Email</th>
+            <th>Phone Number</th>
+            <th>TIN</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {currentUsers.map((user, index) => (
-            <tr key={user.id}>
+          {currentDebtors.map((debtor, index) => (
+            <tr key={debtor.id}>
               <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-              <td>{user.name}</td>
-              <td>{user.role}</td>
-              <td>{user.email}</td>
+              <td>{debtor.name}</td>
+              <td>{debtor.debtorCode}</td>
+              <td>{debtor.debtorTypeId}</td>
+              <td>{debtor.email}</td>
+              <td>{debtor.phoneNumber}</td>
+              <td>{debtor.tin}</td>
               <td>
                 <button
-                  onClick={() => handleOpenModal(user, "Edit User")}
+                  onClick={() => handleOpenModal(debtor, "Edit Debtor")}
                   className="action-button edit"
                 >
                   <FaEdit /> Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(user.id)}
+                  onClick={() => handleDelete(debtor.id)}
                   className="action-button delete"
                 >
                   <FaTrash /> Delete
                 </button>
                 <button
-                  onClick={() => handleOpenModal(user, "View User", true)}
+                  onClick={() => handleOpenModal(debtor, "View Debtor", true)}
                   className="action-button view"
                 >
                   <FaEye /> View
@@ -185,11 +200,10 @@ const DebtorMaintenance = () => {
           Next
         </button>
       </div>
-      <CrudModal
+      <DebtorModal
         isOpen={isPopupOpen}
         title={modalTitle}
-        fields={fields}
-        data={newUser}
+        data={newDebtor}
         onClose={handleCloseModal}
         onSave={handleSave}
         onInputChange={handleInputChange}

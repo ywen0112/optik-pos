@@ -56,9 +56,9 @@ const Transaction = () => {
   // Step 2: Transaction Management Screen
   return (
     <div className="transaction-container">
-      <div className="sidebar">
+      <div className="transaction-sidebar">
         <button
-          className={`sidebar-button ${
+          className={`transaction-sidebar-button ${
             location.pathname === "/main/transaction/cash-management" ? "active" : ""
           }`}
           onClick={() => navigate("/main/transaction/cash-management")}
@@ -66,7 +66,7 @@ const Transaction = () => {
           Cash Management
         </button>
         <button
-          className={`sidebar-button ${
+          className={`transaction-sidebar-button ${
             location.pathname === "/main/transaction/sales-invoice" ? "active" : ""
           }`}
           onClick={() => navigate("/main/transaction/sales-invoice")}

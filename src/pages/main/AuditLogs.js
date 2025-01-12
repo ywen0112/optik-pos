@@ -14,16 +14,31 @@ const AuditLogs = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/audit-logs?page=${currentPage}&itemsPerPage=${itemsPerPage}`); // Replace with actual API endpoint
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch audit logs");
-        }
-        
-        const data = await response.json();
+        // Mock data to simulate API response
+        const mockData = {
+          items: [
+            { id: 1, dateTime: "2025-01-01 10:00:00", actionType: "Login", name: "John Doe", role: "Admin" },
+            { id: 2, dateTime: "2025-01-01 10:05:00", actionType: "Logout", name: "Jane Smith", role: "User" },
+            { id: 3, dateTime: "2025-01-01 10:10:00", actionType: "Debtor Update", name: "Alice Johnson", role: "Admin" },
+            { id: 4, dateTime: "2025-01-01 10:15:00", actionType: "Debtor Type Delete", name: "Bob Brown", role: "Admin" },
+            { id: 5, dateTime: "2025-01-01 10:20:00", actionType: "User Create", name: "Charlie White", role: "Super Admin" },
+            { id: 6, dateTime: "2025-01-01 10:25:00", actionType: "Transaction", name: "David Black", role: "Admin" },
+            { id: 7, dateTime: "2025-01-01 10:30:00", actionType: "Transaction", name: "Ella Green", role: "Admin" },
+          ],
+          totalPages: 2, // Simulating 2 pages of data
+        };
 
-        setUsers(data.items); // Assuming API response includes an "items" array
-        setTotalPages(data.totalPages); // Assuming API response includes "totalPages"
+        // Simulate fetching data
+        setTimeout(() => {
+          setUsers(
+            mockData.items.slice(
+              (currentPage - 1) * itemsPerPage,
+              currentPage * itemsPerPage
+            )
+          );
+          setTotalPages(mockData.totalPages);
+          setLoading(false);
+        }, 500);
       } catch (error) {
         console.error("Error fetching audit logs:", error);
         setErrorModal({
@@ -31,7 +46,6 @@ const AuditLogs = () => {
           title: "Error Fetching Data",
           message: error.message,
         });
-      } finally {
         setLoading(false);
       }
     };
@@ -91,7 +105,7 @@ const AuditLogs = () => {
               <tr>
                 <th>No</th>
                 <th>Date Time</th>
-                <th>Type</th>
+                <th>Action Type</th>
                 <th>Name</th>
                 <th>User Role</th>
               </tr>
@@ -101,7 +115,7 @@ const AuditLogs = () => {
                 <tr key={user.id}>
                   <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                   <td>{user.dateTime}</td>
-                  <td>{user.type}</td>
+                  <td>{user.actionType}</td>
                   <td>{user.name}</td>
                   <td>{user.role}</td>
                 </tr>

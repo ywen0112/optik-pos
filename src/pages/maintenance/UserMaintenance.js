@@ -17,27 +17,32 @@ const UserMaintenance = () => {
   const [fields, setFields] = useState([]);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState(""); // Message for the modal
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [actionLoading, setActionLoading] = useState(false); // Action-specific loading state
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/users?page=${currentPage}&itemsPerPage=${itemsPerPage}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch users.");
-      }
-      const data = await response.json();
-      setUsers(data.items);
-      setTotalPages(data.totalPages);
-    } catch (error) {
-      setErrorModal({ isOpen: true, title: "Error", message: error.message });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const mockUsers = [
+    { id: 1, name: "John Doe", role: "Admin", email: "john.doe@example.com" },
+    { id: 2, name: "Jane Smith", role: "User", email: "jane.smith@example.com" },
+    { id: 3, name: "Alice Johnson", role: "Admin", email: "alice.johnson@example.com" },
+    { id: 4, name: "Bob Brown", role: "Admin", email: "bob.brown@example.com" },
+    { id: 5, name: "Charlie White", role: "User", email: "charlie.white@example.com" },
+    { id: 6, name: "David Black", role: "Admin", email: "david.black@example.com" },
+  ];
 
   useEffect(() => {
+    const fetchUsers = () => {
+      setLoading(true);
+      setTimeout(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const paginatedUsers = mockUsers.slice(startIndex, startIndex + itemsPerPage);
+        setUsers(paginatedUsers);
+        setTotalPages(Math.ceil(mockUsers.length / itemsPerPage));
+        setLoading(false);
+      }, 500);
+    };
+
     fetchUsers();
 
     setFields([
@@ -82,55 +87,58 @@ const UserMaintenance = () => {
     setIsPopupOpen(false);
   };
 
-  const handleSave = async () => {
-    try {
-      const method = newUser.id ? "PUT" : "POST";
-      const endpoint = newUser.id ? `/api/users/${newUser.id}` : "/api/users";
-      const response = await fetch(endpoint, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser),
-      });
-
-      if (!response.ok) {
-        throw new Error(newUser.id ? "Failed to update user." : "Failed to add user.");
-      }
-
-      const data = await response.json();
-      setUsers(data.items); // Update table with API response
-      setTotalPages(data.totalPages); // Update pagination
-      handleCloseModal();
-    } catch (error) {
-      setErrorModal({ isOpen: true, title: "Error", message: error.message });
-    }
+  const handleSave = () => {
+    setConfirmAction(() => performSave); // Set save as confirm action
+    setConfirmMessage(newUser.id ? "Do you want to update this user?" : "Do you want to add this user?");
+    setIsConfirmOpen(true); // Open confirmation modal
   };
 
-  const handleDelete = async (id) => {
-    const action = async () => {
+  const performSave = () => {
+    setActionLoading(true); // Start loading
+    setTimeout(() => {
       try {
-        const response = await fetch(`/api/users/${id}`, { method: "DELETE" });
-        if (!response.ok) {
-          throw new Error("Failed to delete user.");
+        if (newUser.id) {
+          setUsers((prevUsers) =>
+            prevUsers.map((user) =>
+              user.id === newUser.id ? { ...user, ...newUser } : user
+            )
+          );
+        } else {
+          setUsers((prevUsers) => [
+            ...prevUsers,
+            { ...newUser, id: users.length + 1 },
+          ]);
         }
-
-        const data = await response.json();
-        setUsers(data.items); // Update table with API response
-        setTotalPages(data.totalPages); // Update pagination
+        handleCloseModal();
       } catch (error) {
         setErrorModal({ isOpen: true, title: "Error", message: error.message });
+      } finally {
+        setActionLoading(false); // Stop loading
       }
-    };
-
-    handleOpenConfirmModal(action);
+    }, 1000); // Simulate async action
   };
 
-  const handleOpenConfirmModal = (action) => {
-    setConfirmAction(() => action);
-    setIsConfirmOpen(true);
+  const handleDelete = (id) => {
+    setConfirmAction(() => () => performDelete(id)); // Set delete as confirm action
+    setConfirmMessage("Do you want to delete this user?");
+    setIsConfirmOpen(true); // Open confirmation modal
   };
 
-  const handleConfirmAction = async () => {
-    if (confirmAction) await confirmAction();
+  const performDelete = (id) => {
+    setActionLoading(true); // Start loading
+    setTimeout(() => {
+      try {
+        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error", message: error.message });
+      } finally {
+        setActionLoading(false); // Stop loading
+      }
+    }, 1000); // Simulate async action
+  };
+
+  const handleConfirmAction = () => {
+    if (confirmAction) confirmAction();
     setIsConfirmOpen(false);
   };
 
@@ -200,8 +208,9 @@ const UserMaintenance = () => {
                   <button
                     onClick={() => handleDelete(user.id)}
                     className="action-button delete"
+                    disabled={actionLoading}
                   >
-                    <FaTrash /> Delete
+                    {actionLoading ? "Processing..." : <><FaTrash /> Delete</>}
                   </button>
                   <button
                     onClick={() => handleOpenModal(user, "View User", true)}
@@ -245,7 +254,7 @@ const UserMaintenance = () => {
       <ConfirmationModal
         isOpen={isConfirmOpen}
         title="Confirm Action"
-        message="Are you sure you want to proceed with this action?"
+        message={confirmMessage}
         onConfirm={handleConfirmAction}
         onCancel={() => setIsConfirmOpen(false)}
       />
@@ -254,3 +263,4 @@ const UserMaintenance = () => {
 };
 
 export default UserMaintenance;
+

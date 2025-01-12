@@ -6,7 +6,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import ErrorModal from "../../components/ErrorModal";
 
 const AccessRightMaintenance = () => {
-  const [roles, setRoles] = useState([]);
+  const [roles, setRoles] = useState([]); // Local state for roles
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
@@ -19,26 +19,30 @@ const AccessRightMaintenance = () => {
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [loading, setLoading] = useState(false);
 
-  const fetchRoles = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/access-rights?page=${currentPage}&itemsPerPage=${itemsPerPage}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch roles.");
-      }
-      const data = await response.json();
-      setRoles(data.items || []); // Assuming the API returns `items`
-      setTotalPages(data.totalPages || 1); // Assuming the API returns `totalPages`
-    } catch (error) {
-      setErrorModal({ isOpen: true, title: "Error", message: error.message });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const mockRoles = [
+    {
+      id: 1,
+      role: "Admin",
+      accessRights: [
+        { module: "Dashboard", permissions: ["Allow"] },
+        { module: "User Maintenance", permissions: ["View", "Add", "Edit", "Delete"] },
+      ],
+    },
+    {
+      id: 2,
+      role: "User",
+      accessRights: [
+        { module: "Dashboard", permissions: ["Allow"] },
+        { module: "User Maintenance", permissions: ["View"] },
+      ],
+    },
+  ];
 
+  // Initialize roles on component load
   useEffect(() => {
-    fetchRoles();
-  }, [currentPage, itemsPerPage]);
+    setRoles(mockRoles);
+    setTotalPages(Math.ceil(mockRoles.length / itemsPerPage));
+  }, [itemsPerPage]);
 
   const handleItemsPerPageChange = (event) => {
     setItemsPerPage(Number(event.target.value));
@@ -50,7 +54,10 @@ const AccessRightMaintenance = () => {
   };
 
   const handleOpenModal = (role = {}, title = "", viewing = false) => {
-    setNewRole(role);
+    setNewRole({
+      ...role,
+      accessRights: role.accessRights || [],
+    });
     setModalTitle(title);
     setIsViewing(viewing);
     setIsPopupOpen(true);
@@ -60,45 +67,45 @@ const AccessRightMaintenance = () => {
     setIsPopupOpen(false);
   };
 
-  const handleSave = async (updatedRole) => {
-    try {
-      const method = updatedRole.id ? "PUT" : "POST";
-      const endpoint = updatedRole.id ? `/api/access-rights/${updatedRole.id}` : `/api/access-rights`;
-      const response = await fetch(endpoint, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedRole),
-      });
-
-      if (!response.ok) {
-        throw new Error(updatedRole.id ? "Failed to update role." : "Failed to add role.");
-      }
-
-      await fetchRoles(); // Refresh the table
-      handleCloseModal(); // Close modal after successful operation
-    } catch (error) {
-      setErrorModal({ isOpen: true, title: "Error", message: error.message });
-    }
-  };
-
-  const handleDelete = async (id) => {
-    const action = async () => {
-      try {
-        const response = await fetch(`/api/access-rights/${id}`, { method: "DELETE" });
-        if (!response.ok) {
-          throw new Error("Failed to delete role.");
+  const handleSave = (updatedRole) => {
+    setConfirmAction(() => async () => {
+      setLoading(true);
+      setTimeout(() => {
+        try {
+          if (updatedRole.id) {
+            // Update existing role
+            setRoles((prevRoles) =>
+              prevRoles.map((role) => (role.id === updatedRole.id ? updatedRole : role))
+            );
+          } else {
+            // Add new role
+            const newId = roles.length ? Math.max(...roles.map((role) => role.id)) + 1 : 1;
+            setRoles((prevRoles) => [...prevRoles, { ...updatedRole, id: newId }]);
+          }
+          handleCloseModal();
+        } catch (error) {
+          setErrorModal({ isOpen: true, title: "Error", message: error.message });
+        } finally {
+          setLoading(false);
         }
-        await fetchRoles(); // Refresh the table after deletion
-      } catch (error) {
-        setErrorModal({ isOpen: true, title: "Error", message: error.message });
-      }
-    };
-
-    handleOpenConfirmModal(action);
+      }, 500);
+    });
+    setIsConfirmOpen(true);
   };
 
-  const handleOpenConfirmModal = (action) => {
-    setConfirmAction(() => action);
+  const handleDelete = (id) => {
+    setConfirmAction(() => async () => {
+      setLoading(true);
+      setTimeout(() => {
+        try {
+          setRoles((prevRoles) => prevRoles.filter((role) => role.id !== id));
+        } catch (error) {
+          setErrorModal({ isOpen: true, title: "Error", message: error.message });
+        } finally {
+          setLoading(false);
+        }
+      }, 500);
+    });
     setIsConfirmOpen(true);
   };
 
@@ -142,7 +149,7 @@ const AccessRightMaintenance = () => {
         </div>
         <button
           className="add-button"
-          onClick={() => handleOpenModal({}, "Add Role")}
+          onClick={() => handleOpenModal({ accessRights: [] }, "Add Role")}
         >
           Add Role
         </button>

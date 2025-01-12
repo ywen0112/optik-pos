@@ -19,14 +19,14 @@
   display: flex;
 }
 
-.sidebar {
+.transaction-sidebar {
   width: 200px;
   background-color: #002462;
   padding: 20px;
   color: white;
 }
 
-.sidebar-button {
+.transaction-sidebar-button {
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;

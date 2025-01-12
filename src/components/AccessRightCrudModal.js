@@ -10,13 +10,12 @@ const AccessRightCrudModal = ({
   isViewing,
 }) => {
   const [formData, setFormData] = useState({
-    id: null, // Include id field to track the current role
+    id: null,
     role: "",
     accessRights: [],
-    fullAccess: false, // To track "Full Access" state
+    fullAccess: false,
   });
 
-  // Memoize defaultModules to prevent re-creation on each render
   const defaultModules = useMemo(
     () => [
       { name: "Dashboard", singlePermission: true },
@@ -48,23 +47,42 @@ const AccessRightCrudModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      const fullAccess = defaultModules.every((module) => {
-        const moduleRights = data.accessRights?.find(
+      // Map defaultModules and merge with the role's existing accessRights
+      const accessRights = defaultModules.map((module) => {
+        const existingModule = data.accessRights?.find(
           (right) => right.module === module.name
         );
-        return module.singlePermission
-          ? moduleRights?.permissions.includes("Allow")
-          : moduleRights?.permissions.length === module.permissions?.length;
+        return {
+          module: module.name,
+          permissions: existingModule?.permissions || [],
+        };
       });
-  
+
+      // Calculate fullAccess state
+      const fullAccess = accessRights.every((module) => {
+        const moduleDefinition = defaultModules.find((mod) => mod.name === module.module);
+
+        return moduleDefinition?.singlePermission
+          ? module.permissions.includes("Allow")
+          : module.permissions.length === (moduleDefinition?.permissions?.length || 0);
+      });
+
       setFormData({
         id: data.id || null,
         role: data.role || "",
-        accessRights: data.accessRights || defaultModules.map((module) => ({
+        accessRights,
+        fullAccess,
+      });
+    } else {
+      // Reset form when modal is closed
+      setFormData({
+        id: null,
+        role: "",
+        accessRights: defaultModules.map((module) => ({
           module: module.name,
           permissions: [],
         })),
-        fullAccess, // Recalculate fullAccess based on the data
+        fullAccess: false,
       });
     }
   }, [isOpen, data, defaultModules]);
@@ -76,76 +94,74 @@ const AccessRightCrudModal = ({
   const handleFullAccessChange = () => {
     setFormData((prevState) => {
       const fullAccess = !prevState.fullAccess;
-  
-      const updatedRights = fullAccess
-        ? defaultModules.map((module) => ({
-            module: module.name,
-            permissions: module.singlePermission
-              ? ["Allow"] // For single-permission modules
-              : [...(module.permissions || [])], // For multi-permission modules
-          }))
-        : defaultModules.map((module) => ({
-            module: module.name,
-            permissions: [], // Clear permissions when unchecking "Full Access"
-          }));
-  
+
+      const updatedRights = defaultModules.map((module) => ({
+        module: module.name,
+        permissions: fullAccess
+          ? module.singlePermission
+            ? ["Allow"]
+            : module.permissions || []
+          : [],
+      }));
+
       return { ...prevState, accessRights: updatedRights, fullAccess };
     });
   };
-  
-  const handlePermissionChange = (moduleName, permission) => {
-    setFormData((prevState) => {
-      const updatedRights = prevState.accessRights.map((module) => {
-        if (module.module === moduleName) {
-          const permissions = module.permissions?.includes(permission)
-            ? module.permissions.filter((perm) => perm !== permission)
-            : [...(module.permissions || []), permission];
-          return { ...module, permissions };
-        }
-        return module;
-      });
-  
-      // Check if "Full Access" needs to be disabled.
-      const isFullAccess = defaultModules.every((module) => {
-        const moduleRights = updatedRights.find(
-          (right) => right.module === module.name
-        );
-        return module.singlePermission
-          ? moduleRights?.permissions.includes("Allow")
-          : moduleRights?.permissions.length === module.permissions?.length;
-      });
-  
-      return { ...prevState, accessRights: updatedRights, fullAccess: isFullAccess };
-    });
-  };  
-  
+
   const handleModuleCheckboxChange = (moduleName, permissions = []) => {
     setFormData((prevState) => {
       const updatedRights = prevState.accessRights.map((module) => {
         if (module.module === moduleName) {
-          const isAllSelected =
-            permissions.every((permission) =>
-              module.permissions?.includes(permission) // Safely check for permissions
-            );
+          const isAllSelected = permissions.every((permission) =>
+            module.permissions?.includes(permission)
+          );
+
           return {
             ...module,
-            permissions: isAllSelected ? [] : [...permissions],
+            permissions: isAllSelected ? [] : permissions,
           };
         }
         return module;
       });
-  
-      // Check if "Full Access" needs to be disabled.
-      const isFullAccess = defaultModules.every((module) => {
+
+      const fullAccess = defaultModules.every((module) => {
         const moduleRights = updatedRights.find(
           (right) => right.module === module.name
         );
         return module.singlePermission
           ? moduleRights?.permissions.includes("Allow")
-          : moduleRights?.permissions.length === module.permissions?.length;
+          : moduleRights?.permissions.length ===
+              (module.permissions?.length || 0);
       });
-  
-      return { ...prevState, accessRights: updatedRights, fullAccess: isFullAccess };
+
+      return { ...prevState, accessRights: updatedRights, fullAccess };
+    });
+  };
+
+  const handlePermissionChange = (moduleName, permission) => {
+    setFormData((prevState) => {
+      const updatedRights = prevState.accessRights.map((module) => {
+        if (module.module === moduleName) {
+          const permissions = module.permissions.includes(permission)
+            ? module.permissions.filter((perm) => perm !== permission)
+            : [...module.permissions, permission];
+
+          return { ...module, permissions };
+        }
+        return module;
+      });
+
+      const fullAccess = defaultModules.every((module) => {
+        const moduleRights = updatedRights.find(
+          (right) => right.module === module.name
+        );
+        return module.singlePermission
+          ? moduleRights?.permissions.includes("Allow")
+          : moduleRights?.permissions.length ===
+              (module.permissions?.length || 0);
+      });
+
+      return { ...prevState, accessRights: updatedRights, fullAccess };
     });
   };
 
@@ -154,7 +170,7 @@ const AccessRightCrudModal = ({
       alert("Role name is required.");
       return;
     }
-    onSave(formData); // Pass the updated formData to the parent
+    onSave(formData);
   };
 
   if (!isOpen) return null;
@@ -198,13 +214,18 @@ const AccessRightCrudModal = ({
                     <div className="module-checkbox">
                       <input
                         type="checkbox"
-                        checked={formData.accessRights.find(
-                          (right) => right.module === module.name
-                        )?.permissions.length > 0}
-                        onChange={() =>
+                        checked={
                           module.singlePermission
-                            ? handleModuleCheckboxChange(module.name, ["Allow"])
-                            : handleModuleCheckboxChange(module.name, module.permissions)
+                            ? formData.accessRights.find((right) => right.module === module.name)
+                                ?.permissions.includes("Allow")
+                            : formData.accessRights.find((right) => right.module === module.name)
+                                ?.permissions.length === (module.permissions || []).length
+                        }
+                        onChange={() =>
+                          handleModuleCheckboxChange(
+                            module.name,
+                            module.singlePermission ? ["Allow"] : module.permissions
+                          )
                         }
                         disabled={isViewing}
                       />

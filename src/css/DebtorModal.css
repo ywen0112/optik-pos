@@ -83,4 +83,30 @@
     display: flex;
     gap: 10px;
   }
+
+  .error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 0px;
+  }
+  
+  .close-modal-button {
+    padding: 10px 20px;
+    background-color: #dc3545; 
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .highlight-tin input {
+    background-color: #f0f8ff;
+    font-weight: bold;
+  }
+
+  .required {
+    color: red;
+    font-weight: bold;
+    margin-left: 5px;
+  }
   

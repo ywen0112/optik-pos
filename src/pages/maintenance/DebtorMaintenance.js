@@ -208,6 +208,9 @@ const DebtorMaintenance = () => {
         onSave={handleSave}
         onInputChange={handleInputChange}
         isViewing={isViewing}
+        onOpenConfirmModal={(callback) => {
+          handleOpenConfirmModal(callback);
+        }}
       />
       <ConfirmationModal
         isOpen={isConfirmOpen}

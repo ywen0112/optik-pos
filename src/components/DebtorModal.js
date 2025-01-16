@@ -28,9 +28,14 @@ const DebtorModal = ({
     debtorName: "Debtor Name",
     debtorTypeId: "Debtor Type ID",
     address1: "Address 1",
-    address2: "Address 2", 
+    address2: "Address 2",
+    address3: "Address 3",
+    address4: "Address 4",
     postcode: "Postcode",
     deliverAddr1: "Delivery Address 1",
+    deliverAddr2: "Delivery Address 2",
+    deliverAddr3: "Delivery Address 3",
+    deliverAddr4: "Delivery Address 4",
     deliverPostcode: "Delivery Postcode",
     locationId: "Location ID",
     salesAgent: "Sales Agent",
@@ -149,6 +154,7 @@ const DebtorModal = ({
             </div>
             {expandedSections[section] && (
               <div className="debtor-section-content">
+                {/* Required fields */}
                 {requiredFields[section].map((name) => (
                   <div key={name} className="debtor-form-group">
                     <label className="debtor-form-label">
@@ -168,7 +174,7 @@ const DebtorModal = ({
                         setErrors((prevErrors) => ({
                           ...prevErrors,
                           [name]: "",
-                        })); // Clear error on input
+                        }));
                       }}
                       disabled={isViewing || name === "tin"}
                       readOnly={name === "tin"}
@@ -176,37 +182,64 @@ const DebtorModal = ({
                     {errors[name] && (
                       <p className="error-message">{errors[name]}</p>
                     )}
+                    {!isViewing && name === "tin" && (
+                      <div className="debtor-fetch-tin">
+                        <button
+                          className="debtor-fetch-tin-button"
+                          onClick={handleFetchTIN}
+                        >
+                          Fetch TIN
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
-                 {section === "debtorInfo" && (
-                  <div className="debtor-form-group">
-                    <label className="debtor-form-label">
-                      {fieldLabels["address2"]}
-                    </label>
-                    <input
-                      className="debtor-form-input"
-                      type="text"
-                      name="address2"
-                      value={sectionData["address2"] || ""}
-                      onChange={(e) =>
-                        setSectionData({
-                          ...sectionData,
-                          address2: e.target.value,
-                        })
-                      }
-                      disabled={isViewing}
-                    />
-                  </div>
-                )}
-                {!isViewing && section === "debtorInfo" && (
-                  <div className="debtor-fetch-tin">
-                    <button
-                      className="debtor-fetch-tin-button"
-                      onClick={handleFetchTIN}
-                    >
-                      Fetch TIN
-                    </button>
-                  </div>
+                {/* Non-required address fields */}
+                {section === "debtorInfo" && (
+                  <>
+                    {["address2", "address3", "address4"].map((name) => (
+                      <div key={name} className="debtor-form-group">
+                        <label className="debtor-form-label">
+                          {fieldLabels[name]}
+                        </label>
+                        <input
+                          className="debtor-form-input"
+                          type="text"
+                          name={name}
+                          value={sectionData[name] || ""}
+                          onChange={(e) =>
+                            setSectionData({
+                              ...sectionData,
+                              [name]: e.target.value,
+                            })
+                          }
+                          disabled={isViewing}
+                        />
+                      </div>
+                    ))}
+                    {["deliverAddr2", "deliverAddr3", "deliverAddr4"].map(
+                      (name) => (
+                        <div key={name} className="debtor-form-group">
+                          <label className="debtor-form-label">
+                            {fieldLabels[name]}
+                          </label>
+                          <input
+                            className="debtor-form-input"
+                            type="text"
+                            name={name}
+                            value={sectionData[name] || ""}
+                            onChange={(e) =>
+                              setSectionData({
+                                ...sectionData,
+                                [name]: e.target.value,
+                              })
+                            }
+                            disabled={isViewing}
+                          />
+                        </div>
+                      )
+                    )}
+                  </>
                 )}
                 {!isViewing && (
                   <div className="section-buttons">

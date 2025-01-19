@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "../css/AccessRightCrudModal.css";
+import ErrorModal from "./ErrorModal";
 
 const AccessRightCrudModal = ({
   isOpen,
@@ -15,6 +16,7 @@ const AccessRightCrudModal = ({
     accessRights: [],
     fullAccess: false,
   });
+  const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
 
   const defaultModules = useMemo(
     () => [
@@ -47,7 +49,6 @@ const AccessRightCrudModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      // Map defaultModules and merge with the role's existing accessRights
       const accessRights = defaultModules.map((module) => {
         const existingModule = data.accessRights?.find(
           (right) => right.module === module.name
@@ -58,7 +59,6 @@ const AccessRightCrudModal = ({
         };
       });
 
-      // Calculate fullAccess state
       const fullAccess = accessRights.every((module) => {
         const moduleDefinition = defaultModules.find((mod) => mod.name === module.module);
 
@@ -74,7 +74,6 @@ const AccessRightCrudModal = ({
         fullAccess,
       });
     } else {
-      // Reset form when modal is closed
       setFormData({
         id: null,
         role: "",
@@ -167,10 +166,18 @@ const AccessRightCrudModal = ({
 
   const handleSave = () => {
     if (!formData.role) {
-      alert("Role name is required.");
+      setErrorModal({
+        isOpen: true,
+        title: "Error",
+        message: "Please fill out all required fields highlighted in red.",
+      });
       return;
     }
     onSave(formData);
+  };
+
+  const closeErrorModal = () => {
+    setErrorModal({ isOpen: false, title: "", message: "" });
   };
 
   if (!isOpen) return null;
@@ -277,6 +284,13 @@ const AccessRightCrudModal = ({
           )}
         </div>
       </div>
+
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        title={errorModal.title}
+        message={errorModal.message}
+        onClose={closeErrorModal}
+      />
     </div>
   );
 };

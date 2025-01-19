@@ -3,44 +3,85 @@ import "../../css/Transaction.css";
 import ErrorModal from "../../components/ErrorModal";
 
 const SalesInvoice = () => {
-  const [cashInValue, setCashInValue] = useState("");
-  const [cashInDescription, setCashInDescription] = useState("");
-  const [cashOutValue, setCashOutValue] = useState("");
-  const [cashOutDescription, setCashOutDescription] = useState("");
-  const [transactions, setTransactions] = useState([]);
+  const [customerName, setCustomerName] = useState("");
+  const [items, setItems] = useState([]);
+  const [eyePower, setEyePower] = useState({ left: "", right: "" });
+  const [locationId, setLocationId] = useState("");
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [newPayment, setNewPayment] = useState({ method: "", amount: "" });
+  const [outstandingAmount, setOutstandingAmount] = useState(0);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
 
-  const handleAddTransaction = (type) => {
-    const amount = type === "Cash In" ? cashInValue : cashOutValue;
-    const description = type === "Cash In" ? cashInDescription : cashOutDescription;
-
-    if (!amount || parseFloat(amount) <= 0) {
+  const handleAddItem = () => {
+    if (!locationId) {
       setErrorModal({
         isOpen: true,
-        title: "Invalid Amount",
-        message: `Please enter a valid amount for ${type}.`,
+        title: "Missing Location",
+        message: "Please provide a valid location ID for item pick-up.",
       });
       return;
     }
-    
 
-    const newTransaction = {
-      type,
-      description,
-      amount: parseFloat(amount),
+    const newItem = {
+      id: items.length + 1,
+      eyePower: { ...eyePower },
+      locationId,
     };
-
-    setTransactions([...transactions, newTransaction]);
-    type === "Cash In" ? setCashInValue("") : setCashOutValue("");
-    type === "Cash In" ? setCashInDescription("") : setCashOutDescription("");
+    setItems([...items, newItem]);
+    setEyePower({ left: "", right: "" });
+    setLocationId("");
   };
 
-  const calculateTotalAmount = () => {
-    return transactions.reduce((total, transaction) => {
-      return transaction.type === "Cash In"
-        ? total + transaction.amount
-        : total - transaction.amount; 
-    }, 0);
+  const handleAddPayment = () => {
+    if (!newPayment.method || parseFloat(newPayment.amount) <= 0) {
+      setErrorModal({
+        isOpen: true,
+        title: "Invalid Payment",
+        message: "Please provide a valid payment method and amount.",
+      });
+      return;
+    }
+
+    const payment = {
+      method: newPayment.method,
+      amount: parseFloat(newPayment.amount),
+    };
+    setPaymentMethods([...paymentMethods, payment]);
+    setNewPayment({ method: "", amount: "" });
+
+    const totalPayments = paymentMethods.reduce((total, p) => total + p.amount, 0) + payment.amount;
+    setOutstandingAmount(Math.max(0, outstandingAmount - totalPayments));
+  };
+
+  const handleSubmitInvoice = () => {
+    if (!customerName || items.length === 0) {
+      setErrorModal({
+        isOpen: true,
+        title: "Incomplete Invoice",
+        message: "Please fill in all required details and add at least one item.",
+      });
+      return;
+    }
+
+    // Submit invoice logic here
+    console.log("Invoice Submitted:", {
+      customerName,
+      items,
+      paymentMethods,
+      outstandingAmount,
+    });
+
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setCustomerName("");
+    setItems([]);
+    setEyePower({ left: "", right: "" });
+    setLocationId("");
+    setPaymentMethods([]);
+    setNewPayment({ method: "", amount: "" });
+    setOutstandingAmount(0);
   };
 
   const handleCloseErrorModal = () => {
@@ -48,87 +89,116 @@ const SalesInvoice = () => {
   };
 
   return (
-    <div className="cash-management-container">
+    <div className="sales-invoice-container">
       <h2>Sales Invoice</h2>
-      <div className="cash-management">
-        <div className="cash-in">
-          <label>Cash In:</label>
-          <div className="cash-amount">
-            <input
-              type="number"
-              placeholder="Enter Amount"
-              value={cashInValue}
-              onChange={(e) => setCashInValue(e.target.value)}
-            />
-            <button className="add-cash-button" onClick={() => handleAddTransaction("Cash In")}>
-              Add
-            </button>
-          </div>
+      <div className="invoice-form">
+        <label>Customer Name:</label>
+        <input
+          type="text"
+          value={customerName}
+          onChange={(e) => setCustomerName(e.target.value)}
+          placeholder="Enter Customer Name"
+        />
+
+        <h3>Eye Power</h3>
+        <div className="eye-power-inputs">
+          <label>Left:</label>
           <input
-            type="text"
-            placeholder="Enter Description"
-            value={cashInDescription}
-            onChange={(e) => setCashInDescription(e.target.value)}
+            type="number"
+            value={eyePower.left}
+            onChange={(e) => setEyePower({ ...eyePower, left: e.target.value })}
+            placeholder="Left Eye Power"
+          />
+          <label>Right:</label>
+          <input
+            type="number"
+            value={eyePower.right}
+            onChange={(e) => setEyePower({ ...eyePower, right: e.target.value })}
+            placeholder="Right Eye Power"
           />
         </div>
-        <div className="cash-out">
-          <label>Cash Out:</label>
-          <div className="cash-amount">
-            <input
-              type="number"
-              placeholder="Enter Amount"
-              value={cashOutValue}
-              onChange={(e) => setCashOutValue(e.target.value)}
-            />
-            <button className="add-cash-button" onClick={() => handleAddTransaction("Cash Out")}>
-              Add
-            </button>
-          </div>
-          <input
-            type="text"
-            placeholder="Enter Description"
-            value={cashOutDescription}
-            onChange={(e) => setCashOutDescription(e.target.value)}
-          />
-        </div>
+
+        <label>Location ID:</label>
+        <input
+          type="text"
+          value={locationId}
+          onChange={(e) => setLocationId(e.target.value)}
+          placeholder="Enter Location ID"
+        />
+        <button onClick={handleAddItem} className="add-item-button">
+          Add Item
+        </button>
       </div>
-      <div className="transaction-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Transaction Type</th>
-              <th>Description</th>
-              <th>Amount</th>
+
+      <h3>Items</h3>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Left Eye Power</th>
+            <th>Right Eye Power</th>
+            <th>Location ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item, index) => (
+            <tr key={item.id}>
+              <td>{index + 1}</td>
+              <td>{item.eyePower.left}</td>
+              <td>{item.eyePower.right}</td>
+              <td>{item.locationId}</td>
             </tr>
-          </thead>
-          <tbody>
-            {transactions.map((transaction, index) => (
-              <tr key={index}>
-                <td>{transaction.type}</td>
-                <td>{transaction.description}</td>
-                <td>{transaction.amount.toFixed(2)}</td>
-              </tr>
-            ))}
-            {transactions.length === 0 && (
-              <tr>
-                <td colSpan="3" style={{ textAlign: "center" }}>
-                  No transactions added
-                </td>
-              </tr>
-            )}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan="2" style={{ textAlign: "right" }}>
-                <strong>Total Amount:</strong>
-              </td>
-              <td>
-                <strong>{calculateTotalAmount().toFixed(2)}</strong>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
+          ))}
+        </tbody>
+      </table>
+
+      <h3>Payments</h3>
+      <div className="payment-section">
+        <input
+          type="text"
+          placeholder="Payment Method"
+          value={newPayment.method}
+          onChange={(e) => setNewPayment({ ...newPayment, method: e.target.value })}
+        />
+        <input
+          type="number"
+          placeholder="Amount"
+          value={newPayment.amount}
+          onChange={(e) => setNewPayment({ ...newPayment, amount: e.target.value })}
+        />
+        <button onClick={handleAddPayment} className="add-payment-button">
+          Add Payment
+        </button>
       </div>
+
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Payment Method</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paymentMethods.map((payment, index) => (
+            <tr key={index}>
+              <td>{payment.method}</td>
+              <td>{payment.amount.toFixed(2)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <h3>Outstanding Amount: {outstandingAmount.toFixed(2)}</h3>
+
+      <div className="invoice-actions">
+        <button onClick={handleSubmitInvoice} className="submit-button">
+          Submit Invoice
+        </button>
+        <button onClick={resetForm} className="cancel-button">
+          Cancel
+        </button>
+      </div>
+
       <ErrorModal
         isOpen={errorModal.isOpen}
         title={errorModal.title}

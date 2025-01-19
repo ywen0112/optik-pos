@@ -6,7 +6,7 @@ import ConfirmationModal from "../../components/ConfirmationModal";
 import ErrorModal from "../../components/ErrorModal";
 
 const AccessRightMaintenance = () => {
-  const [roles, setRoles] = useState([]); // Local state for roles
+  const [roles, setRoles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
@@ -16,33 +16,58 @@ const AccessRightMaintenance = () => {
   const [modalTitle, setModalTitle] = useState("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState("");
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [loading, setLoading] = useState(false);
 
-  const mockRoles = [
-    {
-      id: 1,
-      role: "Admin",
-      accessRights: [
-        { module: "Dashboard", permissions: ["Allow"] },
-        { module: "User Maintenance", permissions: ["View", "Add", "Edit", "Delete"] },
-      ],
-    },
-    {
-      id: 2,
-      role: "User",
-      accessRights: [
-        { module: "Dashboard", permissions: ["Allow"] },
-        { module: "User Maintenance", permissions: ["View"] },
-      ],
-    },
-  ];
-
-  // Initialize roles on component load
   useEffect(() => {
-    setRoles(mockRoles);
-    setTotalPages(Math.ceil(mockRoles.length / itemsPerPage));
-  }, [itemsPerPage]);
+    const fetchRoles = async () => {
+      setLoading(true);
+      try {
+        const mockData = {
+          items: [
+            {
+              id: 1,
+              role: "Admin",
+              accessRights: [
+                { module: "Dashboard", permissions: ["Allow"] },
+                { module: "User Maintenance", permissions: ["View", "Add", "Edit", "Delete"] },
+              ],
+            },
+            {
+              id: 2,
+              role: "User",
+              accessRights: [
+                { module: "Dashboard", permissions: ["Allow"] },
+                { module: "User Maintenance", permissions: ["View"] },
+              ],
+            },
+          ],
+          totalPages: Math.ceil(2 / itemsPerPage),
+        };
+
+        setTimeout(() => {
+          setRoles(
+            mockData.items.slice(
+              (currentPage - 1) * itemsPerPage,
+              currentPage * itemsPerPage
+            )
+          );
+          setTotalPages(mockData.totalPages);
+          setLoading(false);
+        }, 500);
+      } catch (error) {
+        setErrorModal({
+          isOpen: true,
+          title: "Error Fetching Data",
+          message: error.message,
+        });
+        setLoading(false);
+      }
+    };
+
+    fetchRoles();
+  }, [currentPage, itemsPerPage]);
 
   const handleItemsPerPageChange = (event) => {
     setItemsPerPage(Number(event.target.value));
@@ -64,25 +89,37 @@ const AccessRightMaintenance = () => {
   };
 
   const handleCloseModal = () => {
-    setIsPopupOpen(false);
+    if (isViewing) {
+      setIsPopupOpen(false); // Close modal immediately in viewing mode
+      return;
+    }
+
+    setConfirmAction(() => () => {
+      setIsPopupOpen(false);
+    });
+
+    setConfirmMessage("Are you sure you want to cancel and discard unsaved changes?");
+    setIsConfirmOpen(true);
   };
 
   const handleSave = (updatedRole) => {
+    const confirmMessage = updatedRole.id
+      ? `Are you sure you want to update the role "${updatedRole.role}"?`
+      : `Are you sure you want to add the role "${updatedRole.role}"?`;
+
     setConfirmAction(() => async () => {
       setLoading(true);
       setTimeout(() => {
         try {
           if (updatedRole.id) {
-            // Update existing role
             setRoles((prevRoles) =>
               prevRoles.map((role) => (role.id === updatedRole.id ? updatedRole : role))
             );
           } else {
-            // Add new role
             const newId = roles.length ? Math.max(...roles.map((role) => role.id)) + 1 : 1;
             setRoles((prevRoles) => [...prevRoles, { ...updatedRole, id: newId }]);
           }
-          handleCloseModal();
+          setIsPopupOpen(false);
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -90,10 +127,15 @@ const AccessRightMaintenance = () => {
         }
       }, 500);
     });
+
+    setConfirmMessage(confirmMessage);
     setIsConfirmOpen(true);
   };
 
   const handleDelete = (id) => {
+    const roleToDelete = roles.find((role) => role.id === id);
+    const confirmMessage = `Are you sure you want to delete the role "${roleToDelete?.role}"?`;
+
     setConfirmAction(() => async () => {
       setLoading(true);
       setTimeout(() => {
@@ -106,6 +148,7 @@ const AccessRightMaintenance = () => {
         }
       }, 500);
     });
+    setConfirmMessage(confirmMessage);
     setIsConfirmOpen(true);
   };
 
@@ -223,7 +266,7 @@ const AccessRightMaintenance = () => {
       <ConfirmationModal
         isOpen={isConfirmOpen}
         title="Confirm Action"
-        message="Are you sure you want to proceed with this action?"
+        message={confirmMessage}
         onConfirm={handleConfirmAction}
         onCancel={() => setIsConfirmOpen(false)}
       />

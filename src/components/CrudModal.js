@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../css/CrudModal.css";
+import ErrorModal from "./ErrorModal";
 
 const CrudModal = ({
   isOpen,
@@ -12,6 +13,7 @@ const CrudModal = ({
   isViewing,
 }) => {
   const [errors, setErrors] = useState({});
+  const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
 
   useEffect(() => {
     setErrors({});
@@ -37,7 +39,17 @@ const CrudModal = ({
   const handleSave = () => {
     if (validateFields()) {
       onSave();
+    } else {
+      setErrorModal({
+        isOpen: true,
+        title: "Error",
+        message: "Please fill out all required fields highlighted in red.",
+      });
     }
+  };
+
+  const closeErrorModal = () => {
+    setErrorModal({ isOpen: false, title: "", message: "" });
   };
 
   if (!isOpen) return null;
@@ -99,6 +111,13 @@ const CrudModal = ({
           )}
         </div>
       </div>
+
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        title={errorModal.title}
+        message={errorModal.message}
+        onClose={closeErrorModal}
+      />
     </div>
   );
 };

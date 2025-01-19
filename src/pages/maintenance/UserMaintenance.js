@@ -17,33 +17,45 @@ const UserMaintenance = () => {
   const [fields, setFields] = useState([]);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
-  const [confirmMessage, setConfirmMessage] = useState(""); // Message for the modal
+  const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
-  const [actionLoading, setActionLoading] = useState(false); // Action-specific loading state
-
-  const mockUsers = [
-    { id: 1, name: "John Doe", role: "Admin", email: "john.doe@example.com" },
-    { id: 2, name: "Jane Smith", role: "User", email: "jane.smith@example.com" },
-    { id: 3, name: "Alice Johnson", role: "Admin", email: "alice.johnson@example.com" },
-    { id: 4, name: "Bob Brown", role: "Admin", email: "bob.brown@example.com" },
-    { id: 5, name: "Charlie White", role: "User", email: "charlie.white@example.com" },
-    { id: 6, name: "David Black", role: "Admin", email: "david.black@example.com" },
-  ];
 
   useEffect(() => {
-    const fetchUsers = () => {
+    const fetchData = async () => {
       setLoading(true);
-      setTimeout(() => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const paginatedUsers = mockUsers.slice(startIndex, startIndex + itemsPerPage);
-        setUsers(paginatedUsers);
-        setTotalPages(Math.ceil(mockUsers.length / itemsPerPage));
+      try {
+        const mockData = {
+          items: [
+            { id: 1, name: "John Doe", role: "Super Admin", email: "john.doe@example.com", locationId: "L001" },
+            { id: 2, name: "Jane Smith", role: "User", email: "jane.smith@example.com", locationId: "L002" },
+            { id: 3, name: "Alice Johnson", role: "Admin", email: "alice.johnson@example.com", locationId: "L003" },
+            { id: 4, name: "Bob Brown", role: "Admin", email: "bob.brown@example.com", locationId: "L004" },
+          ],
+          totalPages: Math.ceil(5 / itemsPerPage),
+        };
+
+        setTimeout(() => {
+          setUsers(
+            mockData.items.slice(
+              (currentPage - 1) * itemsPerPage,
+              currentPage * itemsPerPage
+            )
+          );
+          setTotalPages(mockData.totalPages);
+          setLoading(false);
+        }, 500);
+      } catch (error) {
+        setErrorModal({
+          isOpen: true,
+          title: "Error Fetching Data",
+          message: error.message,
+        });
         setLoading(false);
-      }, 500);
+      }
     };
 
-    fetchUsers();
+    fetchData();
 
     setFields([
       { name: "name", label: "Name", type: "text", required: true },
@@ -56,6 +68,18 @@ const UserMaintenance = () => {
           { label: "Admin", value: "Admin" },
           { label: "User", value: "User" },
           { label: "Super Admin", value: "Super Admin" },
+        ],
+        required: true,
+      },
+      {
+        name: "locationId",
+        label: "Location ID",
+        type: "select",
+        options: [
+          { label: "L001", value: "L001" },
+          { label: "L002", value: "L002" },
+          { label: "L003", value: "L003" },
+          { label: "L004", value: "L004" },
         ],
         required: true,
       },
@@ -84,57 +108,60 @@ const UserMaintenance = () => {
   };
 
   const handleCloseModal = () => {
-    setIsPopupOpen(false);
+    if (isViewing) {
+      setIsPopupOpen(false); // Close modal immediately in viewing mode
+      return;
+    }
+
+    setConfirmAction(() => () => {
+      setIsPopupOpen(false); // Close the modal
+    });
+
+    setConfirmMessage("Are you sure you want to cancel and discard unsaved changes?");
+    setIsConfirmOpen(true);
   };
 
   const handleSave = () => {
-    setConfirmAction(() => performSave); // Set save as confirm action
-    setConfirmMessage(newUser.id ? "Do you want to update this user?" : "Do you want to add this user?");
-    setIsConfirmOpen(true); // Open confirmation modal
-  };
+    setConfirmAction(() => () => {
+      setLoading(true);
+      setTimeout(() => {
+        try {
+          const updatedUsers = newUser.id
+            ? users.map((user) =>
+                user.id === newUser.id ? { ...user, ...newUser } : user
+              )
+            : [...users, { ...newUser, id: users.length + 1 }];
 
-  const performSave = () => {
-    setActionLoading(true); // Start loading
-    setTimeout(() => {
-      try {
-        if (newUser.id) {
-          setUsers((prevUsers) =>
-            prevUsers.map((user) =>
-              user.id === newUser.id ? { ...user, ...newUser } : user
-            )
-          );
-        } else {
-          setUsers((prevUsers) => [
-            ...prevUsers,
-            { ...newUser, id: users.length + 1 },
-          ]);
+          setUsers(updatedUsers);
+          setIsPopupOpen(false);
+        } catch (error) {
+          setErrorModal({ isOpen: true, title: "Error", message: error.message });
+        } finally {
+          setLoading(false);
         }
-        handleCloseModal();
-      } catch (error) {
-        setErrorModal({ isOpen: true, title: "Error", message: error.message });
-      } finally {
-        setActionLoading(false); // Stop loading
-      }
-    }, 1000); // Simulate async action
+      }, 500);
+    });
+
+    setConfirmMessage(newUser.id ? "Do you want to update this user?" : "Do you want to add this user?");
+    setIsConfirmOpen(true);
   };
 
   const handleDelete = (id) => {
-    setConfirmAction(() => () => performDelete(id)); // Set delete as confirm action
-    setConfirmMessage("Do you want to delete this user?");
-    setIsConfirmOpen(true); // Open confirmation modal
-  };
+    setConfirmAction(() => () => {
+      setLoading(true);
+      setTimeout(() => {
+        try {
+          setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+        } catch (error) {
+          setErrorModal({ isOpen: true, title: "Error", message: error.message });
+        } finally {
+          setLoading(false);
+        }
+      }, 500);
+    });
 
-  const performDelete = (id) => {
-    setActionLoading(true); // Start loading
-    setTimeout(() => {
-      try {
-        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
-      } catch (error) {
-        setErrorModal({ isOpen: true, title: "Error", message: error.message });
-      } finally {
-        setActionLoading(false); // Stop loading
-      }
-    }, 1000); // Simulate async action
+    setConfirmMessage("Do you want to delete this user?");
+    setIsConfirmOpen(true);
   };
 
   const handleConfirmAction = () => {
@@ -188,6 +215,7 @@ const UserMaintenance = () => {
               <th>Name</th>
               <th>User Role</th>
               <th>Email</th>
+              <th>Location ID</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -198,6 +226,7 @@ const UserMaintenance = () => {
                 <td>{user.name}</td>
                 <td>{user.role}</td>
                 <td>{user.email}</td>
+                <td>{user.locationId}</td>
                 <td>
                   <button
                     onClick={() => handleOpenModal(user, "Edit User")}
@@ -208,9 +237,8 @@ const UserMaintenance = () => {
                   <button
                     onClick={() => handleDelete(user.id)}
                     className="action-button delete"
-                    disabled={actionLoading}
                   >
-                    {actionLoading ? "Processing..." : <><FaTrash /> Delete</>}
+                    <FaTrash /> Delete
                   </button>
                   <button
                     onClick={() => handleOpenModal(user, "View User", true)}
@@ -263,4 +291,3 @@ const UserMaintenance = () => {
 };
 
 export default UserMaintenance;
-

@@ -1,16 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../css/DebtorModal.css";
+import ErrorModal from "./ErrorModal";
+import ConfirmationModal from "./ConfirmationModal";
 
-const DebtorModal = ({
-  isOpen,
-  title,
-  data,
-  onClose,
-  onSave,
-  onInputChange,
-  isViewing,
-  onOpenConfirmModal,
-}) => {
+const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isViewing }) => {
   const [expandedSections, setExpandedSections] = useState({
     debtorInfo: false,
     glassesProfile: false,
@@ -19,80 +12,13 @@ const DebtorModal = ({
 
   const [sectionData, setSectionData] = useState({ ...data });
   const [errors, setErrors] = useState({});
+  const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
 
-  // Define field labels
-  const fieldLabels = {
-    emailAddress: "Email Address",
-    mobile: "Mobile",
-    debtorCode: "Debtor Code",
-    debtorName: "Debtor Name",
-    debtorTypeId: "Debtor Type ID",
-    address1: "Address 1",
-    address2: "Address 2",
-    address3: "Address 3",
-    address4: "Address 4",
-    postcode: "Postcode",
-    deliverAddr1: "Delivery Address 1",
-    deliverAddr2: "Delivery Address 2",
-    deliverAddr3: "Delivery Address 3",
-    deliverAddr4: "Delivery Address 4",
-    deliverPostcode: "Delivery Postcode",
-    locationId: "Location ID",
-    salesAgent: "Sales Agent",
-    currencyCode: "Currency Code",
-    ic: "IC",
-    nameOnIc: "Name on IC",
-    tin: "TIN",
-    glassesRightSPH: "Right Eye SPH (Glasses)",
-    glassesRightCYL: "Right Eye CYL (Glasses)",
-    glassesRightAXIS: "Right Eye AXIS (Glasses)",
-    glassesLeftSPH: "Left Eye SPH (Glasses)",
-    glassesLeftCYL: "Left Eye CYL (Glasses)",
-    glassesLeftAXIS: "Left Eye AXIS (Glasses)",
-    lensRightSPH: "Right Eye SPH (Contact Lens)",
-    lensRightCYL: "Right Eye CYL (Contact Lens)",
-    lensRightAXIS: "Right Eye AXIS (Contact Lens)",
-    lensLeftSPH: "Left Eye SPH (Contact Lens)",
-    lensLeftCYL: "Left Eye CYL (Contact Lens)",
-    lensLeftAXIS: "Left Eye AXIS (Contact Lens)",
-  };
-
-  // Define required fields for each section
-  const requiredFields = {
-    debtorInfo: [
-      "emailAddress",
-      "mobile",
-      "debtorCode",
-      "debtorName",
-      "debtorTypeId",
-      "address1",
-      "postcode",
-      "deliverAddr1",
-      "deliverPostcode",
-      "locationId",
-      "salesAgent",
-      "currencyCode",
-      "ic",
-      "nameOnIc",
-      "tin",
-    ],
-    glassesProfile: [
-      "glassesRightSPH",
-      "glassesRightCYL",
-      "glassesRightAXIS",
-      "glassesLeftSPH",
-      "glassesLeftCYL",
-      "glassesLeftAXIS",
-    ],
-    contactLensProfile: [
-      "lensRightSPH",
-      "lensRightCYL",
-      "lensRightAXIS",
-      "lensLeftSPH",
-      "lensLeftCYL",
-      "lensLeftAXIS",
-    ],
-  };
+  useEffect(() => {
+    setSectionData({ ...data }); 
+  }, [data]);
 
   const toggleSection = (section) => {
     setExpandedSections((prevState) => ({
@@ -101,159 +27,291 @@ const DebtorModal = ({
     }));
   };
 
-  const handleSaveSection = (sectionName) => {
-    const newErrors = {};
-
-    // Validate required fields for the section
-    requiredFields[sectionName].forEach((field) => {
-      if (!sectionData[field]) {
-        newErrors[field] = `${fieldLabels[field]} is required.`;
+  const validateFields = (fields) => {
+    const validationErrors = {};
+    fields.forEach(({ label, name }) => {
+      if (!sectionData[name]) {
+        validationErrors[name] = `${label} is required.`;
       }
     });
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      onSave(sectionData);
-    }
+    setErrors(validationErrors);
+    return validationErrors;
   };
 
+  const handleSaveSection = (sectionName) => {
+    let fieldsToValidate = [];
+
+    if (sectionName === "Debtor Information") {
+      fieldsToValidate = [
+        { label: "Email Address", name: "emailAddress" },
+        { label: "Mobile", name: "mobile" },
+        { label: "Debtor Code", name: "debtorCode" },
+        { label: "Debtor Name", name: "debtorName" },
+        { label: "Debtor Type ID", name: "debtorTypeId" },
+        { label: "Address 1", name: "address1" },
+        { label: "Postcode", name: "postCode" },
+        { label: "Delivery Address 1", name: "deliverAddr1" },
+        { label: "Delivery Postcode", name: "deliverPostCode" },
+        { label: "Location ID", name: "locationId" },
+        { label: "Sales Agent", name: "salesAgent" },
+        { label: "Currency Code", name: "currencyCode" },
+        { label: "IC", name: "ic" },
+        { label: "Name on IC", name: "nameOnIC" },
+        { label: "TIN", name: "tin" },
+      ];
+    } else if (sectionName === "Glasses Profile") {
+      fieldsToValidate = [
+        { label: "Right Eye SPH", name: "glassesRightSPH" },
+        { label: "Right Eye CYL", name: "glassesRightCYL" },
+        { label: "Right Eye AXIS", name: "glassesRightAXIS" },
+        { label: "Left Eye SPH", name: "glassesLeftSPH" },
+        { label: "Left Eye CYL", name: "glassesLeftCYL" },
+        { label: "Left Eye AXIS", name: "glassesLeftAXIS" },
+      ];
+    } else if (sectionName === "Contact Lens Profile") {
+      fieldsToValidate = [
+        { label: "Right Eye SPH", name: "lensRightSPH" },
+        { label: "Right Eye CYL", name: "lensRightCYL" },
+        { label: "Right Eye AXIS", name: "lensRightAXIS" },
+        { label: "Left Eye SPH", name: "lensLeftSPH" },
+        { label: "Left Eye CYL", name: "lensLeftCYL" },
+        { label: "Left Eye AXIS", name: "lensLeftAXIS" },
+      ];
+    }
+
+    const validationErrors = validateFields(fieldsToValidate);
+    if (Object.keys(validationErrors).length === 0) {
+      onSave(sectionData);
+    } else {
+      setErrorModal({
+        isOpen: true,
+        title: "Error",
+        message: "Please fill out all required fields highlighted in red.",
+      });
+    }
+  };
   const handleCancelSection = (sectionName) => {
-    onOpenConfirmModal(() => {
-      setSectionData({ ...data }); // Reset to original data
+    const action = () => {
+      setSectionData({ ...data }); // Reset data to the original state
       setErrors({}); // Clear errors
-    });
+    };
+
+    setConfirmAction(() => action);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmAction = () => {
+    if (confirmAction) confirmAction();
+    setIsConfirmOpen(false);
+  };
+  
+  if (!isOpen) return null;
+
+  const fetchTIN = (ic, nameOnIC) => {
+    const mockDatabase = {
+      "123456789": { name: "John Doe", tin: "TIN123456" },
+      "987654321": { name: "Alice Smith", tin: "TIN987654" },
+      "456789123": { name: "Michael Johnson", tin: "TIN456789" },
+      "789123456": { name: "Emily Davis", tin: "TIN789123" },
+    };
+
+    if (mockDatabase[ic] && mockDatabase[ic].name === nameOnIC) {
+      return mockDatabase[ic].tin;
+    }
+    return null;
   };
 
   const handleFetchTIN = () => {
-    const mockTIN = "TIN123456"; // Mocked TIN for testing
-    setSectionData({ ...sectionData, tin: mockTIN });
+    const ic = sectionData.ic;
+    const nameOnIC = sectionData.nameOnIC;
+  
+    if (!ic || !nameOnIC) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        ic: !ic ? "IC is required to fetch TIN." : prevErrors.ic,
+        nameOnIC: !nameOnIC ? "Name on IC is required to fetch TIN." : prevErrors.nameOnIC,
+      }));
+      return;
+    }
+  
+    const tin = fetchTIN(ic, nameOnIC);
+    if (tin) {
+      setSectionData({ ...sectionData, tin });
+    } else {
+      setSectionData({ ...sectionData, tin: "" }); // Clear TIN field
+      setErrorModal({
+        isOpen: true,
+        title: "TIN Fetch Error",
+        message: "TIN could not be found for the provided IC and Name on IC. Please verify your input.",
+      });
+    }
   };
 
-  if (!isOpen) return null;
 
   return (
     <div className="debtor-popup-overlay">
       <div className="debtor-popup-content">
         <h3 className="debtor-modal-title">{title}</h3>
 
-        {/* Iterate through sections */}
-        {Object.keys(requiredFields).map((section) => (
-          <div className="debtor-section" key={section}>
+        {/* Render sections dynamically */}
+        {[
+          {
+            name: "Debtor Information",
+            key: "debtorInfo",
+            fields: [
+              { label: "Email Address", name: "emailAddress" },
+              { label: "Mobile", name: "mobile" },
+              { label: "Debtor Code", name: "debtorCode" },
+              { label: "Debtor Name", name: "debtorName" },
+              {
+                label: "Debtor Type ID",
+                name: "debtorTypeId",
+                type: "select", 
+                options: [
+                  { label: "DT001", value: "DT001" },
+                  { label: "DT002", value: "DT002" },
+                  { label: "DT003", value: "DT003" },
+                ],
+              }, 
+             { label: "Address 1", name: "address1" },
+              { label: "Address 2", name: "address2", required: false },
+              { label: "Address 3", name: "address3", required: false },
+              { label: "Address 4", name: "address4", required: false },
+              { label: "Postcode", name: "postCode" },
+              { label: "Delivery Address 1", name: "deliverAddr1" },
+              { label: "Delivery Address 2", name: "deliverAddr2", required: false },
+              { label: "Delivery Address 3", name: "deliverAddr3", required: false },
+              { label: "Delivery Address 4", name: "deliverAddr4", required: false },
+              { label: "Delivery Postcode", name: "deliverPostCode" },
+              {
+                label: "Location ID",
+                name: "locationId",
+                type: "select", 
+                options: [
+                  { label: "L001", value: "L001" },
+                  { label: "L002", value: "L002" },
+                  { label: "L003", value: "L003" },
+                ],
+              }, 
+              { label: "Sales Agent", name: "salesAgent" },
+              { label: "Currency Code", name: "currencyCode" },
+              { label: "IC", name: "ic" },
+              { label: "Name on IC", name: "nameOnIC" },
+            ],
+            specialField: (
+              <div className="debtor-form-group">
+                <label className="debtor-form-label">
+                  TIN <span className="required">*</span>
+                </label>
+                <div className="debtor-tin-container">
+                  <input
+                    className="debtor-form-input"
+                    type="text"
+                    name="tin"
+                    value={sectionData.tin || ""}
+                    readOnly
+                  />
+                  {!isViewing && (
+                      <button
+                        className="debtor-fetch-tin-button"
+                        onClick={handleFetchTIN}
+                      >
+                        Fetch TIN
+                      </button>
+                  )}
+                </div>
+                {errors.tin && <p className="error-message">{errors.tin}</p>}
+              </div>
+            ),
+          },
+          {
+            name: "Glasses Profile",
+            key: "glassesProfile",
+            fields: [
+              { label: "Right Eye SPH", name: "glassesRightSPH" },
+              { label: "Right Eye CYL", name: "glassesRightCYL" },
+              { label: "Right Eye AXIS", name: "glassesRightAXIS" },
+              { label: "Left Eye SPH", name: "glassesLeftSPH" },
+              { label: "Left Eye CYL", name: "glassesLeftCYL" },
+              { label: "Left Eye AXIS", name: "glassesLeftAXIS" },
+            ],
+          },
+          {
+            name: "Contact Lens Profile",
+            key: "contactLensProfile",
+            fields: [
+              { label: "Right Eye SPH", name: "lensRightSPH" },
+              { label: "Right Eye CYL", name: "lensRightCYL" },
+              { label: "Right Eye AXIS", name: "lensRightAXIS" },
+              { label: "Left Eye SPH", name: "lensLeftSPH" },
+              { label: "Left Eye CYL", name: "lensLeftCYL" },
+              { label: "Left Eye AXIS", name: "lensLeftAXIS" },
+            ],
+          },
+        ].map(({ name, key, fields, specialField }) => (
+          <div className="debtor-section" key={key}>
             <div
               className="debtor-section-header"
-              onClick={() => toggleSection(section)}
+              onClick={() => toggleSection(key)}
             >
-              <h4>
-                {section === "debtorInfo" && "Debtor Information"}
-                {section === "glassesProfile" && "Glasses Eye Power Profile"}
-                {section === "contactLensProfile" &&
-                  "Contact Lens Eye Power Profile"}
-              </h4>
-              <span>{expandedSections[section] ? "-" : "+"}</span>
+              <h4>{name}</h4>
+              <span>{expandedSections[key] ? "-" : "+"}</span>
             </div>
-            {expandedSections[section] && (
-              <div className="debtor-section-content">
-                {/* Required fields */}
-                {requiredFields[section].map((name) => (
+            {expandedSections[key] && (
+              <div>
+                <div className="debtor-section-content">
+                {fields.map(({ label, name, type = "text", options, required = true }) => (
                   <div key={name} className="debtor-form-group">
                     <label className="debtor-form-label">
-                      {fieldLabels[name]}{" "}
-                      <span className="required">*</span>
+                      {label} {required && <span className="required">*</span>}
                     </label>
-                    <input
-                      className="debtor-form-input"
-                      type="text"
-                      name={name}
-                      value={sectionData[name] || ""}
-                      onChange={(e) => {
-                        setSectionData({
-                          ...sectionData,
-                          [name]: e.target.value,
-                        });
-                        setErrors((prevErrors) => ({
-                          ...prevErrors,
-                          [name]: "",
-                        }));
-                      }}
-                      disabled={isViewing || name === "tin"}
-                      readOnly={name === "tin"}
-                    />
-                    {errors[name] && (
-                      <p className="error-message">{errors[name]}</p>
+                    {type === "select" ? (
+                      <select
+                        className="debtor-form-input"
+                        name={name}
+                        value={sectionData[name] || ""}
+                        onChange={(e) =>
+                          setSectionData({ ...sectionData, [name]: e.target.value })
+                        }
+                        disabled={isViewing}
+                      >
+                        <option value="">Select {label}</option>
+                        {options?.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        className="debtor-form-input"
+                        type={type}
+                        name={name}
+                        value={sectionData[name] || ""}
+                        onChange={(e) =>
+                          setSectionData({ ...sectionData, [name]: e.target.value })
+                        }
+                        disabled={isViewing}
+                      />
                     )}
-                    {!isViewing && name === "tin" && (
-                      <div className="debtor-fetch-tin">
-                        <button
-                          className="debtor-fetch-tin-button"
-                          onClick={handleFetchTIN}
-                        >
-                          Fetch TIN
-                        </button>
-                      </div>
-                    )}
+                    {errors[name] && <p className="error-message">{errors[name]}</p>}
                   </div>
                 ))}
-                {/* Non-required address fields */}
-                {section === "debtorInfo" && (
-                  <>
-                    {["address2", "address3", "address4"].map((name) => (
-                      <div key={name} className="debtor-form-group">
-                        <label className="debtor-form-label">
-                          {fieldLabels[name]}
-                        </label>
-                        <input
-                          className="debtor-form-input"
-                          type="text"
-                          name={name}
-                          value={sectionData[name] || ""}
-                          onChange={(e) =>
-                            setSectionData({
-                              ...sectionData,
-                              [name]: e.target.value,
-                            })
-                          }
-                          disabled={isViewing}
-                        />
-                      </div>
-                    ))}
-                    {["deliverAddr2", "deliverAddr3", "deliverAddr4"].map(
-                      (name) => (
-                        <div key={name} className="debtor-form-group">
-                          <label className="debtor-form-label">
-                            {fieldLabels[name]}
-                          </label>
-                          <input
-                            className="debtor-form-input"
-                            type="text"
-                            name={name}
-                            value={sectionData[name] || ""}
-                            onChange={(e) =>
-                              setSectionData({
-                                ...sectionData,
-                                [name]: e.target.value,
-                              })
-                            }
-                            disabled={isViewing}
-                          />
-                        </div>
-                      )
-                    )}
-                  </>
-                )}
+                  {specialField}
+                </div>
                 {!isViewing && (
-                  <div className="section-buttons">
+                  <div className="debtor-section-buttons">
                     <button
                       className="save-button"
-                      onClick={() => handleSaveSection(section)}
+                      onClick={() => handleSaveSection(name)}
                     >
                       Save Changes
                     </button>
                     <button
                       className="cancel-button"
-                      onClick={() => handleCancelSection(section)}
+                      onClick={() => handleCancelSection(name)}
                     >
-                      Cancel
+                      Cancel / Close
                     </button>
                   </div>
                 )}
@@ -261,6 +319,21 @@ const DebtorModal = ({
             )}
           </div>
         ))}
+
+        <ErrorModal
+          isOpen={errorModal.isOpen}
+          title={errorModal.title}
+          message={errorModal.message}
+          onClose={() => setErrorModal({ isOpen: false, title: "", message: "" })}
+        />
+
+        <ConfirmationModal
+          isOpen={isConfirmOpen}
+          title="Confirm Cancel"
+          message="Are you sure you want to cancel without saving changes?"
+          onConfirm={handleConfirmAction}
+          onCancel={() => setIsConfirmOpen(false)}
+        />
 
         <div className="modal-footer">
           <button className="close-modal-button" onClick={onClose}>

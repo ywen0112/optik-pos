@@ -25,7 +25,7 @@ const AuditLogs = () => {
             { id: 6, dateTime: "2025-01-01 10:25:00", actionType: "Transaction", name: "David Black", role: "Admin" },
             { id: 7, dateTime: "2025-01-01 10:30:00", actionType: "Transaction", name: "Ella Green", role: "Admin" },
           ],
-          totalPages: 2, // Simulating 2 pages of data
+          totalPages: 2,
         };
 
         // Simulate fetching data

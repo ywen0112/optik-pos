@@ -1,4 +1,4 @@
-.debtor-popup-overlay {
+.creditor-popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -8,110 +8,101 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
-  .debtor-popup-content {
+}
+
+.creditor-popup-content {
     background: white;
     padding: 20px;
     width: 600px;
     max-height: 90%;
     overflow-y: auto;
     border-radius: 8px;
-  }
-  
-  .debtor-section {
+}
+
+.creditor-section {
     margin-bottom: 20px;
     border: 1px solid #ddd;
-  }
-  
-  .debtor-section-header {
+}
+
+.creditor-section-header {
     display: flex;
     justify-content: space-between;
     cursor: pointer;
     background: #f0f0f0;
     padding: 10px;
     border-radius: 4px;
-  }
-  
-  .debtor-section-content {
+}
+
+.creditor-section-content {
     padding: 10px;
     background: #f9f9f9;
     border-radius: 4px;
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
-  }
-  
-  .debtor-form-group {
+}
+
+.creditor-form-group {
     flex: 0 0 calc(50% - 16px);
-  }
-  
-  .debtor-form-label,
-  .debtor-rx-label {
+}
+
+.creditor-form-label {
     display: block;
     font-weight: bold;
-  }
-  
-  .debtor-form-input,
-  .debtor-rx-input {
+}
+
+.creditor-form-input,
+.creditor-rx-input {
     width: 100%;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
-  }
+}
 
+.creditor-form-checkbox {
+    margin-top: 8px;
+}
 
-  .debtor-fetch-tin-button {
-    padding: 8px 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .debtor-fetch-tin-button:hover {
-    background-color: #0056b3;
-  }
-
-  .section-buttons {
-    display: flex;
-    gap: 10px;
-  }
-
-  .error-message {
+.error-message {
     color: red;
     font-size: 12px;
     margin-top: 0px;
-  }
-  
-  .close-modal-button {
+}
+
+.close-modal-button {
     padding: 10px 20px;
-    background-color: #dc3545; 
+    background-color: #dc3545;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-  }
+}
 
-  .debtor-form-input[readonly] {
-    background-color: #f0f0f0; 
-    color: #000; 
-    cursor: not-allowed; 
-  }
-  
-  .required {
+.required {
     color: red;
     font-weight: bold;
     margin-left: 5px;
-  }
+}
 
-  .debtor-section-buttons {
-    margin-top: 20px; 
+.section-buttons {
+    margin-top: 20px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     gap: 10px;
     margin-bottom: 5px;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-self: flex-start;
+    margin-top: 20px;
+    font-weight: bold;
   }
   
+  .creditor-form-checkbox {
+    margin: 0;
+    flex: 1;
+  }

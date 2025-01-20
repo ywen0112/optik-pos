@@ -94,7 +94,6 @@ const MainLayout = () => {
         <div className="content-area">
           <div className="main-layout-header">
             <h2>{selectedMenu}</h2>
-            <button className="sync-button">Sync Data</button>
           </div>
           <div className="main-layout-content">
             <Routes>

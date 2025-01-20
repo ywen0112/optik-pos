@@ -77,7 +77,17 @@ const MemberTypeMaintenance = () => {
     setFields([
       { name: "memberType", label: "Member Type", type: "text", required: true },
       { name: "memberTypeId", label: "Member Type ID", type: "text", required: true },
-      { name: "currencyCode", label: "Currency Code", type: "text", required: true },
+      { 
+        label: "Currency Code", 
+        name: "currencyCode",
+        type: "select",
+        options: [
+          {label: "USD", value: "USD"},
+          {label: "EUR", value: "EUR"},
+          {label: "MYR", value: "MYR"},
+        ],
+        required: true
+      }, 
       { name: "memberPointSetting", label: "Member Point Setting (RM 1 = ? points)", type: "number", required: true },
     ]);
   }, [currentPage, itemsPerPage]);
@@ -138,11 +148,22 @@ const MemberTypeMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage(newMemberType.id ? "Do you want to update this member type?" : "Do you want to add this member type?");
+    setConfirmMessage(
+      newMemberType.id 
+      ? `Do you want to update this member type "${newMemberType.memberType}"?`
+      : `Do you want to add this member type "${newMemberType.memberType}"?`
+    );
     setIsConfirmOpen(true);
   };
 
   const handleDelete = (id) => {
+    const memberTypeToDelete = memberTypes.find((memberType) => memberType.id === id);
+  
+    if (!memberTypeToDelete) {
+      console.error("Member Type not found");
+      return;
+    }
+
     setConfirmAction(() => () => {
       setLoading(true);
       setTimeout(() => {
@@ -156,7 +177,7 @@ const MemberTypeMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage("Do you want to delete this member type?");
+    setConfirmMessage(`Do you want to delete this member type "${memberTypeToDelete.memberType}"?`);
     setIsConfirmOpen(true);
   };
 

@@ -10,6 +10,8 @@ import InquiryScreen from "../pages/main/InquiryScreen";
 import Transaction from "../pages/main/Transaction";
 import CashManagement from "../pages/main/CashManagement";
 import SalesInvoice from "../pages/main/SalesInvoice";
+import PurchaseInvoice from "../pages/main/PurchaseInvoice";
+import CloseCounter from "../pages/main/CloseCounter"
 
 import UserMaintenance from "../pages/maintenance/UserMaintenance";
 import AccessRightMaintenance from "../pages/maintenance/AccessRightMaintenance";
@@ -45,6 +47,8 @@ const MainLayout = () => {
     "/main/transaction": "Transaction",
     "/main/transaction/cash-management": "Transaction",
     "/main/transaction/sales-invoice": "Transaction",
+    "/main/transaction/purchase-invoice": "Transaction",
+    "/main/transaction/close-counter": "Transaction",
     "/maintenance/user-maintenance": "User Maintenance",
     "/maintenance/access-right-maintenance": "Access Right Maintenance",
     "/maintenance/debtor-maintenance": "Debtor Maintenance",
@@ -100,6 +104,8 @@ const MainLayout = () => {
               <Route path="/main/transaction" element={<Transaction />}>
                 <Route path="cash-management" element={<CashManagement />} />
                 <Route path="sales-invoice" element={<SalesInvoice />} />
+                <Route path="purchase-invoice" element={<PurchaseInvoice />} />
+                <Route path="close-counter" element={<CloseCounter />} />
               </Route>
               {/* Maintenance Routes */}
               <Route path="/maintenance/user-maintenance" element={<UserMaintenance />} />

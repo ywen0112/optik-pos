@@ -31,19 +31,43 @@ const CreditorMaintenance = () => {
               creditorCode: "C001",
               creditorTypeId: "CT001",
               companyName: "ABC Corp",
+              registerNo: "202005123456",
+              isGroupCompany: true,
               mobile: "1234567890",
               emailAddress: "abc@corporate.com",
+              fax1: "123456789",
+              address1: "1 FerSelim Ltd",
+              postcode: "46300",
+              locationId: "L001",
+              attention: "ABC",
+              natureOfBusiness: "Corporation",
+              purchaseAgent: "Lily",
+              currencyCode: "USD",
+              displayTerm: "glasses",
+              tin: "C208305702101",
             },
             {
               id: 2,
               creditorCode: "C002",
               creditorTypeId: "CT002",
               companyName: "XYZ Ltd",
+              registerNo: "202105123456",
+              isGroupCompany: false,
               mobile: "0987654321",
               emailAddress: "xyz@corporate.com",
+              fax1: "0987654321",
+              address1: "25 Wilayah KL",
+              postcode: "46300",
+              locationId: "L002",
+              attention: "XYZ",
+              natureOfBusiness: "Corporation",
+              purchaseAgent: "Lauren",
+              currencyCode: "EUR",
+              displayTerm: "glasses",
+              tin: "C238305702102",
             },
           ],
-          totalPages: Math.ceil(2 / itemsPerPage),
+          totalPages: Math.ceil(5 / itemsPerPage),
         };
 
         setTimeout(() => {
@@ -194,6 +218,7 @@ const CreditorMaintenance = () => {
               <th>Company Name</th>
               <th>Mobile</th>
               <th>Email Address</th>
+              <th>Location ID</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -201,11 +226,12 @@ const CreditorMaintenance = () => {
             {creditors.map((creditor, index) => (
               <tr key={creditor.id}>
                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{creditor.creditorCode}</td>
-                <td>{creditor.creditorTypeId}</td>
-                <td>{creditor.companyName}</td>
-                <td>{creditor.mobile}</td>
-                <td>{creditor.emailAddress}</td>
+                <td>{creditor.creditorCode || "-"}</td>
+                <td>{creditor.creditorTypeId || "-"}</td>
+                <td>{creditor.companyName || "-"}</td>
+                <td>{creditor.mobile || "-"}</td>
+                <td>{creditor.emailAddress || "-"}</td>
+                <td>{creditor.locationId || "-"}</td>
                 <td>
                   <button
                     onClick={() => handleOpenModal(creditor, "Edit Creditor")}

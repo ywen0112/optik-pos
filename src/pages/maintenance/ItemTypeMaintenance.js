@@ -32,16 +32,19 @@ const ItemTypeMaintenance = () => {
               itemTypeName: "Electronics",
               itemTypeId: "IT001",
               itemTypeDescription: "Electronics category",
-              locationId: "L001",
+              commissionType: "Rate",
               commissionPoint: 5.0,
+              locationId: "L001",
+
             },
             {
               id: 2,
               itemTypeName: "Furniture",
               itemTypeId: "IT002",
               itemTypeDescription: "Furniture category",
-              locationId: "L002",
+              commissionType: "Rate",
               commissionPoint: 7.5,
+              locationId: "L002",
             },
           ],
           totalPages: Math.ceil(5 / itemsPerPage),
@@ -74,6 +77,17 @@ const ItemTypeMaintenance = () => {
       { name: "itemTypeId", label: "Item Type ID", type: "text", required: true },
       { name: "itemTypeDescription", label: "Item Type Description", type: "textarea", required: true },
       {
+        name: "commissionType",
+        label: "Commission Type",
+        type: "select",
+        options: [
+          { label: "Rate", value: "Rate" },
+          { label: "Amount", value: "Amount" },
+        ],
+        required: true,
+      },
+      { name: "commissionPoint", label: "Commission Point", type: "number", required: true },
+      {
         name: "locationId",
         label: "Location ID",
         type: "select",
@@ -84,7 +98,6 @@ const ItemTypeMaintenance = () => {
         ],
         required: true,
       },
-      { name: "commissionPoint", label: "Commission Point", type: "number", required: true },
     ]);
   }, [currentPage, itemsPerPage]);
 
@@ -144,11 +157,21 @@ const ItemTypeMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage(newItemType.id ? "Do you want to update this item type?" : "Do you want to add this item type?");
+    setConfirmMessage(
+      newItemType.id 
+      ? `Do you want to update this item type "${newItemType.itemTypeName}"?`
+      : `Do you want to add this item type "${newItemType.itemTypeName}"?`
+    );
     setIsConfirmOpen(true);
   };
 
   const handleDelete = (id) => {
+    const itemTypeToDelete = itemTypes.find((type) => type.id === id);
+  
+    if (!itemTypeToDelete) {
+      console.error("Item type not found");
+      return;
+    }
     setConfirmAction(() => () => {
       setLoading(true);
       setTimeout(() => {
@@ -162,7 +185,7 @@ const ItemTypeMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage("Do you want to delete this item type?");
+    setConfirmMessage(`Do you want to delete this item type "${itemTypeToDelete.itemTypeName}"?`);
     setIsConfirmOpen(true);
   };
 
@@ -218,6 +241,7 @@ const ItemTypeMaintenance = () => {
               <th>Item Type ID</th>
               <th>Item Type Description</th>
               <th>Location ID</th>
+              <th>Commission Type</th>
               <th>Commission Point</th>
               <th>Action</th>
             </tr>
@@ -226,11 +250,12 @@ const ItemTypeMaintenance = () => {
             {itemTypes.map((type, index) => (
               <tr key={type.id}>
                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{type.itemTypeName}</td>
-                <td>{type.itemTypeId}</td>
-                <td>{type.itemTypeDescription}</td>
-                <td>{type.locationId}</td>
-                <td>{type.commissionPoint}</td>
+                <td>{type.itemTypeName || "-"}</td>
+                <td>{type.itemTypeId || "-"}</td>
+                <td>{type.itemTypeDescription || "-"}</td>
+                <td>{type.locationId || "-"}</td>
+                <td>{type.commissionType || "-"}</td>
+                <td>{type.commissionPoint || "-"}</td>
                 <td>
                   <button
                     onClick={() => handleOpenModal(type, "Edit Item Type")}

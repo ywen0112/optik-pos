@@ -1,26 +1,26 @@
 import React, { useState } from "react";
 import "../../css/CrudModal.css";
-import "../../css/Transaction.css"
+import "../../css/Transaction.css";
 import ErrorModal from "../../components/ErrorModal";
-import SuccessModal from "../../components/SuccessModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import SuccessModal from "../../components/SuccessModal";
 
-const SalesInvoice = () => {
+const PurchaseInvoice = () => {
   const [formData, setFormData] = useState({
-    dateTime: new Date().toISOString(),
-    debtorCode: "",
-    debtorName: "",
-    memberCode: "",
-    debtorMobile: "",
-    debtorAddress: "",
-    pickUpLocationId: "",
-    glassesProfile: {},
-    contactLensProfile: {},
+    creditorCode: "",
+    companyName: "",
+    registrationNumber: "",
+    natureOfBusiness: "",
+    TIN: "",
+    mobile: "",
+    fax: "",
+    address: "",
+    locationId: "",
     items: [],
     payments: [],
-    salesAgent: "",
     currencyCode: "",
   });
+
   const [item, setItem] = useState({
     itemCode: "",
     itemName: "",
@@ -30,64 +30,37 @@ const SalesInvoice = () => {
     itemQuantity: "",
   });
 
+  const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [confirmationModal, setConfirmationModal] = useState(false);
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: "", message: "" });
-  const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
 
-   // Mock debtor data
-   const debtorMockData = {
-    D001: {
-      debtorName: "John Doe",
-      memberCode: "M001",
-      debtorMobile: "1234567890",
-      debtorAddress: "123 Main Street",
-      tin: "TIN12345",
+   // Mock data for creditors
+   const creditorMockData = {
+    C001: {
+      companyName: "ABC Supplies Ltd.",
+      registrationNumber: "12345678",
+      natureOfBusiness: "Retail",
+      TIN: "TIN1234",
+      mobile: "9876543210",
+      fax: "123-456789",
+      address: "123 Supplier Street",
+      locationId: "L001",
       currencyCode: "USD",
-      pickUpLocationId: "L001",
-      glassesProfile: {
-        "Right Eye SPH": "-1.5",
-        "Right Eye CYL": "-0.5",
-        "Right Eye AXIS": "90",
-        "Left Eye SPH": "-1.0",
-        "Left Eye CYL": "-0.25",
-        "Left Eye AXIS": "80",
-      },
-      contactLensProfile: {
-        "Right Eye SPH": "-1.5",
-        "Right Eye CYL": "-0.5",
-        "Right Eye AXIS": "90",
-        "Left Eye SPH": "-1.0",
-        "Left Eye CYL": "-0.25",
-        "Left Eye AXIS": "80",
-      },
     },
-    D002: {
-      debtorName: "Jane Smith",
-      memberCode: "M002",
-      debtorMobile: "0987654321",
-      debtorAddress: "456 Elm Street",
-      tin: "TIN67890",
+    C002: {
+      companyName: "XYZ Traders",
+      registrationNumber: "98765432",
+      natureOfBusiness: "Wholesale",
+      TIN: "TIN5678",
+      mobile: "1234567890",
+      fax: "987-654321",
+      address: "456 Trader Avenue",
+      locationId: "L002",
       currencyCode: "EUR",
-      pickUpLocationId: "L002",
-      glassesProfile: {
-        "Right Eye SPH": "-2.0",
-        "Right Eye CYL": "-1.0",
-        "Right Eye AXIS": "70",
-        "Left Eye SPH": "-1.5",
-        "Left Eye CYL": "-0.75",
-        "Left Eye AXIS": "60",
-      },
-      contactLensProfile: {
-        "Right Eye SPH": "-2.0",
-        "Right Eye CYL": "-1.0",
-        "Right Eye AXIS": "70",
-        "Left Eye SPH": "-1.5",
-        "Left Eye CYL": "-0.75",
-        "Left Eye AXIS": "60",
-      },
     },
   };
 
+  // Mock data for items
   const itemMockData = {
     I001: {
       itemName: "Widget A",
@@ -96,7 +69,6 @@ const SalesInvoice = () => {
       unitPrices: {
         USD: 50.0,
         EUR: 45.0,
-        MYR: 200.0,
       },
     },
     I002: {
@@ -106,31 +78,21 @@ const SalesInvoice = () => {
       unitPrices: {
         USD: 75.0,
         EUR: 70.0,
-        MYR: 300.0,
       },
     },
   };
 
-  const handleInputChange = (e, section, key) => {
+  const handleInputChange = (e, key) => {
     const value = e.target.value;
-    if (section) {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+
+    // Auto-populate creditor details when creditorCode is entered
+    if (key === "creditorCode" && creditorMockData[value]) {
+      const creditor = creditorMockData[value];
       setFormData((prev) => ({
         ...prev,
-        [section]: { ...prev[section], [key]: value },
+        ...creditor,
       }));
-    } else {
-      setFormData((prev) => ({ ...prev, [key]: value }));
-      
-      // Auto-fill debtor details when debtorCode is entered
-      if (key === "debtorCode" && debtorMockData[value]) {
-        const debtor = debtorMockData[value];
-        setFormData((prev) => ({
-          ...prev,
-          ...debtor,
-          glassesProfile: debtor.glassesProfile,
-          contactLensProfile: debtor.contactLensProfile,
-        }));
-      }
     }
   };
 
@@ -138,7 +100,7 @@ const SalesInvoice = () => {
     const value = e.target.value;
     setItem((prev) => ({ ...prev, itemCode: value }));
 
-    // Auto-fill item details when itemCode is entered
+    // Auto-populate item details when itemCode is entered
     if (itemMockData[value]) {
       const selectedItem = itemMockData[value];
       setItem((prev) => ({
@@ -167,31 +129,25 @@ const SalesInvoice = () => {
     });
   };
 
+
   const calculateTotalAmount = () => {
     return formData.items.reduce((total, item) => total + item.itemUnitPrice * item.itemQuantity, 0);
   };
 
   const calculateTotalPaid = () => {
-    return formData.payments.reduce((total, payment) => total + parseFloat(payment.amount), 0);
+    return formData.payments.reduce((total, payment) => total + parseFloat(payment.amount || 0), 0);
   };
 
   const handleSubmit = () => {
+    setConfirmationModal(true);
+  };
+
+  const handleConfirmSubmit = () => {
     setConfirmationModal(false);
-    // Simulate submission process
-    const isSuccess = Math.random() > 0.5; // Simulate success/failure randomly
-    if (isSuccess) {
-      setSuccessModal({
-        isOpen: true,
-        title: "Submission Successful",
-        message: "The sales invoice was submitted successfully.",
-      });
-    } else {
-      setErrorModal({
-        isOpen: true,
-        title: "Submission Failed",
-        message: "An error occurred while submitting the sales invoice.",
-      });
-    }
+    // Simulate submission success
+    setTimeout(() => {
+      setSuccessModal({ isOpen: true, title: "Submission Successful", message: "The purchase invoice has been submitted successfully!" });
+    }, 500);
   };
 
   const handleCloseErrorModal = () => {
@@ -203,64 +159,44 @@ const SalesInvoice = () => {
   };
 
   return (
-    <div className="sales-invoice-container">
-      <h2>Sales Invoice</h2>
+    <div className="purchase-invoice-container">
+      <h2>Purchase Invoice</h2>
 
       {/* First Section: Info */}
       <div className="section">
         <h3>Info</h3>
         <div className="popup-form">
           <div className="form-group">
-            <label>Date Time:</label>
-            <input type="text" value={formData.dateTime} readOnly />
+            <label>Creditor Code:</label>
+            <input type="text" value={formData.creditorCode} onChange={(e) => handleInputChange(e, "creditorCode")} />
           </div>
           <div className="form-group">
-            <label>Debtor Code:</label>
-            <input
-              type="text"
-              value={formData.debtorCode}
-              onChange={(e) => handleInputChange(e, null, "debtorCode")}
-            />
+            <label>Company Name:</label>
+            <input type="text" value={formData.companyName} onChange={(e) => handleInputChange(e, "companyName")} />
           </div>
           <div className="form-group">
-            <label>Debtor Name:</label>
-            <input
-              type="text"
-              value={formData.debtorName}
-              onChange={(e) => handleInputChange(e, null, "debtorName")}
-            />
+            <label>Registration Number:</label>
+            <input type="text" value={formData.registrationNumber} onChange={(e) => handleInputChange(e, "registrationNumber")} />
           </div>
           <div className="form-group">
-            <label>Member Code:</label>
-            <input
-              type="text"
-              value={formData.memberCode}
-              onChange={(e) => handleInputChange(e, null, "memberCode")}
-            />
-          </div>
-          <div className="form-group">
-            <label>Debtor Mobile:</label>
-            <input
-              type="text"
-              value={formData.debtorMobile}
-              onChange={(e) => handleInputChange(e, null, "debtorMobile")}
-            />
-          </div>
-          <div className="form-group">
-            <label>Debtor Address:</label>
-            <input
-              type="text"
-              value={formData.debtorAddress}
-              onChange={(e) => handleInputChange(e, null, "debtorAddress")}
-            />
+            <label>Nature of Business:</label>
+            <input type="text" value={formData.natureOfBusiness} onChange={(e) => handleInputChange(e, "natureOfBusiness")} />
           </div>
           <div className="form-group">
             <label>TIN:</label>
-            <input
-              type="text"
-              value={formData.tin}
-              readOnly
-              />
+            <input type="text" value={formData.TIN} onChange={(e) => handleInputChange(e, "TIN")} />
+          </div>
+          <div className="form-group">
+            <label>Mobile:</label>
+            <input type="text" value={formData.mobile} onChange={(e) => handleInputChange(e, "mobile")} />
+          </div>
+          <div className="form-group">
+            <label>Fax:</label>
+            <input type="text" value={formData.fax} onChange={(e) => handleInputChange(e, "fax")} />
+          </div>
+          <div className="form-group">
+            <label>Address:</label>
+            <input type="text" value={formData.address} onChange={(e) => handleInputChange(e, "address")} />
           </div>
           <div className="form-group">
             <label>Currency Code:</label>
@@ -275,100 +211,31 @@ const SalesInvoice = () => {
             </select>
           </div>
           <div className="form-group">
-            <label>Pick Up Location ID:</label>
-            <select
-              value={formData.pickUpLocationId}
-              onChange={(e) => handleInputChange(e, null, "pickUpLocationId")}
-            >
-              <option value="">Select Location</option>
-              <option value="L001">L001</option>
-              <option value="L002">L002</option>
-              <option value="L003">L003</option>
-            </select>
+            <label>Location ID:</label>
+            <input type="text" value={formData.locationId} onChange={(e) => handleInputChange(e, "locationId")} />
           </div>
         </div>
       </div>
 
-      {/* Second Section: Eye Power Record */}
-      <div className="section">
-        <h3>Eye Power Record</h3>
-        <h4>Glasses Profile</h4>
-        <div className="popup-form">
-        {[
-          "Right Eye SPH",
-          "Right Eye CYL",
-          "Right Eye AXIS",
-          "Left Eye SPH",
-          "Left Eye CYL",
-          "Left Eye AXIS",
-        ].map((label) => (
-          <div className="form-group" key={label}>
-            <label>{label}:</label>
-            <input
-              type="text"
-              value={formData.glassesProfile[label]}
-              onChange={(e) => handleInputChange(e, "glassesProfile", label)}
-            />
-          </div>
-        ))}
-        </div>
-        <h4>Contact Lens Profile</h4>
-        <div className="popup-form">
-        {[
-          "Right Eye SPH",
-          "Right Eye CYL",
-          "Right Eye AXIS",
-          "Left Eye SPH",
-          "Left Eye CYL",
-          "Left Eye AXIS",
-        ].map((label) => (
-          <div className="form-group" key={label}>
-            <label>{label}:</label>
-            <input
-              type="text"
-              value={formData.contactLensProfile[label]}
-              onChange={(e) => handleInputChange(e, "contactLensProfile", label)}
-            />
-          </div>
-        ))}
-        </div>
-      </div>
-
-      {/* Third Section: Items */}
+      {/* Second Section: Items */}
       <div className="section">
         <h3>Items</h3>
         <div className="popup-form">
           <div className="form-group">
             <label>Item Code:</label>
-            <input
-              type="text"
-              value={item.itemCode}
-              onChange={handleItemCodeChange}
-            />
+            <input type="text" value={item.itemCode} onChange={handleItemCodeChange} />
           </div>
           <div className="form-group">
             <label>Item Name:</label>
-            <input
-              type="text"
-              value={item.itemName}
-              onChange={(e) => setItem((prev) => ({ ...prev, itemName: e.target.value }))}
-            />
+            <input type="text" value={item.itemName} onChange={(e) => setItem((prev) => ({ ...prev, itemName: e.target.value }))} />
           </div>
           <div className="form-group">
             <label>Batch No:</label>
-            <input
-              type="text"
-              value={item.batchNo}
-              onChange={(e) => setItem((prev) => ({ ...prev, batchNo: e.target.value }))}
-            />
+            <input type="text" value={item.batchNo} onChange={(e) => setItem((prev) => ({ ...prev, batchNo: e.target.value }))} />
           </div>
           <div className="form-group">
             <label>Item Description:</label>
-            <input
-              type="text"
-              value={item.itemDescription}
-              onChange={(e) => setItem((prev) => ({ ...prev, itemDescription: e.target.value }))}
-            />
+            <input type="text" value={item.itemDescription} onChange={(e) => setItem((prev) => ({ ...prev, itemDescription: e.target.value }))} />
           </div>
           <div className="form-group">
             <label>Item Unit Price:</label>
@@ -386,7 +253,9 @@ const SalesInvoice = () => {
               onChange={(e) => setItem((prev) => ({ ...prev, itemQuantity: parseInt(e.target.value, 10) }))}
             />
           </div>
-          <button className="add-cash-button" onClick={handleAddItem}>Add Item</button>
+          <button className="add-cash-button" onClick={handleAddItem}>
+            Add Item
+          </button>
         </div>
 
         {/* Items Table */}
@@ -400,7 +269,6 @@ const SalesInvoice = () => {
                 <th>Unit Price</th>
                 <th>Quantity</th>
                 <th>Amount ({formData.currencyCode})</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -410,44 +278,13 @@ const SalesInvoice = () => {
                   <td>{i.itemName}</td>
                   <td>{i.itemDescription}</td>
                   <td>{i.itemUnitPrice.toFixed(2)}</td>
-                  <td>
-                    <input
-                      type="number"
-                      value={i.itemQuantity}
-                      onChange={(e) => {
-                        const updatedItems = [...formData.items];
-                        updatedItems[index].itemQuantity = parseInt(e.target.value, 10);
-                        setFormData((prev) => ({ ...prev, items: updatedItems }));
-                      }}
-                      style={{ width: "60px" }}
-                    />
-                  </td>
+                  <td>{i.itemQuantity}</td>
                   <td>{(i.itemUnitPrice * i.itemQuantity).toFixed(2)}</td>
-                  <td>
-                    <button
-                      className="edit-button"
-                      onClick={() => {
-                        const editedItem = formData.items[index];
-                        setItem({ ...editedItem });
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="delete-button"
-                      onClick={() => {
-                        const updatedItems = formData.items.filter((_, idx) => idx !== index);
-                        setFormData((prev) => ({ ...prev, items: updatedItems }));
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </td>
                 </tr>
               ))}
               {formData.items.length === 0 && (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: "center" }}>
+                  <td colSpan="6" style={{ textAlign: "center" }}>
                     No items added
                   </td>
                 </tr>
@@ -458,7 +295,7 @@ const SalesInvoice = () => {
                 <td colSpan="5" style={{ textAlign: "right" }}>
                   <strong>Total Amount:</strong>
                 </td>
-                <td colSpan="2">
+                <td>
                   <strong>{calculateTotalAmount().toFixed(2)} {formData.currencyCode}</strong>
                 </td>
               </tr>
@@ -467,7 +304,7 @@ const SalesInvoice = () => {
         </div>
       </div>
 
-      {/* Fourth Section: Payments */}
+      {/* Third Section: Payments */}
       <div className="section">
         <h3>Payments</h3>
         <div className="popup-form">
@@ -559,43 +396,35 @@ const SalesInvoice = () => {
         <p>Total Amount: {calculateTotalAmount().toFixed(2)}</p>
         <p>Total Paid: {calculateTotalPaid().toFixed(2)}</p>
         <p>Change: {(calculateTotalPaid() - calculateTotalAmount()).toFixed(2)}</p>
-      </div>
-
-      <div className="submit-button-container">
-        <button
-          className="submit-button"
-          onClick={() => setConfirmationModal(true)}
-        >
+        <button className="submit-button" onClick={handleSubmit}>
           Submit
         </button>
       </div>
 
-      {/* Confirmation Modal */}
+      {/* Modals */}
+      <ErrorModal 
+        isOpen={errorModal.isOpen} 
+        title={errorModal.title} 
+        message={errorModal.message} 
+        onClose={handleCloseErrorModal} 
+        />
+
       <ConfirmationModal
         isOpen={confirmationModal}
         title="Confirm Submission"
-        message="Are you sure you want to submit the sales invoice?"
-        onConfirm={handleSubmit}
+        message="Are you sure you want to submit this purchase invoice?"
+        onConfirm={handleConfirmSubmit}
         onCancel={() => setConfirmationModal(false)}
-      />
+        />
 
-      {/* Success Modal */}
-      <SuccessModal
-        isOpen={successModal.isOpen}
-        title={successModal.title}
-        message={successModal.message}
-        onClose={handleCloseSuccessModal}
-      />
-
-      {/* Error Modal */}
-      <ErrorModal
-        isOpen={errorModal.isOpen}
-        title={errorModal.title}
-        message={errorModal.message}
-        onClose={handleCloseErrorModal}
-      />
+      <SuccessModal 
+        isOpen={successModal.isOpen} 
+        title={successModal.title} 
+        message={successModal.message} 
+        onClose={handleCloseSuccessModal} 
+        />
     </div>
   );
 };
 
-export default SalesInvoice;
+export default PurchaseInvoice;

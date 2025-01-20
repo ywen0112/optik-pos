@@ -194,7 +194,16 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
                 ],
               }, 
               { label: "Sales Agent", name: "salesAgent" },
-              { label: "Currency Code", name: "currencyCode" },
+              { 
+                label: "Currency Code", 
+                name: "currencyCode",
+                type: "select",
+                options: [
+                  {label: "USD", value: "USD"},
+                  {label: "EUR", value: "EUR"},
+                  {label: "MYR", value: "MYR"},
+                ] 
+              },
               { label: "IC", name: "ic" },
               { label: "Name on IC", name: "nameOnIC" },
             ],
@@ -329,8 +338,8 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
 
         <ConfirmationModal
           isOpen={isConfirmOpen}
-          title="Confirm Cancel"
-          message="Are you sure you want to cancel without saving changes?"
+          title="Confirm Action"
+          message="Are you sure you want to cancel and discard unsaved changes?"
           onConfirm={handleConfirmAction}
           onCancel={() => setIsConfirmOpen(false)}
         />

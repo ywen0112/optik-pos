@@ -43,7 +43,7 @@ const AccessRightMaintenance = () => {
               ],
             },
           ],
-          totalPages: Math.ceil(2 / itemsPerPage),
+          totalPages: Math.ceil(5 / itemsPerPage),
         };
 
         setTimeout(() => {
@@ -212,7 +212,7 @@ const AccessRightMaintenance = () => {
             {currentRoles.map((role, index) => (
               <tr key={role.id}>
                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{role.role}</td>
+                <td>{role.role || "-"}</td>
                 <td>
                   <button
                     onClick={() => handleOpenModal(role, "Edit Role")}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import "../../css/Transaction.css";
 import ErrorModal from "../../components/ErrorModal";
@@ -27,8 +27,16 @@ const Transaction = () => {
     setErrorModal({ isOpen: false, title: "", message: "" });
   };
 
+  // Reset `isCounterOpen` when navigating back to `/main/transaction`
+  useEffect(() => {
+    if (location.pathname === "/main/transaction") {
+      setIsCounterOpen(false);
+      setOpenCounterAmount(""); // Clear the amount
+    }
+  }, [location.pathname]);
+
   if (!isCounterOpen) {
-    // Step 1: Open Counter Screen
+    // Open Counter UI
     return (
       <div className="open-counter-container">
         <h2>Open Counter</h2>
@@ -53,7 +61,7 @@ const Transaction = () => {
     );
   }
 
-  // Step 2: Transaction Management Screen
+  // Main Transaction Management UI
   return (
     <div className="transaction-container">
       <div className="transaction-sidebar">
@@ -73,9 +81,25 @@ const Transaction = () => {
         >
           Sales Invoice
         </button>
+        <button
+          className={`transaction-sidebar-button ${
+            location.pathname === "/main/transaction/purchase-invoice" ? "active" : ""
+          }`}
+          onClick={() => navigate("/main/transaction/purchase-invoice")}
+        >
+          Purchase Invoice
+        </button>
+        <button
+          className={`transaction-sidebar-button ${
+            location.pathname === "/main/transaction/close-counter" ? "active" : ""
+          }`}
+          onClick={() => navigate("/main/transaction/close-counter")}
+        >
+          Close Counter
+        </button>
       </div>
       <div className="main-content">
-        <Outlet /> 
+        <Outlet />
       </div>
     </div>
   );

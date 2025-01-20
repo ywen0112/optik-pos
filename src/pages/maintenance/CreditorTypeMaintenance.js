@@ -122,13 +122,20 @@ const CreditTypeMaintenance = () => {
 
     setConfirmMessage(
       newCreditType.id
-        ? "Do you want to update this credit type?"
-        : "Do you want to add this credit type?"
+        ? `Do you want to update this credit type "${newCreditType.type}"?`
+        : `Do you want to add this credit type "${newCreditType.type}"?`
     );
     setIsConfirmOpen(true);
   };
 
   const handleDelete = (id) => {
+    const creditTypeToDelete = creditTypes.find((type) => type.id === id);
+  
+    if (!creditTypeToDelete) {
+      console.error("Credit type not found");
+      return;
+    }
+  
     setConfirmAction(() => () => {
       setLoading(true);
       setTimeout(() => {
@@ -141,8 +148,8 @@ const CreditTypeMaintenance = () => {
         }
       }, 500);
     });
-
-    setConfirmMessage("Do you want to delete this credit type?");
+  
+    setConfirmMessage(`Do you want to delete this credit type "${creditTypeToDelete.type}"?`);
     setIsConfirmOpen(true);
   };
 
@@ -204,9 +211,9 @@ const CreditTypeMaintenance = () => {
             {creditTypes.map((type, index) => (
               <tr key={type.id}>
                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{type.type}</td>
-                <td>{type.typeId}</td>
-                <td>{type.description}</td>
+                <td>{type.type || "-"}</td>
+                <td>{type.typeId || "-"}</td>
+                <td>{type.description || "-"}</td>
                 <td>
                   <button
                     onClick={() => handleOpenModal(type, "Edit Credit Type")}

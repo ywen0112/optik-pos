@@ -31,26 +31,30 @@ const ItemMaintenance = () => {
               id: 1,
               itemCode: "I001",
               itemName: "Widget A",
+              batchNo: "0001436",
               itemTypeId: "IT001",
               itemGroupId: "IG001",
               itemDescription: "A high-quality widget",
-              inStockAmount: 100,
+              stockQuantity: 100,
               sellingPrice: 50.0,
               purchasePrice: 30.0,
-              commissionPoint: 5.0,
+              commissionType: "Rate",
+              commissionValue: 5.0,
               locationId: "L001",
             },
             {
               id: 2,
               itemCode: "I002",
               itemName: "Gadget B",
+              batchNo: "0001437",
               itemTypeId: "IT002",
               itemGroupId: "IG002",
               itemDescription: "A premium gadget",
-              inStockAmount: 200,
+              stockQuantity: 200,
               sellingPrice: 75.0,
               purchasePrice: 55.0,
-              commissionPoint: 7.5,
+              commissionType: "Amount",
+              commissionValue: 20,
               locationId: "L002",
             },
           ],
@@ -82,6 +86,7 @@ const ItemMaintenance = () => {
     setFields([
       { name: "itemCode", label: "Item Code", type: "text", required: true },
       { name: "itemName", label: "Item Name", type: "text", required: true },
+      { name: "batchNo", label: "Batch No", type: "text", required: false },
       {
         name: "itemGroupId",
         label: "Item Group ID",
@@ -104,6 +109,21 @@ const ItemMaintenance = () => {
         ],
         required: true,
       },
+      { name: "itemDescription", label: "Item Description", type: "textarea", required: true },
+      { name: "stockQuantity", label: "Stock Quantity", type: "number", required: true },
+      { name: "sellingPrice", label: "Selling Price", type: "number", required: true },
+      { name: "purchasePrice", label: "Purchase Price", type: "number", required: true },
+      {
+        name: "commissionType",
+        label: "Commission Type",
+        type: "select",
+        options: [
+          { label: "Rate", value: "Rate" },
+          { label: "Amount", value: "Amount" },
+        ],
+        required: true,
+      },
+      { name: "commissionValue", label: "Commission Value", type: "number", required: true },
       {
         name: "locationId",
         label: "Location ID",
@@ -115,11 +135,6 @@ const ItemMaintenance = () => {
         ],
         required: true,
       },
-      { name: "itemDescription", label: "Item Description", type: "textarea", required: true },
-      { name: "inStockAmount", label: "In Stock Amount", type: "number", required: true },
-      { name: "sellingPrice", label: "Selling Price", type: "number", required: true },
-      { name: "purchasePrice", label: "Purchase Price", type: "number", required: true },
-      { name: "commissionPoint", label: "Commission Point", type: "number", required: true },
     ]);
   }, [currentPage, itemsPerPage]);
 
@@ -179,11 +194,22 @@ const ItemMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage(newItem.id ? "Do you want to update this item?" : "Do you want to add this item?");
+    setConfirmMessage(
+      newItem.id
+        ? `Do you want to update this item "${newItem.itemName}"?`
+        : `Do you want to add this item "${newItem.itemName}"?`
+    );
     setIsConfirmOpen(true);
   };
 
   const handleDelete = (id) => {
+    const itemToDelete = items.find((item) => item.id === id);
+
+    if (!itemToDelete) {
+      console.error("Item not found");
+      return;
+    }
+
     setConfirmAction(() => () => {
       setLoading(true);
       setTimeout(() => {
@@ -197,7 +223,7 @@ const ItemMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage("Do you want to delete this item?");
+    setConfirmMessage(`Do you want to delete this item "${itemToDelete.itemName}"?`);
     setIsConfirmOpen(true);
   };
 
@@ -251,14 +277,16 @@ const ItemMaintenance = () => {
               <th>No</th>
               <th>Item Code</th>
               <th>Item Name</th>
+              <th>Batch No</th>
               <th>Item Group ID</th>
               <th>Item Type ID</th>
-              <th>Location ID</th>
               <th>Item Description</th>
-              <th>In Stock Amount</th>
+              <th>Stock Quantity</th>
               <th>Selling Price</th>
               <th>Purchase Price</th>
-              <th>Commission Point</th>
+              <th>Commission Type</th>
+              <th>Commission Value</th>
+              <th>Location ID</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -266,16 +294,18 @@ const ItemMaintenance = () => {
             {items.map((item, index) => (
               <tr key={item.id}>
                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{item.itemCode}</td>
-                <td>{item.itemName}</td>
-                <td>{item.itemGroupId}</td>
-                <td>{item.itemTypeId}</td>
-                <td>{item.locationId}</td>
-                <td>{item.itemDescription}</td>
-                <td>{item.inStockAmount}</td>
-                <td>{item.sellingPrice}</td>
-                <td>{item.purchasePrice}</td>
-                <td>{item.commissionPoint}</td>
+                <td>{item.itemCode || "-"}</td>
+                <td>{item.itemName || "-"}</td>
+                <td>{item.batchNo || "-"}</td>
+                <td>{item.itemGroupId || "-"}</td>
+                <td>{item.itemTypeId || "-"}</td>
+                <td>{item.itemDescription || "-"}</td>
+                <td>{item.stockQuantity || "-"}</td>
+                <td>{item.sellingPrice || "-"}</td>
+                <td>{item.purchasePrice || "-"}</td>
+                <td>{item.commissionType || "-"}</td>
+                <td>{item.commissionValue || "-"}</td>
+                <td>{item.locationId || "-"}</td>
                 <td>
                   <button
                     onClick={() => handleOpenModal(item, "Edit Item")}

@@ -13,18 +13,29 @@ const CrudModal = ({
   isViewing,
 }) => {
   const [errors, setErrors] = useState({});
-  const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [errorModal, setErrorModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+  });
 
-  // Mock member points data
   const mockPoints = {
-    Alice: { MT001: 500, MT002: 300, MT003: 100 },
-    Bob: { MT001: 700, MT002: 400, MT003: 200 },
-    John: { MT001: 600, MT002: 350, MT003: 150 },
+    USD: {
+      Alice: { MT001: 500, MT002: 300, MT003: 100 },
+      Bob: { MT001: 700, MT002: 400, MT003: 200 },
+      John: { MT001: 600, MT002: 350, MT003: 150 },
+    },
+    EUR: {
+      Alice: { MT001: 250, MT002: 150, MT003: 75 },
+      Bob: { MT001: 350, MT002: 200, MT003: 100 },
+      John: { MT001: 300, MT002: 175, MT003: 90 },
+    },
   };
 
   useEffect(() => {
     setErrors({});
-  }, [isOpen]);
+    calculateMemberPoints();
+  }, [isOpen, data.memberName, data.memberTypeId, data.currencyCode]);
 
   const validateFields = () => {
     const validationErrors = {};
@@ -55,26 +66,26 @@ const CrudModal = ({
     }
   };
 
-  const fetchMemberPoints = () => {
-    const { memberName, memberTypeId } = data;
+  const calculateMemberPoints = () => {
+    const { memberName, memberTypeId, currencyCode } = data;
 
-    if (!memberName || !memberTypeId) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        memberName: !memberName ? "Member Name is required." : "",
-        memberTypeId: !memberTypeId ? "Member Type ID is required." : "",
-      }));
-      return;
+    if (memberName && memberTypeId && currencyCode) {
+      const points =
+        mockPoints[currencyCode]?.[memberName]?.[memberTypeId] || 0;
+      onInputChange({
+        target: {
+          name: "memberPoint",
+          value: points,
+        },
+      });
+    } else {
+      onInputChange({
+        target: {
+          name: "memberPoint",
+          value: "",
+        },
+      });
     }
-
-    const points = mockPoints[memberName]?.[memberTypeId] || 0;
-
-    onInputChange({
-      target: {
-        name: "memberPoint",
-        value: points,
-      },
-    });
   };
 
   const closeErrorModal = () => {
@@ -92,7 +103,9 @@ const CrudModal = ({
             .filter((field) => field.name !== "memberPoint") // Exclude memberPoint from regular fields
             .map((field) => (
               <div className="form-group" key={field.name}>
-                <label>{field.label}</label>
+                <label>
+                  {field.label} {field.required && <span className="required">*</span>}
+                </label>
                 {field.type === "select" ? (
                   <select
                     name={field.name}
@@ -124,28 +137,17 @@ const CrudModal = ({
               </div>
             ))}
 
-          {/* Single Member Point Field */}
-          <div className="form-group">
+          {/* Member Point Field */}
+          <div className="member-point-form-group">
             <label>
               Member Point <span className="required">*</span>
             </label>
-            <div className="member-point-container">
-              <input
-                type="text"
-                name="memberPoint"
-                value={data.memberPoint || ""}
-                readOnly
-              />
-              {!isViewing && (
-                <button
-                  type="button"
-                  className="fetch-points-button"
-                  onClick={fetchMemberPoints}
-                >
-                  Fetch Points
-                </button>
-              )}
-            </div>
+            <input
+              type="text"
+              name="memberPoint"
+              value={data.memberPoint || ""}
+              readOnly
+            />
             {errors.memberPoint && (
               <p className="error-message">{errors.memberPoint}</p>
             )}

@@ -92,11 +92,21 @@ const MemberMaintenance = () => {
         ],
         required: true,
       },
+      { 
+        label: "Currency Code", 
+        name: "currencyCode",
+        type: "select",
+        options: [
+          {label: "USD", value: "USD"},
+          {label: "EUR", value: "EUR"},
+          {label: "MYR", value: "MYR"},
+        ],
+        required: true
+      },      
       { name: "mobile", label: "Mobile", type: "text", required: true },
       { name: "emailAddress", label: "Email Address", type: "email", required: true },
       { name: "address", label: "Address", type: "text", required: true },
       { name: "postcode", label: "Postcode", type: "text", required: true },
-      { name: "currencyCode", label: "Currency Code", type: "text", required: true },
       { name: "memberPoint", label: "Member Point", type: "number", required: true },
     ]);
   }, [currentPage, itemsPerPage]);
@@ -159,13 +169,20 @@ const MemberMaintenance = () => {
 
     setConfirmMessage(
       newMember.id
-        ? "Do you want to update this member?"
-        : "Do you want to add this member?"
+        ? `Do you want to update this member "${newMember.memberName}"?`
+      : `Do you want to add this member "${newMember.memberName}"?`
     );
     setIsConfirmOpen(true);
   };
 
   const handleDelete = (id) => {
+    const memberToDelete = members.find((member) => member.id === id);
+  
+    if (!memberToDelete) {
+      console.error("Member not found");
+      return;
+    }
+
     setConfirmAction(() => () => {
       setLoading(true);
       setTimeout(() => {
@@ -179,7 +196,7 @@ const MemberMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage("Do you want to delete this member?");
+    setConfirmMessage(`Do you want to delete this member "${memberToDelete.memberName}"?`);
     setIsConfirmOpen(true);
   };
 

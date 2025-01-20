@@ -122,11 +122,22 @@ const LocationMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage(newLocation.id ? "Do you want to update this location?" : "Do you want to add this location?");
+    setConfirmMessage(
+      newLocation.id 
+      ? `Do you want to update this item group "${newLocation.locationName}"?`
+      : `Do you want to add this item group "${newLocation.locationName}"?`
+    );
     setIsConfirmOpen(true);
   };
 
   const handleDelete = (id) => {
+    const locationToDelete = locations.find((location) => location.id === id);
+  
+    if (!locationToDelete) {
+      console.error("Location not found");
+      return;
+    }
+
     setConfirmAction(() => () => {
       setLoading(true);
       setTimeout(() => {
@@ -140,7 +151,7 @@ const LocationMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage("Do you want to delete this location?");
+    setConfirmMessage(`Do you want to delete this location "${locationToDelete.locationName}"?`);
     setIsConfirmOpen(true);
   };
 

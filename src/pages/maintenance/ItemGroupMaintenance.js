@@ -33,6 +33,7 @@ const ItemGroupMaintenance = () => {
               itemGroupId: "IG001",
               itemTypeId: "IT001",
               itemGroupDescription: "Group for electronic items",
+              commissionType: "Rate",
               commissionPoint: 5.0,
               locationId: "L001",
             },
@@ -42,7 +43,8 @@ const ItemGroupMaintenance = () => {
               itemGroupId: "IG002",
               itemTypeId: "IT002",
               itemGroupDescription: "Group for furniture items",
-              commissionPoint: 7.5,
+              commissionType: "Amount",
+              commissionPoint: 30,
               locationId: "L002",
             },
           ],
@@ -97,6 +99,16 @@ const ItemGroupMaintenance = () => {
         required: true,
       },
       { name: "itemGroupDescription", label: "Item Group Description", type: "textarea", required: true },
+      {
+        name: "commissionType",
+        label: "Commission Type",
+        type: "select",
+        options: [
+          { label: "Rate", value: "Rate" },
+          { label: "Amount", value: "Amount" },
+        ],
+        required: true,
+      },
       { name: "commissionPoint", label: "Commission Point", type: "number", required: true },
     ]);
   }, [currentPage, itemsPerPage]);
@@ -157,11 +169,22 @@ const ItemGroupMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage(newItemGroup.id ? "Do you want to update this item group?" : "Do you want to add this item group?");
+    setConfirmMessage(
+      newItemGroup.id 
+      ? `Do you want to update this item group "${newItemGroup.itemGroupName}"?`
+      : `Do you want to add this item group "${newItemGroup.itemGroupName}"?`
+  );
     setIsConfirmOpen(true);
   };
 
   const handleDelete = (id) => {
+    const itemGroupToDelete = itemGroups.find((group) => group.id === id);
+  
+    if (!itemGroupToDelete) {
+      console.error("Item group not found");
+      return;
+    }
+
     setConfirmAction(() => () => {
       setLoading(true);
       setTimeout(() => {
@@ -175,7 +198,7 @@ const ItemGroupMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage("Do you want to delete this item group?");
+    setConfirmMessage(`Do you want to delete this item group "${itemGroupToDelete.itemGroupName}"?`);
     setIsConfirmOpen(true);
   };
 
@@ -230,9 +253,10 @@ const ItemGroupMaintenance = () => {
               <th>Item Group Name</th>
               <th>Item Group ID</th>
               <th>Item Type ID</th>
-              <th>Location ID</th>
               <th>Item Group Description</th>
+              <th>Commission Type</th>
               <th>Commission Point</th>
+              <th>Location ID</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -240,12 +264,13 @@ const ItemGroupMaintenance = () => {
             {itemGroups.map((group, index) => (
               <tr key={group.id}>
                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{group.itemGroupName}</td>
-                <td>{group.itemGroupId}</td>
-                <td>{group.itemTypeId}</td>
-                <td>{group.locationId}</td> {/* Display Location ID */}
-                <td>{group.itemGroupDescription}</td>
-                <td>{group.commissionPoint}</td>
+                <td>{group.itemGroupName || "-"}</td>
+                <td>{group.itemGroupId || "-"}</td>
+                <td>{group.itemTypeId || "-"}</td>
+                <td>{group.itemGroupDescription || "-"}</td>
+                <td>{group.commissionType || "-"}</td>
+                <td>{group.commissionPoint || "-"}</td>
+                <td>{group.locationId || "-"}</td>
                 <td>
                   <button
                     onClick={() => handleOpenModal(group, "Edit Item Group")}

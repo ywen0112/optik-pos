@@ -122,13 +122,20 @@ const DebtorTypeMaintenance = () => {
 
     setConfirmMessage(
       newDebtorType.id
-        ? "Do you want to update this debtor type?"
-        : "Do you want to add this debtor type?"
+      ? `Do you want to update the debtor type "${newDebtorType.type}"?`
+      : `Do you want to add the debtor "${newDebtorType.type}"?`
     );
     setIsConfirmOpen(true);
   };
 
   const handleDelete = (id) => {
+    const debtorTypeToDelete = debtorTypes.find((type) => type.id === id);
+  
+    if (!debtorTypeToDelete) {
+      console.error("Debtor type not found");
+      return;
+    }
+  
     setConfirmAction(() => () => {
       setLoading(true);
       setTimeout(() => {
@@ -141,10 +148,11 @@ const DebtorTypeMaintenance = () => {
         }
       }, 500);
     });
-
-    setConfirmMessage("Do you want to delete this debtor type?");
+  
+    setConfirmMessage(`Do you want to delete this debtor type "${debtorTypeToDelete.type}"?`);
     setIsConfirmOpen(true);
   };
+  
 
   const handleConfirmAction = () => {
     if (confirmAction) confirmAction();
@@ -204,9 +212,9 @@ const DebtorTypeMaintenance = () => {
             {debtorTypes.map((type, index) => (
               <tr key={type.id}>
                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{type.type}</td>
-                <td>{type.typeId}</td>
-                <td>{type.description}</td>
+                <td>{type.type || "-"}</td>
+                <td>{type.typeId || "-"}</td>
+                <td>{type.description || "-"}</td>
                 <td>
                   <button
                     onClick={() => handleOpenModal(type, "Edit Debtor Type")}

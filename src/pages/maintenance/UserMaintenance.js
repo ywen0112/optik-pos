@@ -142,11 +142,22 @@ const UserMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage(newUser.id ? "Do you want to update this user?" : "Do you want to add this user?");
+    setConfirmMessage(
+      newUser.id 
+      ? `Do you want to update this user "${newUser.name}"?`
+      : `Do you want to add this user "${newUser.name}"?`
+    );
     setIsConfirmOpen(true);
   };
 
   const handleDelete = (id) => {
+    const userToDelete = users.find((user) => user.id === id);
+  
+    if (!userToDelete) {
+      console.error("User not found");
+      return;
+    }
+
     setConfirmAction(() => () => {
       setLoading(true);
       setTimeout(() => {
@@ -160,7 +171,7 @@ const UserMaintenance = () => {
       }, 500);
     });
 
-    setConfirmMessage("Do you want to delete this user?");
+    setConfirmMessage(`Do you want to delete this user "${userToDelete.name}"?`);
     setIsConfirmOpen(true);
   };
 

@@ -32,7 +32,7 @@ const DebtorMaintenance = () => {
               id: 1,
               emailAddress: "john.doe@example.com",
               mobile: "1234567890",
-              debtorCode: "D01",
+              debtorCode: "D001",
               debtorName: "John Doe",
               debtorTypeId: "DT001",
               address1: "123 Main St",
@@ -50,7 +50,7 @@ const DebtorMaintenance = () => {
               id: 2,
               emailAddress: "jane.smith@example.com",
               mobile: "0987654321",
-              debtorCode: "D02",
+              debtorCode: "D002",
               debtorName: "Jane Smith",
               debtorTypeId: "DT002",
               address1: "456 Elm St",
@@ -65,7 +65,7 @@ const DebtorMaintenance = () => {
               tin: "TIN987654",
             },
           ],
-          totalPages: 1,
+          totalPages: Math.ceil(5 / itemsPerPage),
         };
   
         // Simulate fetching data
@@ -227,8 +227,8 @@ const DebtorMaintenance = () => {
                 <th>Debtor Type ID</th>
                 <th>Email</th>
                 <th>Phone Number</th>
-                <th>Location ID</th>
                 <th>TIN</th>
+                <th>Location ID</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -241,8 +241,8 @@ const DebtorMaintenance = () => {
                   <td>{debtor.debtorTypeId || "-"}</td>
                   <td>{debtor.emailAddress || "-"}</td>
                   <td>{debtor.mobile || "-"}</td>
-                  <td>{debtor.locationId || "-"}</td>
                   <td>{debtor.tin || "-"}</td>
+                  <td>{debtor.locationId || "-"}</td>
                   <td>
                     <button
                       onClick={() => handleOpenModal(debtor, "Edit Debtor")}

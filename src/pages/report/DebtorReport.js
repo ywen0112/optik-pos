@@ -3,6 +3,8 @@ import "../../css/DebtorReport.css";
 
 const DebtorReport = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const mockData = [
     {
@@ -13,13 +15,8 @@ const DebtorReport = () => {
       debtorTypeId: "DT001",
       address1: "123 Main Street",
       address2: "Suite 5",
-      address3: "",
-      address4: "",
       postCode: "12345",
       deliverAddr1: "Warehouse A",
-      deliverAddr2: "",
-      deliverAddr3: "",
-      deliverAddr4: "",
       deliverPostCode: "54321",
       locationId: "L001",
       salesAgent: "Agent A",
@@ -27,6 +24,7 @@ const DebtorReport = () => {
       ic: "A1234567",
       nameOnIC: "Johnathan Doe",
       tin: "TIN123456",
+      timestamp: "2025-01-01 12:34:56",
     },
     {
       emailAddress: "janesmith@example.com",
@@ -35,14 +33,8 @@ const DebtorReport = () => {
       debtorName: "Jane Smith",
       debtorTypeId: "DT002",
       address1: "456 Elm Street",
-      address2: "",
-      address3: "",
-      address4: "",
       postCode: "67890",
       deliverAddr1: "Warehouse B",
-      deliverAddr2: "",
-      deliverAddr3: "",
-      deliverAddr4: "",
       deliverPostCode: "98765",
       locationId: "L002",
       salesAgent: "Agent B",
@@ -50,6 +42,7 @@ const DebtorReport = () => {
       ic: "B7654321",
       nameOnIC: "Janet Smith",
       tin: "TIN654321",
+      timestamp: "2025-01-02 08:15:30",
     },
     {
       emailAddress: "peterparker@example.com",
@@ -58,14 +51,8 @@ const DebtorReport = () => {
       debtorName: "Peter Parker",
       debtorTypeId: "DT001",
       address1: "789 Broadway",
-      address2: "Apt 2",
-      address3: "",
-      address4: "",
       postCode: "56789",
       deliverAddr1: "Warehouse C",
-      deliverAddr2: "",
-      deliverAddr3: "",
-      deliverAddr4: "",
       deliverPostCode: "98789",
       locationId: "L003",
       salesAgent: "Agent C",
@@ -73,81 +60,70 @@ const DebtorReport = () => {
       ic: "C4567890",
       nameOnIC: "Spiderman Parker",
       tin: "TIN987654",
-    },
-    {
-      emailAddress: "tonystark@example.com",
-      mobile: "135791357",
-      debtorCode: "D004",
-      debtorName: "Tony Stark",
-      debtorTypeId: "DT003",
-      address1: "108 Stark Tower",
-      address2: "",
-      address3: "",
-      address4: "",
-      postCode: "11223",
-      deliverAddr1: "Warehouse D",
-      deliverAddr2: "",
-      deliverAddr3: "",
-      deliverAddr4: "",
-      deliverPostCode: "22111",
-      locationId: "L004",
-      salesAgent: "Agent D",
-      currencyCode: "USD",
-      ic: "D1239876",
-      nameOnIC: "Iron Man Stark",
-      tin: "TIN321456",
-    },
-    {
-      emailAddress: "natasharomanoff@example.com",
-      mobile: "246824682",
-      debtorCode: "D005",
-      debtorName: "Natasha Romanoff",
-      debtorTypeId: "DT002",
-      address1: "Black Widow Street",
-      address2: "",
-      address3: "",
-      address4: "",
-      postCode: "22334",
-      deliverAddr1: "Warehouse E",
-      deliverAddr2: "",
-      deliverAddr3: "",
-      deliverAddr4: "",
-      deliverPostCode: "33422",
-      locationId: "L005",
-      salesAgent: "Agent E",
-      currencyCode: "EUR",
-      ic: "E8765432",
-      nameOnIC: "Nat Romanoff",
-      tin: "TIN654123",
+      timestamp: "2025-01-03 14:22:45",
     },
   ];
 
-  const filteredData = mockData.filter(
-    (debtor) =>
+  const filteredData = mockData.filter((debtor) => {
+    const debtorDate = new Date(debtor.timestamp);
+  
+    // Include the entire day for the "toDate" filter
+    const from = fromDate ? new Date(fromDate) : null;
+    const to = toDate ? new Date(new Date(toDate).setHours(23, 59, 59, 999)) : null;
+  
+    const matchesSearchQuery =
       debtor.debtorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      debtor.debtorCode.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      debtor.debtorCode.toLowerCase().includes(searchQuery.toLowerCase());
+  
+    const withinDateRange =
+      (!from || debtorDate >= from) && (!to || debtorDate <= to);
+  
+    return matchesSearchQuery && withinDateRange;
+  });
+  
 
   return (
     <div className="debtor-report-container">
       <div className="debtor-report-search">
-        <input
-          type="text"
-          placeholder="Search by Debtor Name or Code"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+        <div className="debtor-search-criteria">
+          <div className="form-group">
+            <label>From Date:</label>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label>To Date:</label>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label>Search (Name or Code):</label>
+            <input
+              type="text"
+              placeholder="Enter Debtor Name or Code"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
       <table className="debtor-report-table">
         <thead>
           <tr>
-            <th>Email Address</th>
-            <th>Mobile</th>
+            <th>Timestamp</th>
+            <th>No</th>
             <th>Debtor Code</th>
             <th>Debtor Name</th>
+            <th>Email Address</th>
+            <th>Mobile</th>
             <th>Debtor Type ID</th>
             <th>Address 1</th>
-            <th>Address 2</th>
             <th>Postcode</th>
             <th>Delivery Address 1</th>
             <th>Delivery Postcode</th>
@@ -163,13 +139,14 @@ const DebtorReport = () => {
           {filteredData.length > 0 ? (
             filteredData.map((debtor, index) => (
               <tr key={index}>
-                <td>{debtor.emailAddress}</td>
-                <td>{debtor.mobile}</td>
+                <td>{debtor.timestamp}</td>
+                <td>{index + 1}</td>
                 <td>{debtor.debtorCode}</td>
                 <td>{debtor.debtorName}</td>
+                <td>{debtor.emailAddress}</td>
+                <td>{debtor.mobile}</td>
                 <td>{debtor.debtorTypeId}</td>
                 <td>{debtor.address1}</td>
-                <td>{debtor.address2 || "N/A"}</td>
                 <td>{debtor.postCode}</td>
                 <td>{debtor.deliverAddr1}</td>
                 <td>{debtor.deliverPostCode}</td>
@@ -183,7 +160,7 @@ const DebtorReport = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="16" style={{ textAlign: "center" }}>
+              <td colSpan="17" style={{ textAlign: "center" }}>
                 No records found.
               </td>
             </tr>

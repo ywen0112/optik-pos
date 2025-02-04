@@ -68,13 +68,11 @@
 
 .pagination-controls {
   flex: 7;
-  font-size: 18px;
 }
 
 .items-per-page-select {
   margin: 10px 8px;
   padding: 5px 5px;
-  font-size: 15px;
 }
 
 .pagination {
@@ -126,7 +124,7 @@
 .table td {
   padding: 8px 8px;
   text-align: left;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .table th {

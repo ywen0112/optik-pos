@@ -16,6 +16,7 @@ const AccessRightCrudModal = ({
     accessRights: [],
     fullAccess: false,
   });
+  const [errors, setErrors] = useState({});
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
 
   const defaultModules = useMemo(
@@ -78,6 +79,16 @@ const AccessRightCrudModal = ({
       });
     }
   }, [isOpen, data, defaultModules]);
+
+  const validateFields = () => {
+    const validationErrors = {};
+    if (!formData.role.trim()) {
+      validationErrors.role = "Role is required.";
+    }
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
+  };
+
 
   const handleRoleChange = (e) => {
     setFormData({ ...formData, role: e.target.value });
@@ -158,15 +169,15 @@ const AccessRightCrudModal = ({
   };
 
   const handleSave = () => {
-    if (!formData.role) {
+    if (validateFields()) {
+      onSave(formData);
+    } else {
       setErrorModal({
         isOpen: true,
         title: "Error",
         message: "Please fill out all required fields highlighted in red.",
       });
-      return;
     }
-    onSave(formData);
   };
 
   const closeErrorModal = () => {
@@ -188,7 +199,9 @@ const AccessRightCrudModal = ({
               onChange={handleRoleChange}
               disabled={isViewing}
               placeholder="Enter user role"
+              className={errors.role ? "input-error" : ""}
             />
+            {errors.role && <span className="error-message">{errors.role}</span>}
           </div>
 
           <div className="access-rights">

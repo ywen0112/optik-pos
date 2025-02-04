@@ -107,45 +107,6 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
   
   if (!isOpen) return null;
 
-  const fetchTIN = (ic, nameOnIC) => {
-    const mockDatabase = {
-      "123456789": { name: "John Doe", tin: "TIN123456" },
-      "987654321": { name: "Alice Smith", tin: "TIN987654" },
-      "456789123": { name: "Michael Johnson", tin: "TIN456789" },
-      "789123456": { name: "Emily Davis", tin: "TIN789123" },
-    };
-
-    if (mockDatabase[ic] && mockDatabase[ic].name === nameOnIC) {
-      return mockDatabase[ic].tin;
-    }
-    return null;
-  };
-
-  const handleFetchTIN = () => {
-    const ic = sectionData.ic;
-    const nameOnIC = sectionData.nameOnIC;
-  
-    if (!ic || !nameOnIC) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        ic: !ic ? "IC is required to fetch TIN." : prevErrors.ic,
-        nameOnIC: !nameOnIC ? "Name on IC is required to fetch TIN." : prevErrors.nameOnIC,
-      }));
-      return;
-    }
-  
-    const tin = fetchTIN(ic, nameOnIC);
-    if (tin) {
-      setSectionData({ ...sectionData, tin });
-    } else {
-      setSectionData({ ...sectionData, tin: "" }); // Clear TIN field
-      setErrorModal({
-        isOpen: true,
-        title: "TIN Fetch Error",
-        message: "TIN could not be found for the provided IC and Name on IC. Please verify your input.",
-      });
-    }
-  };
 
 
   return (
@@ -153,7 +114,6 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
       <div className="debtor-popup-content">
         <h3 className="debtor-modal-title">{title}</h3>
 
-        {/* Render sections dynamically */}
         {[
           {
             name: "Debtor Information",
@@ -206,32 +166,8 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
               },
               { label: "IC", name: "ic" },
               { label: "Name on IC", name: "nameOnIC" },
+              { label: "TIN", name: "tin" },
             ],
-            specialField: (
-              <div className="debtor-form-group">
-                <label className="debtor-form-label">
-                  TIN <span className="required">*</span>
-                </label>
-                <div className="debtor-tin-container">
-                  <input
-                    className="debtor-form-input"
-                    type="text"
-                    name="tin"
-                    value={sectionData.tin || ""}
-                    readOnly
-                  />
-                  {!isViewing && (
-                      <button
-                        className="debtor-fetch-tin-button"
-                        onClick={handleFetchTIN}
-                      >
-                        Fetch TIN
-                      </button>
-                  )}
-                </div>
-                {errors.tin && <p className="error-message">{errors.tin}</p>}
-              </div>
-            ),
           },
           {
             name: "Glasses Profile",

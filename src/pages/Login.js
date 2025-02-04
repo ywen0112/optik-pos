@@ -13,7 +13,6 @@ const Login = ({ logo }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Email validation regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email)) {
@@ -56,6 +55,7 @@ const Login = ({ logo }) => {
           <label htmlFor="email" className="input-label">Email</label>
           <input
             type="email"
+            className="login-input"
             id="email"
             placeholder="Enter your email"
             value={email}
@@ -67,6 +67,7 @@ const Login = ({ logo }) => {
           <div className="password-input">
             <input
               type={showPassword ? "text" : "password"}
+              className="login-input"
               id="password"
               placeholder="Enter your password"
               value={password}

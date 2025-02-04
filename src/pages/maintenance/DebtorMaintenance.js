@@ -255,13 +255,13 @@ const DebtorMaintenance = () => {
                       onClick={() => handleOpenModal(debtor, "Edit Debtor")}
                       className="action-button edit"
                     >
-                      <FaEdit /> Edit
+                      <FaEdit />
                     </button>
                     <button
                       onClick={() => handleDelete(debtor.id)}
                       className="action-button delete"
                     >
-                      <FaTrash /> Delete
+                      <FaTrash />
                     </button>
                     <button
                       onClick={() =>
@@ -269,7 +269,7 @@ const DebtorMaintenance = () => {
                       }
                       className="action-button view"
                     >
-                      <FaEye /> View
+                      <FaEye />
                     </button>
                   </td>
                 </tr>

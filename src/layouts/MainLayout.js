@@ -88,9 +88,6 @@ const MainLayout = () => {
       <div className="main-container">
         <Sidebar onMenuClick={handleMenuClick} />
         <div className="content-area">
-          {/* <div className="main-layout-header">
-            <h2>{selectedMenu}</h2>
-          </div> */}
           <div className="main-layout-content">
             <Routes>
               <Route path="/main/dashboard" element={<Dashboard />} />

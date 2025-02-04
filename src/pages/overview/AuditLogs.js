@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../../css/AuditLogs.css";
-import ErrorModal from "../../components/ErrorModal"; // Assuming ErrorModal is in the components folder
+import ErrorModal from "../../modals/ErrorModal"; // Assuming ErrorModal is in the components folder
 
 const AuditLogs = () => {
   const [users, setUsers] = useState([]);

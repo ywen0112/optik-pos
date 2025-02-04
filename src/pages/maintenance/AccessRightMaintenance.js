@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 import "../../css/Maintenance.css";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
-import AccessRightCrudModal from "../../components/AccessRightCrudModal";
-import ConfirmationModal from "../../components/ConfirmationModal";
-import ErrorModal from "../../components/ErrorModal";
+import AccessRightCrudModal from "../../modals/AccessRightCrudModal";
+import ConfirmationModal from "../../modals/ConfirmationModal";
+import ErrorModal from "../../modals/ErrorModal";
 
 const AccessRightMaintenance = () => {
   const [roles, setRoles] = useState([]);
@@ -19,6 +20,8 @@ const AccessRightMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -168,6 +171,13 @@ const AccessRightMaintenance = () => {
 
   return (
     <div className="maintenance-container">
+      <div className="breadcrumb">
+        <span className="back-link" onClick={() => navigate("/maintenance")}>
+          Maintenance
+        </span>
+        <span> / Access Right Maintenance</span>
+      </div>
+
       <ErrorModal
         isOpen={errorModal.isOpen}
         title={errorModal.title}
@@ -218,19 +228,19 @@ const AccessRightMaintenance = () => {
                     onClick={() => handleOpenModal(role, "Edit Role")}
                     className="action-button edit"
                   >
-                    <FaEdit /> Edit
+                    <FaEdit />
                   </button>
                   <button
                     onClick={() => handleDelete(role.id)}
                     className="action-button delete"
                   >
-                    <FaTrash /> Delete
+                    <FaTrash />
                   </button>
                   <button
                     onClick={() => handleOpenModal(role, "View Role", true)}
                     className="action-button view"
                   >
-                    <FaEye /> View
+                    <FaEye />
                   </button>
                 </td>
               </tr>

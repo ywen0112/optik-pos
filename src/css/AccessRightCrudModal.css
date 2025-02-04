@@ -1,79 +1,69 @@
 .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .popup-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .popup-form {
-    display: flex;
-    gap: 15px;
-  }
-  
-  .form-group label {
-    font-weight: bold;
-  }
-  
-  .access-rights {
-    margin-top: 15px;
-  }
-  
-  .modules {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-  
-  .module-group {
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 4px;
-    width: 250px;
-  }
+  top: 100px;
+  width: auto;
+  height: auto;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  justify-self: anchor-center;
+  background: rgba(0, 0, 0, 0.5);
+}
 
-  
-  .module-title {
-    display: flex;
-    gap: 5px;
-    font-weight: bold;
-  }
+.popup-content {
+  background: white;
+  overflow-y: auto;
+  padding: 20px 20px;
+}
 
-  .module-checkbox {
-    padding: 0;
-  }
+.form-group label {
+  font-weight: bold;
+  font-size: 15px;
+}
 
-  .access-rights label {
-    font-weight: bold;
-  }
-  
-  .permissions label {
-    display: flex;
-    gap: 5px;
-    margin-top: 5px;
-    font-weight: normal;
-  }
+.access-rights {
+  margin-top: 15px;
+}
 
-  .popup-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-  
-  
+.modules {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(6, 1fr); 
+}
+
+.module-group {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding-top: 5px;
+  width: auto;
+  height: auto;
+}
+
+.module-title {
+  display: flex;
+  font-weight: bold;
+  gap: 5px;
+  font-size: 14px;
+}
+
+.module-checkbox {
+  padding: 0;
+}
+
+.access-rights label {
+  font-weight: bold;
+}
+
+.permissions label {
+  display: flex;
+  font-weight: normal;
+  font-size: 14px;
+  gap: 5px;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+

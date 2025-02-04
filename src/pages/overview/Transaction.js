@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import "../../css/Transaction.css";
-import ErrorModal from "../../components/ErrorModal";
+import ErrorModal from "../../modals/ErrorModal";
 
 const Transaction = () => {
   const [isCounterOpen, setIsCounterOpen] = useState(false);
@@ -11,7 +11,7 @@ const Transaction = () => {
   const location = useLocation();
 
   const handleOpenCounter = () => {
-    if (!openCounterAmount || parseFloat(openCounterAmount) <= 0) {
+    if (!openCounterAmount || parseFloat(openCounterAmount) < 0) {
       setErrorModal({
         isOpen: true,
         title: "Invalid Amount",

@@ -21,25 +21,7 @@
     align-items: center;
     margin-bottom: 20px;
   }
-  
-  .main-layout-header h2 {
-    margin: 0;
-    color: #002462;
-  }
-  
-  .sync-button {
-    background-color: #002462;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 15px;
-  }
 
-  .sync-button:hover{
-    background-color: #004ccf;
-  }
   
   .main-layout-content {
     background: white;

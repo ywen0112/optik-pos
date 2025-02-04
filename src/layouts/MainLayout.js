@@ -1,32 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Outlet, useNavigate, useLocation } from "react-router-dom";
-import HeaderBar from "../components/HeaderBar";
-import Sidebar from "../components/SideBar";
+import HeaderBar from "../header/HeaderBar";
+import Sidebar from "./SideBar";
 import "../css/MainLayout.css";
 
-import Dashboard from "../pages/main/Dashboard";
-import AuditLogs from "../pages/main/AuditLogs";
-import InquiryScreen from "../pages/main/InquiryScreen";
-import Transaction from "../pages/main/Transaction";
-import CashManagement from "../pages/main/CashManagement";
-import SalesInvoice from "../pages/main/SalesInvoice";
-import PurchaseInvoice from "../pages/main/PurchaseInvoice";
-import CloseCounter from "../pages/main/CloseCounter"
+import Dashboard from "../pages/overview/Dashboard";
+import AuditLogs from "../pages/overview/AuditLogs";
+import InquiryScreen from "../pages/overview/InquiryScreen";
+import Transaction from "../pages/overview/Transaction";
+import CashManagement from "../pages/overview/CashManagement";
+import SalesInvoice from "../pages/overview/SalesInvoice";
+import PurchaseInvoice from "../pages/overview/PurchaseInvoice";
+import CloseCounter from "../pages/overview/CloseCounter"
 
+import Maintenance from "../pages/maintenance/Maintenance";
 import UserMaintenance from "../pages/maintenance/UserMaintenance";
 import AccessRightMaintenance from "../pages/maintenance/AccessRightMaintenance";
 import DebtorMaintenance from "../pages/maintenance/DebtorMaintenance";
-import DebtorTypeMaintenance from "../pages/maintenance/DebtorTypeMaintenance";
 import CreditorMaintenance from "../pages/maintenance/CreditorMaintenance";
-import CreditorTypeMaintenance from "../pages/maintenance/CreditorTypeMaintenance";
 import ItemMaintenance from "../pages/maintenance/ItemMaintenance";
-import ItemGroupMaintenance from "../pages/maintenance/ItemGroupMaintenance";
-import ItemTypeMaintenance from "../pages/maintenance/ItemTypeMaintenance";
 import MemberMaintenance from "../pages/maintenance/MemberMaintenance";
-import MemberTypeMaintenance from "../pages/maintenance/MemberTypeMaintenance";
 import LocationMaintenance from "../pages/maintenance/LocationMaintenance";
 import PWPMaintenance from "../pages/maintenance/PWPMaintenance";
 
+import Report from "../pages/report/Report";
 import DebtorReport from "../pages/report/DebtorReport";
 import CreditorReport from "../pages/report/CreditorReport";
 import ItemReport from "../pages/report/ItemReport";
@@ -34,6 +31,8 @@ import MemberReport from "../pages/report/MemberReport";
 import TransactionReport from "../pages/report/TransactionReport";
 import LocationReport from "../pages/report/LocationReport";
 import PWPReport from "../pages/report/PWPReport";
+
+import Profile from "../header/Profile";
 
 const MainLayout = () => {
   const [selectedMenu, setSelectedMenu] = useState("Dashboard");
@@ -49,19 +48,16 @@ const MainLayout = () => {
     "/main/transaction/sales-invoice": "Transaction",
     "/main/transaction/purchase-invoice": "Transaction",
     "/main/transaction/close-counter": "Transaction",
+    "/maintenance": "Maintenance",
     "/maintenance/user-maintenance": "User Maintenance",
     "/maintenance/access-right-maintenance": "Access Right Maintenance",
     "/maintenance/debtor-maintenance": "Debtor Maintenance",
-    "/maintenance/debtor-type-maintenance": "Debtor Type Maintenance",
     "/maintenance/creditor-maintenance": "Creditor Maintenance",
-    "/maintenance/creditor-type-maintenance": "Creditor Type Maintenance",
     "/maintenance/item-maintenance-batch-no": "Item Maintenance",
-    "/maintenance/item-group-maintenance": "Item Group Maintenance",
-    "/maintenance/item-type-maintenance": "Item Type Maintenance",
     "/maintenance/member-maintenance": "Member Maintenance",
-    "/maintenance/member-type-maintenance": "Member Type Maintenance",
     "/maintenance/location-maintenance": "Location Maintenance",
     "/maintenance/pwp-maintenance": "PWP Maintenance",
+    "/report": "Report",
     "/report/debtor-report": "Debtor Report",
     "/report/creditor-report": "Creditor Report",
     "/report/item-report": "Item Report",
@@ -69,10 +65,10 @@ const MainLayout = () => {
     "/report/transaction-report": "Transaction Report",
     "/report/location-report": "Location Report",
     "/report/pwp-report": "PWP Report",
+    "/profile": "Profile"
   };
 
   useEffect(() => {
-    // Update selectedMenu based on the current route
     const currentMenu = menuMapping[location.pathname] || "Dashboard";
     setSelectedMenu(currentMenu);
   }, [location.pathname]);
@@ -92,9 +88,9 @@ const MainLayout = () => {
       <div className="main-container">
         <Sidebar onMenuClick={handleMenuClick} />
         <div className="content-area">
-          <div className="main-layout-header">
+          {/* <div className="main-layout-header">
             <h2>{selectedMenu}</h2>
-          </div>
+          </div> */}
           <div className="main-layout-content">
             <Routes>
               <Route path="/main/dashboard" element={<Dashboard />} />
@@ -106,21 +102,18 @@ const MainLayout = () => {
                 <Route path="purchase-invoice" element={<PurchaseInvoice />} />
                 <Route path="close-counter" element={<CloseCounter />} />
               </Route>
-              {/* Maintenance Routes */}
+              <Route path="/maintenance" element={<Maintenance />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/maintenance/user-maintenance" element={<UserMaintenance />} />
               <Route path="/maintenance/access-right-maintenance" element={<AccessRightMaintenance />} />
               <Route path="/maintenance/debtor-maintenance" element={<DebtorMaintenance />} />
-              <Route path="/maintenance/debtor-type-maintenance" element={<DebtorTypeMaintenance />} />
               <Route path="/maintenance/creditor-maintenance" element={<CreditorMaintenance />} />
-              <Route path="/maintenance/creditor-type-maintenance" element={<CreditorTypeMaintenance />} />
               <Route path="/maintenance/item-maintenance-batch-no" element={<ItemMaintenance />} />
-              <Route path="/maintenance/item-group-maintenance" element={<ItemGroupMaintenance />} />
-              <Route path="/maintenance/item-type-maintenance" element={<ItemTypeMaintenance />} />
               <Route path="/maintenance/member-maintenance" element={<MemberMaintenance />} />
-              <Route path="/maintenance/member-type-maintenance" element={<MemberTypeMaintenance />} />
               <Route path="/maintenance/location-maintenance" element={<LocationMaintenance />} />
               <Route path="/maintenance/pwp-maintenance" element={<PWPMaintenance />} />
               {/* Report Routes */}
+              <Route path="/report" element={<Report />} />
               <Route path="/report/debtor-report" element={<DebtorReport />} />
               <Route path="/report/creditor-report" element={<CreditorReport />} />
               <Route path="/report/item-report" element={<ItemReport />} />

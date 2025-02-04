@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; 
 import "../../css/Maintenance.css";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
-import CreditorModal from "../../components/CreditorModal";
-import ConfirmationModal from "../../components/ConfirmationModal";
-import ErrorModal from "../../components/ErrorModal";
+import CreditorModal from "../../modals/CreditorModal";
+import ConfirmationModal from "../../modals/ConfirmationModal";
+import ErrorModal from "../../modals/ErrorModal";
 
 const CreditorMaintenance = () => {
   const [creditors, setCreditors] = useState([]);
@@ -19,6 +20,8 @@ const CreditorMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -176,6 +179,13 @@ const CreditorMaintenance = () => {
 
   return (
     <div className="maintenance-container">
+      <div className="breadcrumb">
+        <span className="back-link" onClick={() => navigate("/maintenance")}>
+          Maintenance
+        </span>
+        <span> / Creditor Maintenance</span>
+      </div>
+
       <ErrorModal
         isOpen={errorModal.isOpen}
         title={errorModal.title}

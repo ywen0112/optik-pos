@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 import "../../css/Maintenance.css";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
-import CrudModal from "../../components/CrudModal";
-import ConfirmationModal from "../../components/ConfirmationModal";
-import ErrorModal from "../../components/ErrorModal";
+import CrudModal from "../../modals/CrudModal";
+import ConfirmationModal from "../../modals/ConfirmationModal";
+import ErrorModal from "../../modals/ErrorModal";
 
 const UserMaintenance = () => {
   const [users, setUsers] = useState([]);
@@ -20,6 +21,7 @@ const UserMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -186,6 +188,13 @@ const UserMaintenance = () => {
 
   return (
     <div className="maintenance-container">
+      <div className="breadcrumb">
+        <span className="back-link" onClick={() => navigate("/maintenance")}>
+          Maintenance
+        </span>
+        <span> / User Maintenance</span>
+      </div>
+
       <ErrorModal
         isOpen={errorModal.isOpen}
         title={errorModal.title}
@@ -243,19 +252,19 @@ const UserMaintenance = () => {
                     onClick={() => handleOpenModal(user, "Edit User")}
                     className="action-button edit"
                   >
-                    <FaEdit /> Edit
+                    <FaEdit />
                   </button>
                   <button
                     onClick={() => handleDelete(user.id)}
                     className="action-button delete"
                   >
-                    <FaTrash /> Delete
+                    <FaTrash />
                   </button>
                   <button
                     onClick={() => handleOpenModal(user, "View User", true)}
                     className="action-button view"
                   >
-                    <FaEye /> View
+                    <FaEye />
                   </button>
                 </td>
               </tr>

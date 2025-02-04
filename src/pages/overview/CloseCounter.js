@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ErrorModal from "../../components/ErrorModal";
-import ConfirmationModal from "../../components/ConfirmationModal";
+import ErrorModal from "../../modals/ErrorModal";
+import ConfirmationModal from "../../modals/ConfirmationModal";
 import "../../css/Transaction.css";
 
 const CloseCounter = () => {

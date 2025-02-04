@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 import "../../css/Maintenance.css";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
-import ConfirmationModal from "../../components/ConfirmationModal";
-import ErrorModal from "../../components/ErrorModal";
-import MemberModal from "../../components/MemberModal";
+import ConfirmationModal from "../../modals/ConfirmationModal";
+import ErrorModal from "../../modals/ErrorModal";
+import MemberModal from "../../modals/MemberModal";
 
 const MemberMaintenance = () => {
   const [members, setMembers] = useState([]);
@@ -20,6 +21,7 @@ const MemberMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -211,6 +213,12 @@ const MemberMaintenance = () => {
 
   return (
     <div className="maintenance-container">
+      <div className="breadcrumb">
+        <span className="back-link" onClick={() => navigate("/maintenance")}>
+          Maintenance
+        </span>
+        <span> / Member Maintenance</span>
+      </div>
       <ErrorModal
         isOpen={errorModal.isOpen}
         title={errorModal.title}

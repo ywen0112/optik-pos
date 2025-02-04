@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/Login.css";
-import ErrorModal from "../components/ErrorModal"; 
+import ErrorModal from "../modals/ErrorModal"; 
 
 const Login = ({ logo }) => {
   const [email, setEmail] = useState("");

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 import "../../css/Maintenance.css";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
-import DebtorModal from "../../components/DebtorModal";
-import ConfirmationModal from "../../components/ConfirmationModal";
-import ErrorModal from "../../components/ErrorModal";
+import DebtorModal from "../../modals/DebtorModal";
+import ConfirmationModal from "../../modals/ConfirmationModal";
+import ErrorModal from "../../modals/ErrorModal";
 
 const DebtorMaintenance = () => {
   const [debtors, setDebtors] = useState([]);
@@ -19,13 +20,12 @@ const DebtorMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
-  
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Mock data to simulate API response
         const mockData = {
           items: [
             {
@@ -186,7 +186,14 @@ const DebtorMaintenance = () => {
 
   return (
     <div className="maintenance-container">
-       <ErrorModal
+      <div className="breadcrumb">
+        <span className="back-link" onClick={() => navigate("/maintenance")}>
+          Maintenance
+        </span>
+        <span> / Debtor Maintenance</span>
+      </div>
+      
+        <ErrorModal
         isOpen={errorModal.isOpen}
         title={errorModal.title}
         message={errorModal.message}

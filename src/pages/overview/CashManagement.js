@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../../css/Transaction.css";
-import ErrorModal from "../../components/ErrorModal";
+import ErrorModal from "../../modals/ErrorModal";
 
 const CashManagement = () => {
   const [cashInValue, setCashInValue] = useState("");

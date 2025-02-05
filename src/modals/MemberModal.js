@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../css/CrudModal.css";
 import ErrorModal from "./ErrorModal";
 
-const CrudModal = ({
+const MemberModal = ({
   isOpen,
   title,
   fields,
@@ -100,11 +100,10 @@ const CrudModal = ({
         <h3>{title}</h3>
         <div className="popup-form">
           {fields
-            .filter((field) => field.name !== "memberPoint") // Exclude memberPoint from regular fields
             .map((field) => (
               <div className="form-group" key={field.name}>
                 <label>
-                  {field.label} {field.required && <span className="required">*</span>}
+                  {field.label} 
                 </label>
                 {field.type === "select" ? (
                   <select
@@ -136,22 +135,6 @@ const CrudModal = ({
                 )}
               </div>
             ))}
-
-          {/* Member Point Field */}
-          <div className="member-point-form-group">
-            <label>
-              Member Point <span className="required">*</span>
-            </label>
-            <input
-              type="text"
-              name="memberPoint"
-              value={data.memberPoint || ""}
-              readOnly
-            />
-            {errors.memberPoint && (
-              <p className="error-message">{errors.memberPoint}</p>
-            )}
-          </div>
         </div>
         <div className="popup-buttons">
           {!isViewing && (
@@ -182,4 +165,4 @@ const CrudModal = ({
   );
 };
 
-export default CrudModal;
+export default MemberModal;

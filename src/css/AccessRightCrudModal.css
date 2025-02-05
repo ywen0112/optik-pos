@@ -1,10 +1,25 @@
+.access-popup-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.access-popup-content {
+  background: white;
+  padding: 20px 20px;
+  width: 100%;
+  max-height: 100vh;
+  overflow-y: auto;
+  border-radius: 8px;
+}
+
 .form-group label {
-  font-weight: bold;
-  font-size: 15px;
+  font-size: 13px;
+  color: #393939;
 }
 
 .access-rights {
-  margin-top: 15px;
+  margin-top: 10px;
 }
 
 .modules {
@@ -35,7 +50,8 @@
 }
 
 .access-rights label {
-  font-weight: bold;
+  font-size: 13px;
+  color: #393939;
 }
 
 .permissions label {

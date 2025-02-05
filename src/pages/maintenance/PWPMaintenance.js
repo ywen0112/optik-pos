@@ -276,19 +276,19 @@ const PWPMaintenance = () => {
                     onClick={() => handleOpenModal(pwp, "Edit PWP")}
                     className="action-button edit"
                   >
-                    <FaEdit /> Edit
+                    <FaEdit />
                   </button>
                   <button
                     onClick={() => handleDelete(pwp.id)}
                     className="action-button delete"
                   >
-                    <FaTrash /> Delete
+                    <FaTrash />
                   </button>
                   <button
                     onClick={() => handleOpenModal(pwp, "View PWP", true)}
                     className="action-button view"
                   >
-                    <FaEye /> View
+                    <FaEye />
                   </button>
                 </td>
               </tr>

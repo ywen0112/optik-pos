@@ -7,7 +7,7 @@
     background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .creditor-popup-content {
@@ -48,16 +48,18 @@
 
 .creditor-form-label {
     display: block;
-    font-weight: bold;
+    font-size: 13px;
+    color: #393939;
 }
 
 .creditor-form-input,
 .creditor-rx-input {
     width: 100%;
-    padding: 5px;
+    padding: 7px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+    font-size: 14px;
 }
 
 .creditor-form-checkbox {
@@ -89,12 +91,6 @@
     cursor: pointer;
 }
 
-.required {
-    color: red;
-    font-weight: bold;
-    margin-left: 5px;
-}
-
 .section-buttons {
     margin-top: 20px;
     display: flex;
@@ -109,10 +105,10 @@
     gap: 8px;
     justify-self: flex-start;
     margin-top: 20px;
-    font-weight: bold;
-  }
-  
-  .creditor-form-checkbox {
+    font-size: 13px;
+}
+
+.creditor-form-checkbox {
     margin: 0;
     flex: 1;
-  }
+}

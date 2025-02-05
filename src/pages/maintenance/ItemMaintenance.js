@@ -318,19 +318,19 @@ const ItemMaintenance = () => {
                     onClick={() => handleOpenModal(item, "Edit Item")}
                     className="action-button edit"
                   >
-                    <FaEdit /> Edit
+                    <FaEdit />
                   </button>
                   <button
                     onClick={() => handleDelete(item.id)}
                     className="action-button delete"
                   >
-                    <FaTrash /> Delete
+                    <FaTrash />
                   </button>
                   <button
                     onClick={() => handleOpenModal(item, "View Item", true)}
                     className="action-button view"
                   >
-                    <FaEye /> View
+                    <FaEye />
                   </button>
                 </td>
               </tr>

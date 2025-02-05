@@ -230,19 +230,19 @@ const LocationMaintenance = () => {
                     onClick={() => handleOpenModal(location, "Edit Location")}
                     className="action-button edit"
                   >
-                    <FaEdit /> Edit
+                    <FaEdit /> 
                   </button>
                   <button
                     onClick={() => handleDelete(location.id)}
                     className="action-button delete"
                   >
-                    <FaTrash /> Delete
+                    <FaTrash />
                   </button>
                   <button
                     onClick={() => handleOpenModal(location, "View Location", true)}
                     className="action-button view"
                   >
-                    <FaEye /> View
+                    <FaEye />
                   </button>
                 </td>
               </tr>

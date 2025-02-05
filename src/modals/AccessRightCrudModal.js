@@ -189,9 +189,9 @@ const AccessRightCrudModal = ({
 
   return (
     <div className="popup-overlay">
-      <div className="popup-content">
+      <div className="access-popup-content">
         <h3>{title}</h3>
-        <div className="popup-form">
+        <div className="access-popup-form">
           <div className="form-group">
             <label>User Role</label>
             <input

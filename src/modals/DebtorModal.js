@@ -3,7 +3,7 @@ import "../css/DebtorModal.css";
 import ErrorModal from "./ErrorModal";
 import ConfirmationModal from "./ConfirmationModal";
 
-const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isViewing }) => {
+const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing }) => {
   const [expandedSections, setExpandedSections] = useState({
     debtorInfo: false,
     glassesProfile: false,
@@ -17,8 +17,17 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
   const [confirmAction, setConfirmAction] = useState(null);
 
   useEffect(() => {
-    setSectionData({ ...data }); 
-  }, [data]);
+    if (isOpen) {
+      setSectionData({ ...data });
+      setErrors({});
+    } else {
+      setExpandedSections({
+        debtorInfo: false,
+        glassesProfile: false,
+        contactLensProfile: false,
+      });
+    }
+  }, [isOpen, data]);
 
   const toggleSection = (section) => {
     setExpandedSections((prevState) => ({
@@ -38,6 +47,12 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
     return validationErrors;
   };
 
+  const sectionKeys = {
+    "Debtor Information": "debtorInfo",
+    "Glasses Profile": "glassesProfile",
+    "Contact Lens Profile": "contactLensProfile",
+  };
+
   const handleSaveSection = (sectionName) => {
     let fieldsToValidate = [];
 
@@ -48,10 +63,8 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
         { label: "Debtor Code", name: "debtorCode" },
         { label: "Debtor Name", name: "debtorName" },
         { label: "Debtor Type ID", name: "debtorTypeId" },
-        { label: "Address 1", name: "address1" },
+        { label: "Address", name: "address1" },
         { label: "Postcode", name: "postCode" },
-        { label: "Delivery Address 1", name: "deliverAddr1" },
-        { label: "Delivery Postcode", name: "deliverPostCode" },
         { label: "Location ID", name: "locationId" },
         { label: "Sales Agent", name: "salesAgent" },
         { label: "Currency Code", name: "currencyCode" },
@@ -81,7 +94,12 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
 
     const validationErrors = validateFields(fieldsToValidate);
     if (Object.keys(validationErrors).length === 0) {
-      onSave(sectionData);
+      const updatedSectionData = {
+        ...sectionData,
+        id: data.id, 
+      };
+
+      onSave(updatedSectionData);
     } else {
       setErrorModal({
         isOpen: true,
@@ -90,10 +108,16 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
       });
     }
   };
+
   const handleCancelSection = (sectionName) => {
     const action = () => {
-      setSectionData({ ...data }); // Reset data to the original state
-      setErrors({}); // Clear errors
+      setSectionData({ ...data }); 
+      setErrors({});
+
+      setExpandedSections((prevState) => ({
+        ...prevState,
+        [sectionKeys[sectionName]]: false,
+      }));
     };
 
     setConfirmAction(() => action);
@@ -113,14 +137,11 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
     <div className="debtor-popup-overlay">
       <div className="debtor-popup-content">
         <h3 className="debtor-modal-title">{title}</h3>
-
         {[
           {
             name: "Debtor Information",
             key: "debtorInfo",
             fields: [
-              { label: "Email Address", name: "emailAddress" },
-              { label: "Mobile", name: "mobile" },
               { label: "Debtor Code", name: "debtorCode" },
               { label: "Debtor Name", name: "debtorName" },
               {
@@ -132,17 +153,22 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
                   { label: "DT002", value: "DT002" },
                   { label: "DT003", value: "DT003" },
                 ],
-              }, 
-             { label: "Address 1", name: "address1" },
-              { label: "Address 2", name: "address2", required: false },
-              { label: "Address 3", name: "address3", required: false },
-              { label: "Address 4", name: "address4", required: false },
-              { label: "Postcode", name: "postCode" },
-              { label: "Delivery Address 1", name: "deliverAddr1" },
-              { label: "Delivery Address 2", name: "deliverAddr2", required: false },
-              { label: "Delivery Address 3", name: "deliverAddr3", required: false },
-              { label: "Delivery Address 4", name: "deliverAddr4", required: false },
-              { label: "Delivery Postcode", name: "deliverPostCode" },
+              },
+              { label: "IC", name: "ic" },
+              { label: "Name on IC", name: "nameOnIC" },
+              { label: "TIN", name: "tin" }, 
+              { label: "Email Address", name: "emailAddress" },
+              { label: "Mobile", name: "mobile" },
+              { 
+                label: "Currency Code", 
+                name: "currencyCode",
+                type: "select",
+                options: [
+                  {label: "USD", value: "USD"},
+                  {label: "EUR", value: "EUR"},
+                  {label: "MYR", value: "MYR"},
+                ] 
+              },
               {
                 label: "Location ID",
                 name: "locationId",
@@ -154,19 +180,9 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
                 ],
               }, 
               { label: "Sales Agent", name: "salesAgent" },
-              { 
-                label: "Currency Code", 
-                name: "currencyCode",
-                type: "select",
-                options: [
-                  {label: "USD", value: "USD"},
-                  {label: "EUR", value: "EUR"},
-                  {label: "MYR", value: "MYR"},
-                ] 
-              },
-              { label: "IC", name: "ic" },
-              { label: "Name on IC", name: "nameOnIC" },
-              { label: "TIN", name: "tin" },
+              { label: "Postcode", name: "postCode" },
+              { label: "Address", name: "address1" },
+              { label: "Remark", name: "remark" },
             ],
           },
           {
@@ -194,8 +210,8 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
             ],
           },
         ].map(({ name, key, fields, specialField }) => (
-          <div className="debtor-section" key={key}>
-            <div
+        <div className={`debtor-section ${key === "debtorInfo" ? "debtor-info-section" : "profile-section"}`} key={key}>
+          <div
               className="debtor-section-header"
               onClick={() => toggleSection(key)}
             >
@@ -205,10 +221,10 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
             {expandedSections[key] && (
               <div>
                 <div className="debtor-section-content">
-                {fields.map(({ label, name, type = "text", options, required = true }) => (
+                {fields.map(({ label, name, type = "text", options}) => (
                   <div key={name} className="debtor-form-group">
                     <label className="debtor-form-label">
-                      {label} {required && <span className="required">*</span>}
+                      {label}
                     </label>
                     {type === "select" ? (
                       <select
@@ -227,6 +243,17 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, onInputChange, isVi
                           </option>
                         ))}
                       </select>
+                    ) : name === "remark" || name.includes("address1") ? ( 
+                      <textarea
+                        className="debtor-form-textarea"
+                        name={name}
+                        value={sectionData[name] || ""}
+                        onChange={(e) =>
+                          setSectionData({ ...sectionData, [name]: e.target.value })
+                        }
+                        disabled={isViewing}
+                        rows={3} 
+                      />
                     ) : (
                       <input
                         className="debtor-form-input"

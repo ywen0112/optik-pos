@@ -5,6 +5,7 @@ import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import CreditorModal from "../../modals/CreditorModal";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
+import SuccessModal from "../../modals/SuccessModal";
 
 const CreditorMaintenance = () => {
   const [creditors, setCreditors] = useState([]);
@@ -20,6 +21,7 @@ const CreditorMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [successModal, setSuccessModal] = useState({ isOpen: false, title: "" });
   const navigate = useNavigate();
 
 
@@ -113,6 +115,7 @@ const CreditorMaintenance = () => {
   };
 
   const handleCloseModal = () => {
+    setNewCreditor({});
     setIsPopupOpen(false);
   };
 
@@ -135,6 +138,7 @@ const CreditorMaintenance = () => {
 
           setCreditors(updatedCreditors);
           setIsPopupOpen(false);
+          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -156,6 +160,7 @@ const CreditorMaintenance = () => {
       setTimeout(() => {
         try {
           setCreditors((prev) => prev.filter((creditor) => creditor.id !== id));
+          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -177,6 +182,10 @@ const CreditorMaintenance = () => {
     setErrorModal({ isOpen: false, title: "", message: "" });
   };
 
+  const closeSuccessModal = () => {
+    setSuccessModal({ isOpen: false, title: "" });
+  };
+
   return (
     <div className="maintenance-container">
       <div className="breadcrumb">
@@ -192,7 +201,11 @@ const CreditorMaintenance = () => {
         message={errorModal.message}
         onClose={closeErrorModal}
       />
-
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        title={successModal.title}
+        onClose={closeSuccessModal}
+      />
       <div className="maintenance-header">
         <div className="pagination-controls">
           <label>
@@ -247,13 +260,13 @@ const CreditorMaintenance = () => {
                     onClick={() => handleOpenModal(creditor, "Edit Creditor")}
                     className="action-button edit"
                   >
-                    <FaEdit /> Edit
+                    <FaEdit />
                   </button>
                   <button
                     onClick={() => handleDelete(creditor.id)}
                     className="action-button delete"
                   >
-                    <FaTrash /> Delete
+                    <FaTrash />
                   </button>
                   <button
                     onClick={() =>
@@ -261,7 +274,7 @@ const CreditorMaintenance = () => {
                     }
                     className="action-button view"
                   >
-                    <FaEye /> View
+                    <FaEye />
                   </button>
                 </td>
               </tr>

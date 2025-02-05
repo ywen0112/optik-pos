@@ -5,6 +5,7 @@ import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import DebtorModal from "../../modals/DebtorModal";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
+import SuccessModal from "../../modals/SuccessModal";
 
 const DebtorMaintenance = () => {
   const [debtors, setDebtors] = useState([]);
@@ -20,6 +21,7 @@ const DebtorMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,8 +39,6 @@ const DebtorMaintenance = () => {
               debtorTypeId: "DT001",
               address1: "123 Main St",
               postCode: "12345",
-              deliverAddr1: "123 Main St",
-              deliverPostCode: "12345",
               locationId: "L001",
               salesAgent: "Agent1",
               currencyCode: "USD",
@@ -55,8 +55,6 @@ const DebtorMaintenance = () => {
               debtorTypeId: "DT002",
               address1: "456 Elm St",
               postCode: "54321",
-              deliverAddr1: "456 Elm St",
-              deliverPostCode: "54321",
               locationId: "L002",
               salesAgent: "Agent2",
               currencyCode: "EUR",
@@ -68,7 +66,6 @@ const DebtorMaintenance = () => {
           totalPages: Math.ceil(5 / itemsPerPage),
         };
   
-        // Simulate fetching data
         setTimeout(() => {
           setDebtors(
             mockData.items.slice(
@@ -103,7 +100,7 @@ const DebtorMaintenance = () => {
   };
 
   const handleOpenModal = (debtor = {}, title = "", viewing = false) => {
-    setNewDebtor({ ...debtor });
+    setNewDebtor({ ...debtor, id: debtor.id || null });
     setModalTitle(title);
     setIsViewing(viewing);
     setIsPopupOpen(true);
@@ -120,7 +117,7 @@ const DebtorMaintenance = () => {
       : `Are you sure you want to add the debtor "${updatedDebtor.debtorName}"?`;
   
     setConfirmAction(() => async () => {
-      setLoading(true); // Show loading spinner
+      setLoading(true); 
       setTimeout(() => {
         try {
           const updatedData = {
@@ -129,28 +126,26 @@ const DebtorMaintenance = () => {
           };
   
           if (updatedDebtor.id) {
-            // Update existing debtor
             setDebtors((prev) =>
               prev.map((debtor) =>
                 debtor.id === updatedDebtor.id ? updatedData : debtor
               )
             );
           } else {
-            // Add new debtor
             setDebtors((prev) => [...prev, updatedData]);
           }
-          handleCloseModal(); // Close the modal after saving
+          setSuccessModal({ isOpen: true, title: "Update Successfully!"});
         } catch (error) {
           console.error("Error saving debtor:", error);
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
-          setLoading(false); // Hide loading spinner
+          setLoading(false);
         }
-      }, 500); // Simulate asynchronous operation
+      }, 500); 
     });
   
-    setConfirmMessage(confirmMessage); // Set custom confirmation message
-    setIsConfirmOpen(true); // Open confirmation modal
+    setConfirmMessage(confirmMessage); 
+    setIsConfirmOpen(true);
   };
   
   const handleDelete = (id) => {
@@ -158,21 +153,22 @@ const DebtorMaintenance = () => {
     const confirmMessage = `Are you sure you want to delete the debtor "${debtorToDelete?.debtorName}"?`;
   
     setConfirmAction(() => async () => {
-      setLoading(true); // Show loading spinner
+      setLoading(true);
       setTimeout(() => {
         try {
-          setDebtors((prev) => prev.filter((debtor) => debtor.id !== id)); // Delete debtor by ID
+          setDebtors((prev) => prev.filter((debtor) => debtor.id !== id)); 
+          setSuccessModal({ isOpen: true, title: "Update Successfully! "})
         } catch (error) {
           console.error("Error deleting debtor:", error);
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
-          setLoading(false); // Hide loading spinner
+          setLoading(false);
         }
-      }, 500); // Simulate asynchronous operation
+      }, 500); 
     });
   
-    setConfirmMessage(confirmMessage); // Set custom confirmation message
-    setIsConfirmOpen(true); // Open confirmation modal
+    setConfirmMessage(confirmMessage); 
+    setIsConfirmOpen(true);
   };
 
   const handleConfirmAction = () => {
@@ -184,6 +180,10 @@ const DebtorMaintenance = () => {
     setErrorModal({ isOpen: false, title: "", message: "" });
   };
 
+  const closeSuccessModal = () => {
+    setSuccessModal({ isOpen: false, title: ""});
+  };
+
   return (
     <div className="maintenance-container">
       <div className="breadcrumb">
@@ -193,11 +193,16 @@ const DebtorMaintenance = () => {
         <span> / Debtor Maintenance</span>
       </div>
       
-        <ErrorModal
+      <ErrorModal
         isOpen={errorModal.isOpen}
         title={errorModal.title}
         message={errorModal.message}
         onClose={closeErrorModal}
+      />
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        title={successModal.title}
+        onClose={closeSuccessModal}
       />
         <div className="maintenance-header">
           <div className="pagination-controls">

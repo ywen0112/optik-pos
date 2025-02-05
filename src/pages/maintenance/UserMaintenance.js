@@ -5,6 +5,7 @@ import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import CrudModal from "../../modals/CrudModal";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
+import SuccessModal from "../../modals/SuccessModal";
 
 const UserMaintenance = () => {
   const [users, setUsers] = useState([]);
@@ -21,6 +22,7 @@ const UserMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -111,12 +113,12 @@ const UserMaintenance = () => {
 
   const handleCloseModal = () => {
     if (isViewing) {
-      setIsPopupOpen(false); // Close modal immediately in viewing mode
+      setIsPopupOpen(false); 
       return;
     }
 
     setConfirmAction(() => () => {
-      setIsPopupOpen(false); // Close the modal
+      setIsPopupOpen(false); 
     });
 
     setConfirmMessage("Are you sure you want to cancel and discard unsaved changes?");
@@ -136,6 +138,7 @@ const UserMaintenance = () => {
 
           setUsers(updatedUsers);
           setIsPopupOpen(false);
+          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -165,6 +168,7 @@ const UserMaintenance = () => {
       setTimeout(() => {
         try {
           setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -186,6 +190,10 @@ const UserMaintenance = () => {
     setErrorModal({ isOpen: false, title: "", message: "" });
   };
 
+  const closeSuccessModal = () => {
+    setSuccessModal({ isOpen: false, title: "" });
+  };
+
   return (
     <div className="maintenance-container">
       <div className="breadcrumb">
@@ -200,6 +208,11 @@ const UserMaintenance = () => {
         title={errorModal.title}
         message={errorModal.message}
         onClose={closeErrorModal}
+      />
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        title={successModal.title}
+        onClose={closeSuccessModal}
       />
 
       <div className="maintenance-header">

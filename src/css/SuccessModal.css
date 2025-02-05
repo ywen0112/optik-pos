@@ -8,7 +8,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 1003;
   }
   
   .success-modal {
@@ -39,15 +39,9 @@
   }
   
   .success-modal-title {
-    font-size: 24px;
+    font-size: 20px;
     color: #333;
     margin-bottom: 10px;
-  }
-  
-  .success-modal-message {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 20px;
   }
   
   .success-modal-button {

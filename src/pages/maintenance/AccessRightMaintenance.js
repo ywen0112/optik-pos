@@ -5,6 +5,7 @@ import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import AccessRightCrudModal from "../../modals/AccessRightCrudModal";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
+import SuccessModal from "../../modals/SuccessModal";
 
 const AccessRightMaintenance = () => {
   const [roles, setRoles] = useState([]);
@@ -19,6 +20,7 @@ const AccessRightMaintenance = () => {
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmMessage, setConfirmMessage] = useState("");
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
   const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -93,7 +95,7 @@ const AccessRightMaintenance = () => {
 
   const handleCloseModal = () => {
     if (isViewing) {
-      setIsPopupOpen(false); // Close modal immediately in viewing mode
+      setIsPopupOpen(false); 
       return;
     }
 
@@ -122,6 +124,7 @@ const AccessRightMaintenance = () => {
             const newId = roles.length ? Math.max(...roles.map((role) => role.id)) + 1 : 1;
             setRoles((prevRoles) => [...prevRoles, { ...updatedRole, id: newId }]);
           }
+          setSuccessModal({ isOpen: true, title: "Update Successfully! "})
           setIsPopupOpen(false);
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
@@ -144,6 +147,7 @@ const AccessRightMaintenance = () => {
       setTimeout(() => {
         try {
           setRoles((prevRoles) => prevRoles.filter((role) => role.id !== id));
+          setSuccessModal({ isOpen: true, title: "Update Successfully! "})
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -162,6 +166,10 @@ const AccessRightMaintenance = () => {
 
   const closeErrorModal = () => {
     setErrorModal({ isOpen: false, title: "", message: "" });
+  };
+
+  const closeSuccessModal = () => {
+    setSuccessModal({ isOpen: false, title: ""});
   };
 
   const currentRoles = roles.slice(
@@ -183,6 +191,11 @@ const AccessRightMaintenance = () => {
         title={errorModal.title}
         message={errorModal.message}
         onClose={closeErrorModal}
+      />
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        title={successModal.title}
+        onClose={closeSuccessModal}
       />
       <div className="maintenance-header">
         <div className="pagination-controls">

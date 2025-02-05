@@ -12,16 +12,17 @@ const CreditorModal = ({
   isViewing,
 }) => {
   const [sectionData, setSectionData] = useState({ ...data });
-  const [originalData, setOriginalData] = useState({ ...data });
   const [errors, setErrors] = useState({});
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
 
   useEffect(() => {
-    setSectionData({ ...data });
-    setOriginalData({ ...data });
-  }, [data]);
+    if (isOpen) {
+      setSectionData({ ...data });
+      setErrors({});
+    } 
+  }, [isOpen, data]);
 
   const validateFields = (fields) => {
     const validationErrors = {};
@@ -52,7 +53,7 @@ const CreditorModal = ({
       { label: "Mobile", name: "mobile" },
       { label: "Fax 1", name: "fax1" },
       { label: "Email Address", name: "emailAddress" },
-      { label: "Address 1", name: "address1" },
+      { label: "Address", name: "address1" },
       { label: "Postcode", name: "postcode" },
       {
         label: "Location ID",
@@ -93,12 +94,14 @@ const CreditorModal = ({
     }
   };
 
-  const handleCancel = () => {
-    setConfirmAction(() => () => {
-      setSectionData(originalData);
+  const handleCancelSection = () => {
+    const action = () => {
+      setSectionData({ ...data }); 
+      setErrors({});
       onClose();
-    });
+    };
 
+    setConfirmAction(() => action);
     setIsConfirmOpen(true);
   };
 
@@ -129,17 +132,21 @@ const CreditorModal = ({
             },
             { label: "Company Name", name: "companyName" },
             { label: "Registration Number", name: "registerNo" },
-            { label: "Is Group Company", name: "isGroupCompany", type: "checkbox", required: false },
             { label: "Mobile", name: "mobile" },
             { label: "Phone 1", name: "phone1", required: false },
             { label: "Phone 2", name: "phone2", required: false },
             { label: "Fax 1", name: "fax1" },
             { label: "Fax 2", name: "fax2", required: false },
-            { label: "Address 1", name: "address1" },
-            { label: "Address 2", name: "address2", required: false },
-            { label: "Address 3", name: "address2", required: false },
-            { label: "Address 4", name: "address2", required: false },
-            { label: "Postcode", name: "postcode" },
+            { 
+              label: "Currency Code", 
+              name: "currencyCode",
+              type: "select",
+              options: [
+                {label: "USD", value: "USD"},
+                {label: "EUR", value: "EUR"},
+                {label: "MYR", value: "MYR"},
+              ] 
+            },
             {
               label: "Location ID",
               name: "locationId",
@@ -153,19 +160,12 @@ const CreditorModal = ({
             { label: "Attention", name: "attention" },
             { label: "Nature of Business", name: "natureOfBusiness" },
             { label: "Purchase Agent", name: "purchaseAgent" },
-            { 
-              label: "Currency Code", 
-              name: "currencyCode",
-              type: "select",
-              options: [
-                {label: "USD", value: "USD"},
-                {label: "EUR", value: "EUR"},
-                {label: "MYR", value: "MYR"},
-              ] 
-            },
             { label: "Display Term", name: "displayTerm" },
-            { label: "TIN", name: "tin" },
-          ].map(({ label, name, type = "text", options, required = true }) => (
+            { label: "Postcode", name: "postcode" },
+            { label: "Address", name: "address1" },
+            { label: "Remark", name: "remark" },
+            { label: "Is Group Company", name: "isGroupCompany", type: "checkbox" },
+          ].map(({ label, name, type = "text", options}) => (
             <div key={name} className="creditor-form-group">
               {type === "checkbox" ? (
                 <div className="checkbox-container">
@@ -184,7 +184,7 @@ const CreditorModal = ({
               ) : (
                 <>
                   <label className="creditor-form-label">
-                    {label} {required && <span className="required">*</span>}
+                    {label}
                   </label>
                   {type === "select" ? (
                     <select
@@ -203,6 +203,17 @@ const CreditorModal = ({
                         </option>
                       ))}
                     </select>
+                  ) : name === "remark" || name.includes("address1") ? ( // Apply textarea for Remark & Address fields
+                    <textarea
+                      className="creditor-form-textarea"
+                      name={name}
+                      value={sectionData[name] || ""}
+                      onChange={(e) =>
+                        setSectionData({ ...sectionData, [name]: e.target.value })
+                      }
+                      disabled={isViewing}
+                      rows={3} 
+                    />
                   ) : (
                     <input
                       className="creditor-form-input"
@@ -228,7 +239,7 @@ const CreditorModal = ({
               <button className="save-button" onClick={handleSave}>
                 Save Changes
               </button>
-              <button className="cancel-button" onClick={handleCancel}>
+              <button className="cancel-button" onClick={handleCancelSection}>
                 Cancel / Close
               </button>
             </>

@@ -77,6 +77,7 @@ const AccessRightCrudModal = ({
         })),
         fullAccess: false,
       });
+      setErrors({});
     }
   }, [isOpen, data, defaultModules]);
 

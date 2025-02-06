@@ -1,153 +1,159 @@
-.profile-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  /* .profile-card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    width: 350px;
-    text-align: center;
-  } */
-  
-  .profile-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .profile-icon {
-    font-size: 80px;
-    color: #007bff;
-  }
-  
-  .user-role {
-    color: #555;
-    font-size: 14px;
-    margin-top: -5px;
-  }
-  
-  .profile-details {
-    margin-top: 15px;
-  }
-  
-  .profile-info {
-    text-align: left;
-    margin-bottom: 10px;
-  }
-  
-  .profile-info label {
-    font-weight: bold;
-    display: block;
-  }
-  
-  .profile-info p {
-    background: #f5f5f5;
-    padding: 8px;
-    border-radius: 5px;
-  }
-  
-  .profile-info input {
-    width: 100%;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  .profile-actions {
-    margin-top: 20px;
-  }
-  
-  /* button {
-    padding: 10px;
-    width: 100%;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 10px;
-  } */
-  
-  .edit-btn {
-    background: #007bff;
-    color: white;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 10px;
-  }
-  
-  .save-btn {
-    background: #28a745;
-    color: white;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 10px;
-  }
-  
-  .change-password-btn {
-    background: #ff9800;
-    color: white;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 10px;
-  }
-  
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
-    text-align: center;
-  }
-  
-  .modal-content input {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  .modal-actions {
-    margin-top: 10px;
-  }
-  
-  .cancel-btn {
-    background: #dc3545;
-    color: white;
-  }
-  
-  .error-message {
-    color: red;
-    font-size: 14px;
-    margin-top: 5px;
-  }
-  
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+  display: flex;
+  justify-content: flex-start;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #ddd;
+}
+
+.profile-icon {
+  font-size: 60px;
+  color: #007bff;
+  stroke-width: 1.5px;
+}
+
+.profile-details {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-info label {
+  font-weight: bold;
+  flex: 1;
+}
+
+.profile-info p,
+.profile-info input {
+  flex: 2;
+  background: #f9f9f9;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.profile-select .react-select__control {
+  flex: 2;
+  background: #f9f9f9;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  padding: 0px;
+  width: 70vh;
+}
+
+.profile-info input {
+  background: white;
+  border: 1px solid #ccc;
+}
+
+.profile-select .react-select__single-value {
+  font-size: 14px;
+}
+
+.profile-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn {
+  background: none;
+  color: #007bff;
+  border: 1px solid #1e90ff;
+  padding: 8px 5px;
+  border-radius: 4px;
+  flex: 3;
+}
+
+.save-btn {
+  background: none;
+  color: #28a745;
+  border: 1px solid #28a745;
+  padding: 8px 5px;
+  border-radius: 4px;
+  flex: 3;
+}
+
+.change-password-btn {
+  background: none;
+  color: #ff9800;
+  border: 1px solid #ff9800;
+  padding: 8px 5px;
+  border-radius: 4px;
+  flex: 3;
+}
+
+.logout-btn {
+  background: none;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  padding: 8px 5px;
+  border-radius: 4px;
+  flex: 3;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.modal-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.cancel-btn {
+  background: none;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  padding: 8px 5px;
+  border-radius: 4px;
+  flex: 3;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}

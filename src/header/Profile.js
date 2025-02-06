@@ -1,15 +1,27 @@
 import React, { useState } from "react";
-import { FaUserCircle, FaEdit, FaSave, FaLock } from "react-icons/fa";
+import Select from "react-select";
+import { FaRegUserCircle, FaRegEdit, FaRegSave, FaUnlockAlt, FaSignOutAlt } from "react-icons/fa";
 import "../css/Profile.css";
 
+const roleOptions = [
+  { value: "super-admin", label: "Super Admin" },
+  { value: "admin", label: "Admin" },
+  { value: "user", label: "User" },
+];
+
+const locationOptions = [
+  { value: "L001", label: "L001" },
+  { value: "L002", label: "L002" },
+  { value: "L003", label: "L003" },
+];
+
 const Profile = () => {
-  // Sample User Data
   const initialUserData = {
     username: "admin",
-    role: "Super Admin",
+    role: { value: "super-admin", label: "Super Admin" },
     email: "admin@example.com",
     mobile: "123-456-7890",
-    locationId: "L001",
+    locationId: { value: "L001", label: "L001" },
   };
 
   const [userData, setUserData] = useState(initialUserData);
@@ -27,6 +39,10 @@ const Profile = () => {
     setIsEditing(false);
   };
 
+  const handleLogout = () => {
+    alert("You have logged out.");
+  };
+
   const handleChangePassword = () => {
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match.");
@@ -40,64 +56,101 @@ const Profile = () => {
   };
 
   return (
-    <div className="profile-container">
-      <div className="profile-card">
-        <div className="profile-header">
-          <FaUserCircle className="profile-icon" />
-          <h2>{userData.username}</h2>
-          <p className="user-role">{userData.role}</p>
-        </div>
+    <div className="profile-card">
+      <div className="profile-header">
+        <FaRegUserCircle className="profile-icon" />
+      </div>
 
-        <div className="profile-details">
-          <div className="profile-info">
-            <label>Email:</label>
-            {isEditing ? (
-              <input
-                type="email"
-                value={userData.email}
-                onChange={(e) => setUserData({ ...userData, email: e.target.value })}
-              />
-            ) : (
-              <p>{userData.email}</p>
-            )}
-          </div>
-
-          <div className="profile-info">
-            <label>Mobile:</label>
-            {isEditing ? (
-              <input
-                type="text"
-                value={userData.mobile}
-                onChange={(e) => setUserData({ ...userData, mobile: e.target.value })}
-              />
-            ) : (
-              <p>{userData.mobile}</p>
-            )}
-          </div>
-
-          <div className="profile-info">
-            <label>Location ID:</label>
-            <p>{userData.locationId}</p>
-          </div>
-        </div>
-
-        <div className="profile-actions">
+      <div className="profile-details">
+      <div className="profile-info">
+          <label>Username:</label>
           {isEditing ? (
-            <button className="save-btn" onClick={handleSave}>
-              <FaSave /> Save
-            </button>
+            <input
+              type="text"
+              value={userData.username}
+              onChange={(e) => setUserData({ ...userData, username: e.target.value })}
+            />
           ) : (
-            <button className="edit-btn" onClick={handleEditToggle}>
-              <FaEdit /> Edit
-            </button>
+            <p>{userData.username}</p>
           )}
-          <button className="change-password-btn" onClick={() => setPasswordModalOpen(true)}>
-            <FaLock /> Change Password
-          </button>
+        </div>
+        <div className="profile-info">
+          <label>User Role:</label>
+          {isEditing ? (
+            <Select
+              className="profile-select"
+              classNamePrefix="react-select"
+              value={userData.role}
+              onChange={(selectedOption) => setUserData({ ...userData, role: selectedOption })}
+              options={roleOptions}
+              isSearchable
+            />
+          ) : (
+            <p>{userData.role.label}</p>
+          )}
+        </div>
+
+        <div className="profile-info">
+          <label>Email:</label>
+          {isEditing ? (
+            <input
+              type="email"
+              value={userData.email}
+              onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+            />
+          ) : (
+            <p>{userData.email}</p>
+          )}
+        </div>
+
+        <div className="profile-info">
+          <label>Mobile:</label>
+          {isEditing ? (
+            <input
+              type="text"
+              value={userData.mobile}
+              onChange={(e) => setUserData({ ...userData, mobile: e.target.value })}
+            />
+          ) : (
+            <p>{userData.mobile}</p>
+          )}
+        </div>
+
+        <div className="profile-info">
+          <label>Location ID:</label>
+          {isEditing ? (
+            <Select
+              className="profile-select"
+              classNamePrefix="react-select"
+              value={userData.locationId}
+              onChange={(selectedOption) => setUserData({ ...userData, locationId: selectedOption })}
+              options={locationOptions}
+              isSearchable
+            />
+          ) : (
+            <p>{userData.locationId.label}</p>
+          )}
         </div>
       </div>
 
-      {/* Change Password Modal */}
+      <div className="profile-actions">
+        {isEditing ? (
+          <button className="save-btn" onClick={handleSave}>
+            <FaRegSave /> Save
+          </button>
+        ) : (
+          <button className="edit-btn" onClick={handleEditToggle}>
+            <FaRegEdit /> Edit
+          </button>
+        )}
+        <button className="change-password-btn" onClick={() => setPasswordModalOpen(true)}>
+          <FaUnlockAlt /> Change Password
+        </button>
+        <button className="logout-btn" onClick={handleLogout}>
+          <FaSignOutAlt /> Logout
+        </button>
+      </div>
+
       {passwordModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">

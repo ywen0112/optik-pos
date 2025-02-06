@@ -5,6 +5,7 @@ import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import CrudModal from "../../modals/CrudModal";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
+import SuccessModal from "../../modals/SuccessModal";
 
 const LocationMaintenance = () => {
   const [locations, setLocations] = useState([]);
@@ -21,6 +22,7 @@ const LocationMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -116,6 +118,7 @@ const LocationMaintenance = () => {
 
           setLocations(updatedLocations);
           setIsPopupOpen(false);
+          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -145,6 +148,7 @@ const LocationMaintenance = () => {
       setTimeout(() => {
         try {
           setLocations((prevLocations) => prevLocations.filter((location) => location.id !== id));
+          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -166,6 +170,10 @@ const LocationMaintenance = () => {
     setErrorModal({ isOpen: false, title: "", message: "" });
   };
 
+  const closeSuccessModal = () => {
+    setSuccessModal({ isOpen: false, title: "" });
+  };
+
   return (
     <div className="maintenance-container">
       <div className="breadcrumb">
@@ -180,6 +188,11 @@ const LocationMaintenance = () => {
         title={errorModal.title}
         message={errorModal.message}
         onClose={closeErrorModal}
+      />
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        title={successModal.title}
+        onClose={closeSuccessModal}
       />
 
       <div className="maintenance-header">

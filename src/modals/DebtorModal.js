@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../css/DebtorModal.css";
 import ErrorModal from "./ErrorModal";
 import ConfirmationModal from "./ConfirmationModal";
+import Select from "react-select";
 
 const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing }) => {
   const [expandedSections, setExpandedSections] = useState({
@@ -227,22 +228,17 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing }) => {
                       {label}
                     </label>
                     {type === "select" ? (
-                      <select
-                        className="debtor-form-input"
-                        name={name}
-                        value={sectionData[name] || ""}
-                        onChange={(e) =>
-                          setSectionData({ ...sectionData, [name]: e.target.value })
-                        }
-                        disabled={isViewing}
-                      >
-                        <option value="">Select {label}</option>
-                        {options?.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
+                    <Select
+                      name={name}
+                      value={options.find((option) => option.value === sectionData[name]) || ""}
+                      onChange={(selectedOption) =>
+                        setSectionData({ ...sectionData, [name]: selectedOption.value })
+                      }
+                      options={options}
+                      isDisabled={isViewing}
+                      isSearchable={true}
+                      placeholder={`Select ${label}`}
+                    />
                     ) : name === "remark" || name.includes("address1") ? ( 
                       <textarea
                         className="debtor-form-textarea"

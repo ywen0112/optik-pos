@@ -5,6 +5,7 @@ import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import CrudModal from "../../modals/CrudModal";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
+import SuccessModal from "../../modals/SuccessModal";
 
 const PWPMaintenance = () => {
   const [pwps, setPWPs] = useState([]);
@@ -22,13 +23,13 @@ const PWPMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Mock item data
         const mockItems = [
           { itemCode: "A001", itemName: "Item A1", price: 50 },
           { itemCode: "A002", itemName: "Item A2", price: 70 },
@@ -36,7 +37,6 @@ const PWPMaintenance = () => {
           { itemCode: "B002", itemName: "Item B2", price: 40 },
         ];
 
-        // Mock PWP data
         const mockPWPs = [
           {
             id: 1,
@@ -173,6 +173,7 @@ const PWPMaintenance = () => {
 
           setPWPs(updatedPWPs);
           setIsPopupOpen(false);
+          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -191,6 +192,7 @@ const PWPMaintenance = () => {
       setTimeout(() => {
         try {
           setPWPs((prevPWPs) => prevPWPs.filter((pwp) => pwp.id !== id));
+          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -212,6 +214,10 @@ const PWPMaintenance = () => {
     setErrorModal({ isOpen: false, title: "", message: "" });
   };
 
+  const closeSuccessModal = () => {
+    setSuccessModal({ isOpen: false, title: "" });
+  };
+
   return (
     <div className="maintenance-container">
       <div className="breadcrumb">
@@ -226,6 +232,11 @@ const PWPMaintenance = () => {
         title={errorModal.title}
         message={errorModal.message}
         onClose={closeErrorModal}
+      />
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        title={successModal.title}
+        onClose={closeSuccessModal}
       />
 
       <div className="maintenance-header">

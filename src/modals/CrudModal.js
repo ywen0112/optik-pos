@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../css/CrudModal.css";
 import ErrorModal from "./ErrorModal";
+import Select from "react-select";
 
 const CrudModal = ({
   isOpen,
@@ -63,21 +64,17 @@ const CrudModal = ({
             <div className="form-group" key={field.name}>
               <label>{field.label}</label>
               {field.type === "select" ? (
-                <select
+                <Select
                   name={field.name}
-                  value={data[field.name] || ""}
-                  onChange={onInputChange}
-                  disabled={isViewing}
-                >
-                  <option value="" disabled>
-                    Select {field.label}
-                  </option>
-                  {field.options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  value={field.options.find((option) => option.value === data[field.name]) || ""}
+                  onChange={(selectedOption) =>
+                    onInputChange({ target: { name: field.name, value: selectedOption.value } })
+                  }
+                  options={field.options}
+                  isDisabled={isViewing}
+                  isSearchable={true} 
+                  placeholder={`Select ${field.label}`}
+                />
               ) : (
                 <input
                   type={field.type || "text"}

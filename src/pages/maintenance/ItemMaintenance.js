@@ -5,6 +5,7 @@ import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import CrudModal from "../../modals/CrudModal";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
+import SuccessModal from "../../modals/SuccessModal";
 
 const ItemMaintenance = () => {
   const [items, setItems] = useState([]);
@@ -21,7 +22,9 @@ const ItemMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+    const [successModal, setSuccessModal] = useState({ isOpen: false, title: "" });
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -187,6 +190,7 @@ const ItemMaintenance = () => {
 
           setItems(updatedItems);
           setIsPopupOpen(false);
+          setSuccessModal({ isOpen: true, title: "Update Successfully!"});
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -216,6 +220,7 @@ const ItemMaintenance = () => {
       setTimeout(() => {
         try {
           setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
         } catch (error) {
           setErrorModal({ isOpen: true, title: "Error", message: error.message });
         } finally {
@@ -237,6 +242,10 @@ const ItemMaintenance = () => {
     setErrorModal({ isOpen: false, title: "", message: "" });
   };
 
+  const closeSuccessModal = () => {
+    setSuccessModal({ isOpen: false, title: "" });
+  };
+
   return (
     <div className="maintenance-container">
       <div className="breadcrumb">
@@ -245,13 +254,18 @@ const ItemMaintenance = () => {
         </span>
         <span> / Item Maintenance/Batch No</span>
       </div>
+
       <ErrorModal
         isOpen={errorModal.isOpen}
         title={errorModal.title}
         message={errorModal.message}
         onClose={closeErrorModal}
       />
-
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        title={successModal.title}
+        onClose={closeSuccessModal}
+      />
       <div className="maintenance-header">
         <div className="pagination-controls">
           <label>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { FaRegUserCircle, FaRegEdit, FaRegSave, FaUnlockAlt, FaSignOutAlt } from "react-icons/fa";
 import "../css/Profile.css";
@@ -30,13 +31,16 @@ const Profile = () => {
   const [userData, setUserData] = useState(initialUserData);
   const [isEditing, setIsEditing] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState("");
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: "" });
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  
+  const [isConfirmSaveOpen, setIsConfirmSaveOpen] = useState(false);
+  const [isConfirmPasswordOpen, setIsConfirmPasswordOpen] = useState(false);
+  const [isConfirmLogoutOpen, setIsConfirmLogoutOpen] = useState(false); 
+  const navigate = useNavigate();
+
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
   };
@@ -62,7 +66,7 @@ const Profile = () => {
 
   const handleSave = () => {
     if (validateFields()) {
-      setIsConfirmOpen(true);
+      setIsConfirmSaveOpen(true);
     } else {
       setErrorModal({
         isOpen: true,
@@ -72,26 +76,48 @@ const Profile = () => {
     }
   };
 
-  const handleConfirmation = () => {
+  const handleConfirmationSave = () => {
     setIsEditing(false);
-    setIsConfirmOpen(false);
+    setIsConfirmSaveOpen(false);
     setSuccessModal({ isOpen: true, title: "Update Successfully!" });
   };
 
   const handleLogout = () => {
-    alert("You have logged out.");
+    setIsConfirmLogoutOpen(true); 
+  };
+
+  const handleConfirmLogout = () => {
+    setIsConfirmLogoutOpen(false);
+    navigate("/login"); 
   };
 
   const handleChangePassword = () => {
-    if (newPassword !== confirmPassword) {
-      setErrors("Passwords do not match.");
-      return;
+    const validationErrors = {};
+
+    if (!oldPassword.trim()) validationErrors.oldPassword = "Old password is required.";
+    if (!newPassword.trim()) validationErrors.newPassword = "New password is required.";
+    if (newPassword.length < 6) validationErrors.newPassword = "New password must be at least 6 characters long.";
+
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length === 0) {
+      setIsConfirmPasswordOpen(true);
+    } else {
+      setErrorModal({
+        isOpen: true,
+        title: "Validation Error",
+        message: "Please fill out all required fields correctly.",
+      });
     }
-    alert("Password changed successfully!");
+  };
+
+  const handleConfirmPasswordChange = () => {
+    setOldPassword("");
     setNewPassword("");
-    setConfirmPassword("");
-    setErrors("");
+    setErrors({});
+    setIsConfirmPasswordOpen(false);
     setPasswordModalOpen(false);
+    setSuccessModal({ isOpen: true, title: "Password Changed Successfully!" });
   };
 
   return (
@@ -215,17 +241,21 @@ const Profile = () => {
             <h3>Change Password</h3>
             <input
               type="password"
+              placeholder="Old Password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              className={errors.oldPassword ? "input-error" : ""}
+              />
+              {errors.oldPassword && <p className="error-message">{errors.oldPassword}</p>}
+
+            <input
+              type="password"
               placeholder="New Password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
             />
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-            {errors && <p className="error-message">{errors}</p>}
+            {errors.newPassword && <p className="error-message">{errors.newPassword}</p>}
+
             <div className="modal-actions">
               <button onClick={handleChangePassword} className="save-btn">Save</button>
               <button onClick={() => setPasswordModalOpen(false)} className="cancel-btn">Cancel</button>
@@ -246,12 +276,26 @@ const Profile = () => {
         message={successModal.message}
         onClose={() => setSuccessModal({ isOpen: false, title: ""})}
       />
-      <ConfirmationModal
-        isOpen={isConfirmOpen}
+            <ConfirmationModal
+        isOpen={isConfirmSaveOpen}
         title="Confirm Update"
         message="Are you sure you want to save changes?"
-        onConfirm={handleConfirmation}
-        onCancel={() => setIsConfirmOpen(false)}
+        onConfirm={handleConfirmationSave}
+        onCancel={() => setIsConfirmSaveOpen(false)}
+      />
+      <ConfirmationModal
+        isOpen={isConfirmPasswordOpen}
+        title="Confirm Password Change"
+        message="Are you sure you want to change password?"
+        onConfirm={handleConfirmPasswordChange}
+        onCancel={() => setIsConfirmPasswordOpen(false)}
+      />
+      <ConfirmationModal
+        isOpen={isConfirmLogoutOpen}
+        title="Confirm Logout"
+        message="Are you sure you want to log out?"
+        onConfirm={handleConfirmLogout}
+        onCancel={() => setIsConfirmLogoutOpen(false)}
       />
 
     </div>

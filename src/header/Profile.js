@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import Select from "react-select";
 import { FaRegUserCircle, FaRegEdit, FaRegSave, FaUnlockAlt, FaSignOutAlt } from "react-icons/fa";
 import "../css/Profile.css";
+import ErrorModal from "../modals/ErrorModal";
+import ConfirmationModal from "../modals/ConfirmationModal";
+import SuccessModal from "../modals/SuccessModal";
 
 const roleOptions = [
   { value: "super-admin", label: "Super Admin" },
@@ -29,14 +32,50 @@ const Profile = () => {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-
+  const [errors, setErrors] = useState("");
+  const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [successModal, setSuccessModal] = useState({ isOpen: false, title: "" });
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
   };
 
+  const validateFields = () => {
+    const validationErrors = {};
+    if (!userData.username.trim()) validationErrors.username = "Username is required.";
+    if (!userData.role) validationErrors.role = "User Role is required.";
+    if (!userData.email.trim()) {
+      validationErrors.email = "Email is required.";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(userData.email)) {
+        validationErrors.email = "Invalid email format.";
+      }
+    }
+    if (!userData.mobile.trim()) validationErrors.mobile = "Mobile number is required.";
+    if (!userData.locationId) validationErrors.locationId = "Location ID is required.";
+
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
+  };
+
   const handleSave = () => {
+    if (validateFields()) {
+      setIsConfirmOpen(true);
+    } else {
+      setErrorModal({
+        isOpen: true,
+        title: "Validation Error",
+        message: "Please fill out all required fields highlighted in red.",
+      });
+    }
+  };
+
+  const handleConfirmation = () => {
     setIsEditing(false);
+    setIsConfirmOpen(false);
+    setSuccessModal({ isOpen: true, title: "Update Successfully!" });
   };
 
   const handleLogout = () => {
@@ -45,13 +84,13 @@ const Profile = () => {
 
   const handleChangePassword = () => {
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
+      setErrors("Passwords do not match.");
       return;
     }
     alert("Password changed successfully!");
     setNewPassword("");
     setConfirmPassword("");
-    setError("");
+    setErrors("");
     setPasswordModalOpen(false);
   };
 
@@ -62,75 +101,94 @@ const Profile = () => {
       </div>
 
       <div className="profile-details">
-      <div className="profile-info">
+        <div className="profile-info">
           <label>Username:</label>
-          {isEditing ? (
-            <input
-              type="text"
-              value={userData.username}
-              onChange={(e) => setUserData({ ...userData, username: e.target.value })}
-            />
-          ) : (
-            <p>{userData.username}</p>
-          )}
+          <div className="profile-info-input">
+            {isEditing ? (
+              <input
+                type="text"
+                value={userData.username}
+                onChange={(e) => setUserData({ ...userData, username: e.target.value })}
+                className={errors.username ? "input-error" : ""}
+              />
+            ) : (
+              <p>{userData.username}</p>
+            )}
+          </div>
         </div>
+        {errors.username && <p className="error-message">{errors.username}</p>}
+
         <div className="profile-info">
           <label>User Role:</label>
-          {isEditing ? (
-            <Select
-              className="profile-select"
-              classNamePrefix="react-select"
-              value={userData.role}
-              onChange={(selectedOption) => setUserData({ ...userData, role: selectedOption })}
-              options={roleOptions}
-              isSearchable
-            />
-          ) : (
-            <p>{userData.role.label}</p>
-          )}
+          <div className="profile-info-input">
+            {isEditing ? (
+              <Select
+                className={`profile-select ${errors.role ? "input-error" : ""}`}
+                classNamePrefix="react-select"
+                value={userData.role}
+                onChange={(selectedOption) => setUserData({ ...userData, role: selectedOption })}
+                options={roleOptions}
+                isSearchable
+              />
+            ) : (
+              <p>{userData.role.label}</p>
+            )}
+          </div>
         </div>
+        {errors.role && <p className="error-message">{errors.role}</p>}
 
         <div className="profile-info">
           <label>Email:</label>
-          {isEditing ? (
-            <input
-              type="email"
-              value={userData.email}
-              onChange={(e) => setUserData({ ...userData, email: e.target.value })}
-            />
-          ) : (
-            <p>{userData.email}</p>
-          )}
+          <div className="profile-info-input">
+            {isEditing ? (
+              <input
+                type="email"
+                value={userData.email}
+                onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                className={errors.email ? "input-error" : ""}
+              />
+            ) : (
+              <p>{userData.email}</p>
+            )}
+          </div>
         </div>
+        {errors.email && <p className="error-message">{errors.email}</p>}
 
         <div className="profile-info">
           <label>Mobile:</label>
-          {isEditing ? (
-            <input
-              type="text"
-              value={userData.mobile}
-              onChange={(e) => setUserData({ ...userData, mobile: e.target.value })}
-            />
-          ) : (
-            <p>{userData.mobile}</p>
-          )}
+          <div className="profile-info-input">
+            {isEditing ? (
+              <input
+                type="text"
+                value={userData.mobile}
+                onChange={(e) => setUserData({ ...userData, mobile: e.target.value })}
+                className={errors.mobile ? "input-error" : ""}
+              />
+            ) : (
+              <p>{userData.mobile}</p>
+            )}
+          </div>
         </div>
+        {errors.mobile && <p className="error-message">{errors.mobile}</p>}
 
         <div className="profile-info">
           <label>Location ID:</label>
-          {isEditing ? (
-            <Select
-              className="profile-select"
-              classNamePrefix="react-select"
-              value={userData.locationId}
-              onChange={(selectedOption) => setUserData({ ...userData, locationId: selectedOption })}
-              options={locationOptions}
-              isSearchable
-            />
-          ) : (
-            <p>{userData.locationId.label}</p>
-          )}
+          <div className="profile-info-input">
+            {isEditing ? (
+              <Select
+                className={`profile-select ${errors.locationId ? "input-error" : ""}`}
+                classNamePrefix="react-select"
+                value={userData.locationId}
+                onChange={(selectedOption) => setUserData({ ...userData, locationId: selectedOption })}
+                options={locationOptions}
+                isSearchable
+              />
+            ) : (
+              <p>{userData.locationId.label}</p>
+            )}
+          </div>
         </div>
+        {errors.locationId && <p className="error-message">{errors.locationId}</p>}
       </div>
 
       <div className="profile-actions">
@@ -167,7 +225,7 @@ const Profile = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            {error && <p className="error-message">{error}</p>}
+            {errors && <p className="error-message">{errors}</p>}
             <div className="modal-actions">
               <button onClick={handleChangePassword} className="save-btn">Save</button>
               <button onClick={() => setPasswordModalOpen(false)} className="cancel-btn">Cancel</button>
@@ -175,6 +233,27 @@ const Profile = () => {
           </div>
         </div>
       )}
+
+    <ErrorModal
+        isOpen={errorModal.isOpen}
+        title={errorModal.title}
+        message={errorModal.message}
+        onClose={() => setErrorModal({ isOpen: false, title: "", message: "" })}
+      />
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        title={successModal.title}
+        message={successModal.message}
+        onClose={() => setSuccessModal({ isOpen: false, title: ""})}
+      />
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        title="Confirm Update"
+        message="Are you sure you want to save changes?"
+        onConfirm={handleConfirmation}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
+
     </div>
   );
 };

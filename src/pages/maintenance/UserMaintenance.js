@@ -134,12 +134,13 @@ const UserMaintenance = () => {
     setIsViewing(viewing);
   
     const updatedFields = [
-      { name: "userName", label: "Username", type: "text", required: true },
       { name: "userEmail", label: "Email", type: "email", required: true },
+      { name: "companyName", label: "Company Name", type: "text", required: true },
     ];
   
     if (user.userId) {
       updatedFields.push(
+        { name: "userName", label: "Username", type: "text"},
         {
           name: "accessRightId",
           label: "User Role",
@@ -189,28 +190,27 @@ const UserMaintenance = () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               customerId: Number(customerId),
-              companyName: "", 
-              userName: newUser.userName,
+              companyName: newUser.companyName, 
+              userName: "",
               userEmail: newUser.userEmail,
               userPassword: "", 
               editorUserId: userId,
             }),
           });
   
-          const data = await response.text(); 
-          if (response.ok) {
-            const inviteLink = `https://externalpage.com/invite${data}`; 
-            
-            setSuccessModal({ 
-              isOpen: true, 
-              title: "User Invited Successfully!", 
-              message: `Invitation Link: ${inviteLink}` 
-            });
+          const inviteLink = await response.text();
+
+        if (response.ok) {
+          setSuccessModal({ 
+            isOpen: true, 
+            title: "User Invited Successfully!", 
+            message: `Invitation Link: ${inviteLink}`, 
+          });
   
             setUsers((prevUsers) => [...prevUsers, newUser]);
             setIsPopupOpen(false);
           } else {
-            throw new Error(data || "Failed to invite user.");
+            throw new Error(inviteLink || "Failed to invite user.");
           }
         } else {
           const response = await fetch("https://optikposbackend.absplt.com/Users/UpdateUser", {
@@ -303,10 +303,10 @@ const UserMaintenance = () => {
   };
 
   const filteredUsers = users.filter((user) => {
-    const usernameMatch = user.userName.toLowerCase().includes(searchKeyword.toLowerCase());
-    const emailMatch = user.userEmail.toLowerCase().includes(searchKeyword.toLowerCase());
-
-    return usernameMatch || emailMatch 
+    const usernameMatch = (user.userName || "").toLowerCase().includes((searchKeyword || "").toLowerCase());
+    const emailMatch = (user.userEmail || "").toLowerCase().includes((searchKeyword || "").toLowerCase());
+  
+    return usernameMatch || emailMatch;
   });
 
 

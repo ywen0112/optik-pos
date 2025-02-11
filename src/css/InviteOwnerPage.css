@@ -1,0 +1,46 @@
+.invite-container, .register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+  }
+  
+  .invite-card, .register-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 350px;
+  }
+  
+  .invite-title, .register-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .invite-field, .register-field {
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+  .invite-input, .register-input {
+    width: 95%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .invite-button, .register-button {
+    background: #1e90ff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .invite-button:disabled, .register-button:disabled {
+    background: #87CEEB;
+  }

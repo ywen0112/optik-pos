@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/Login.css";
 import ErrorModal from "../modals/ErrorModal";
+import CompanySelectionModal from "../modals/CompanySelectionModal"; 
 
 const Login = ({ logo }) => {
   const [email, setEmail] = useState("");
@@ -9,6 +10,8 @@ const Login = ({ logo }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState({ isOpen: false, message: "" });
   const [isLoading, setIsLoading] = useState(false);
+  const [companies, setCompanies] = useState([]); 
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -41,13 +44,13 @@ const Login = ({ logo }) => {
       setIsLoading(false);
 
       if (response.ok && data.success && data.data.length > 0) {
-        const userInfo = data.data[0];
-        
-        localStorage.setItem("userId", userInfo.userId);
-        localStorage.setItem("customerId", userInfo.customerId);
-        localStorage.setItem("isLoggedIn", "true");
+        setCompanies(data.data);
 
-        navigate("/dashboard");
+        if (data.data.length === 1) {
+          handleCompanySelection(data.data[0]);
+        } else {
+          setIsCompanyModalOpen(true);
+        }
       } else {
         setError({
           isOpen: true,
@@ -61,6 +64,15 @@ const Login = ({ logo }) => {
         message: "Failed to connect to the server. Please try again later.",
       });
     }
+  };
+
+  const handleCompanySelection = (company) => {
+    localStorage.setItem("userId", company.userId);
+    localStorage.setItem("customerId", company.customerId);
+    localStorage.setItem("isLoggedIn", "true");
+
+    setIsCompanyModalOpen(false);
+    navigate("/dashboard");
   };
 
   const togglePasswordVisibility = () => {
@@ -127,6 +139,14 @@ const Login = ({ logo }) => {
 
       {/* Error Modal */}
       <ErrorModal isOpen={error.isOpen} title="Error" message={error.message} onClose={closeErrorModal} />
+
+      {/* ✅ New Company Selection Modal */}
+      <CompanySelectionModal
+        isOpen={isCompanyModalOpen}
+        companies={companies}
+        onSelect={handleCompanySelection}
+        onCancel={() => setIsCompanyModalOpen(false)}
+      />
     </div>
   );
 };

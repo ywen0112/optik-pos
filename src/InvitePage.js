@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/InviteUserPage.css"; 
 
-const InviteUserPage = () => {
+const InvitePage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [customerId, setCustomerId] = useState("");
-  const [username, setUsername] = useState("");
+  const [userName, setUserName] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -16,14 +17,15 @@ const InviteUserPage = () => {
       const queryParams = new URLSearchParams(window.location.search);
       const customerIdParam = queryParams.get("CustomerId");
       const userEmailParam = queryParams.get("UserEmail");
+      const companyNameParm = queryParams.get("CompanyName");
 
-      if (!customerIdParam || !userEmailParam) {
+      if (!customerIdParam || !userEmailParam || !companyNameParm ) {
         throw new Error("Invalid or missing invite link parameters.");
       }
 
       setCustomerId(customerIdParam);
       setEmail(userEmailParam);
-      setUsername(userEmailParam.split("@")[0]); 
+      setCompanyName(companyNameParm)
     } catch (err) {
       setError(err.message);
     }
@@ -37,13 +39,13 @@ const InviteUserPage = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Users/InviteUser", {
+      const response = await fetch("https://optikposbackend.absplt.com/Users/RegisterUser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           customerId: Number(customerId),
-          companyName: "",
-          userName: username,
+          companyName: companyName,
+          userName: userName,
           userEmail: email,
           userPassword: password,
           editorUserId: "",
@@ -52,7 +54,6 @@ const InviteUserPage = () => {
 
       const data = await response.json();
       if (response.ok && data.success) {
-        alert("Account setup successful! Redirecting to login...");
         navigate("/login");
       } else {
         throw new Error(data.errorMessage || "Failed to complete user invitation.");
@@ -70,10 +71,18 @@ const InviteUserPage = () => {
       {error && <p className="error-message">{error}</p>}
       <p><strong>Email:</strong> {email}</p>
 
+      <label>Username</label>
+      <input
+        type="text"
+        placeholder="Enter username"
+        value={userName}
+        onChange={(e) => setUserName(e.target.value)}
+      />
+
       <label>Password</label>
       <input
-        type="password"
-        placeholder="Enter a secure password"
+        type="text"
+        placeholder="Enter password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
@@ -85,4 +94,4 @@ const InviteUserPage = () => {
   );
 };
 
-export default InviteUserPage;
+export default InvitePage;

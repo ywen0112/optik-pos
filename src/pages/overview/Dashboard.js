@@ -1,5 +1,5 @@
 const Dashboard = () => {
-    return <p>Welcome to the Dashboard page!</p>;
+    return <p>In Maintenance</p>;
   };
   
   export default Dashboard;

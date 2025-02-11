@@ -22,125 +22,136 @@ const ItemMaintenance = () => {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
-    const [successModal, setSuccessModal] = useState({ isOpen: false, title: "" });
+  const [successModal, setSuccessModal] = useState({ isOpen: false, title: "" });
   const navigate = useNavigate();
+  const [itemGroupMapping, setItemGroupMapping] = useState({}); 
+  const [itemTypeMapping, setItemTypeMapping] = useState([]); 
+  const customerId = localStorage.getItem("customerId"); 
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const mockData = {
-          items: [
-            {
-              id: 1,
-              itemCode: "I001",
-              itemName: "Widget A",
-              batchNo: "0001436",
-              itemTypeId: "IT001",
-              itemGroupId: "IG001",
-              itemDescription: "A high-quality widget",
-              stockQuantity: 100,
-              sellingPrice: 50.0,
-              purchasePrice: 30.0,
-              commissionType: "Rate",
-              commissionValue: 5.0,
-              locationId: "L001",
-            },
-            {
-              id: 2,
-              itemCode: "I002",
-              itemName: "Gadget B",
-              batchNo: "0001437",
-              itemTypeId: "IT002",
-              itemGroupId: "IG002",
-              itemDescription: "A premium gadget",
-              stockQuantity: 200,
-              sellingPrice: 75.0,
-              purchasePrice: 55.0,
-              commissionType: "Amount",
-              commissionValue: 20,
-              locationId: "L002",
-            },
-          ],
-          totalPages: Math.ceil(5 / itemsPerPage),
-        };
+      const fetchItemGroups = async () => {
+        try {
+          const response = await fetch("https://optikposbackend.absplt.com/ItemGroup/GetRecords", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
+          });
+  
+          const data = await response.json();
+          if (response.ok && data.success) {
+            const itemGroupMapping = {};
+            data.data.forEach(itemGroup => {
+              itemGroupMapping[itemGroup.itemGroupId] = itemGroup.itemGroupCode;
+            });
+            setItemGroupMapping(itemGroupMapping);
+          } else {
+            throw new Error(data.errorMessage || "Failed to fetch item groups.");
+          }
+        } catch (error) {
+          console.error("Error fetching Item Groups:", error);
+        }
+      };
+  
+      fetchItemGroups();
+    }, [customerId]);
 
-        setTimeout(() => {
-          setItems(
-            mockData.items.slice(
-              (currentPage - 1) * itemsPerPage,
-              currentPage * itemsPerPage
-            )
-          );
-          setTotalPages(mockData.totalPages);
-          setLoading(false);
-        }, 500);
-      } catch (error) {
-        setErrorModal({
-          isOpen: true,
-          title: "Error Fetching Data",
-          message: error.message,
-        });
-        setLoading(false);
-      }
-    };
+    useEffect(() => {
+      const fetchItemTypes = async () => {
+        try {
+          const response = await fetch("https://optikposbackend.absplt.com/ItemType/GetRecords", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
+          });
+  
+          const data = await response.json();
+          if (response.ok && data.success) {
+            const itemTypeMapping = {};
+            data.data.forEach(itemType => {
+              itemTypeMapping[itemType.itemTypeId] = itemType.itemTypeCode;
+            });
+            setItemTypeMapping(itemTypeMapping);
+          } else {
+            throw new Error(data.errorMessage || "Failed to fetch item types.");
+          }
+        } catch (error) {
+          console.error("Error fetching Item Types:", error);
+        }
+      };
+  
+      fetchItemTypes();
+    }, [customerId]);
 
-    fetchData();
-
+  useEffect(() => {
+    fetchItems();
     setFields([
       { name: "itemCode", label: "Item Code", type: "text", required: true },
-      { name: "itemName", label: "Item Name", type: "text", required: true },
-      { name: "batchNo", label: "Batch No", type: "text", required: false },
+      { name: "description", label: "Description", type: "text" },
+      { name: "desc", label: "Description 2", type: "text" },
       {
         name: "itemGroupId",
-        label: "Item Group ID",
+        label: "Item Group Code",
         type: "select",
-        options: [
-          { label: "IG001", value: "IG001" },
-          { label: "IG002", value: "IG002" },
-          { label: "IG003", value: "IG003" },
-        ],
+        options: Object.keys(itemGroupMapping).map(itemGroupId => ({
+          label: itemGroupMapping[itemGroupId], 
+          value: itemGroupId, 
+        })),
         required: true,
       },
       {
         name: "itemTypeId",
-        label: "Item Type ID",
+        label: "Item Type Code",
         type: "select",
-        options: [
-          { label: "IT001", value: "IT001" },
-          { label: "IT002", value: "IT002" },
-          { label: "IT003", value: "IT003" },
-        ],
+        options: Object.keys(itemTypeMapping).map(itemTypeId => ({
+          label: itemTypeMapping[itemTypeId], 
+          value: itemTypeId, 
+        })),
         required: true,
       },
-      { name: "itemDescription", label: "Item Description", type: "textarea", required: true },
-      { name: "stockQuantity", label: "Stock Quantity", type: "number", required: true },
-      { name: "sellingPrice", label: "Selling Price", type: "number", required: true },
-      { name: "purchasePrice", label: "Purchase Price", type: "number", required: true },
-      {
-        name: "commissionType",
-        label: "Commission Type",
-        type: "select",
-        options: [
-          { label: "Rate", value: "Rate" },
-          { label: "Amount", value: "Amount" },
-        ],
-        required: true,
-      },
-      { name: "commissionValue", label: "Commission Value", type: "number", required: true },
-      {
-        name: "locationId",
-        label: "Location ID",
-        type: "select",
-        options: [
-          { label: "L001", value: "L001" },
-          { label: "L002", value: "L002" },
-          { label: "L003", value: "L003" },
-        ],
-        required: true,
-      },
-    ]);
-  }, [currentPage, itemsPerPage]);
+      { name: "itemUOMId", label: "Item UOM Id", type: "text", required: true },
+      { name: "uom", label: "UOM", type: "text", required: true },
+      { name: "unitPrice", label: "Unit Price", type: "number", required: true },
+      { name: "barCode", label: "Barcode", type: "text", required: true },
+    ])
+    }, [itemGroupMapping, itemTypeMapping]); 
+  
+    const fetchItems = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/Item/GetRecords", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            keyword: "",
+            offset: 0,
+            limit: 9999,
+          }),
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+          if (Array.isArray(data.data)) { 
+            setItems(data.data);
+            setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+          }
+        } else {
+          throw new Error(data.errorMessage || "Failed to fetch items.");
+        }
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Fetching Items", message: error.message });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    useEffect(() => {
+        if (items.length > 0) {
+          setTotalPages(Math.ceil(items.length / itemsPerPage)); 
+        }
+      }, [items, itemsPerPage]);
+    
 
   const handleItemsPerPageChange = (event) => {
     setItemsPerPage(Number(event.target.value));
@@ -148,20 +159,114 @@ const ItemMaintenance = () => {
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setNewItem({ ...newItem, [name]: value });
+  
+    setNewItem((prevItem) => {
+      if (name.startsWith("itemUOMs.")) {
+        const [, index, field] = name.split(".");
+        const updatedUOMs = [...(prevItem.itemUOMs || [])];
+  
+        updatedUOMs[index] = {
+          ...updatedUOMs[index],
+          [field]: value,
+        };
+  
+        return {
+          ...prevItem,
+          itemUOMs: updatedUOMs, // ✅ Updates UOM correctly
+        };
+      } else {
+        return {
+          ...prevItem,
+          [name]: value,
+        };
+      }
+    });
+  
+    console.log("Updated Item State:", newItem); // ✅ Debugging output
   };
-
-  const handleOpenModal = (item = {}, title = "", viewing = false) => {
-    setNewItem(item);
-    setModalTitle(title);
-    setIsViewing(viewing);
-    setIsPopupOpen(true);
-  };
+  
+  const handleOpenModal = async (item = {}, title = "", viewing = false) => {
+    try {
+      if (title === "Add Item") {
+        const response = await fetch("https://optikposbackend.absplt.com/Item/New", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            userId: userId,
+            id: "",
+          }),
+        });
+  
+        const data = await response.json();
+        if (response.ok && data.success) {
+          item = {
+            id: data.data.itemId,
+            itemCode: data.data.itemCode || "",
+            description: data.data.description || "",
+            desc2: data.data.desc2 || "",
+            itemGroupId: data.data.itemGroupId || "",
+            itemTypeId: data.data.itemTypeId || "",
+            isActive: data.data.isActive ?? true,
+            image: data.data.image || "",
+            itemUOMs: data.data.itemUOMs ?? [], // ✅ Ensure UOM is always an array
+          };
+        } else {
+          throw new Error(data.errorMessage || "Failed to create new item.");
+        }
+      } 
+      
+      else if ((title === "Edit Item" || title === "View Item") && item.itemId) {
+        const response = await fetch("https://optikposbackend.absplt.com/Item/Edit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            userId: userId,
+            id: item.itemId, 
+          }),
+        });
+  
+        const data = await response.json();
+        if (response.ok && data.success) {
+          item = {
+            id: data.data.itemId,
+            itemCode: data.data.itemCode || "",
+            description: data.data.description || "",
+            desc2: data.data.desc2 || "",
+            itemGroupId: data.data.itemGroupId || "",
+            itemTypeId: data.data.itemTypeId || "",
+            isActive: data.data.isActive ?? true,
+            image: data.data.image || "",
+            itemUOMs: Array.isArray(data.data.itemUOMs) ? [...data.data.itemUOMs] : [], // ✅ Ensure array format
+          };
+        } else {
+          throw new Error(data.errorMessage || "Failed to fetch item.");
+        }
+      }
+  
+      setNewItem(item); // ✅ Ensure UOM data is passed
+      setModalTitle(title);
+      setIsViewing(viewing);
+      setIsPopupOpen(true);
+  
+    } catch (error) {
+      setErrorModal({
+        isOpen: true,
+        title: "Error Opening Modal",
+        message: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };   
 
   const handleCloseModal = () => {
     if (isViewing) {
@@ -177,59 +282,89 @@ const ItemMaintenance = () => {
     setIsConfirmOpen(true);
   };
 
-  const handleSave = () => {
-    setConfirmAction(() => () => {
+  const handleSave = (updatedItem) => {
+    setConfirmMessage(`Do you want to save this item?`);
+  
+    setConfirmAction(() => async () => {
       setLoading(true);
-      setTimeout(() => {
-        try {
-          const updatedItems = newItem.id
-            ? items.map((item) =>
-                item.id === newItem.id ? { ...item, ...newItem } : item
-              )
-            : [...items, { ...newItem, id: items.length + 1 }];
-
-          setItems(updatedItems);
+      try {
+        console.log("Saving Item Data:", updatedItem); // ✅ Debugging output
+  
+        const response = await fetch("https://optikposbackend.absplt.com/Item/Save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            actionData: {
+              customerId: Number(customerId),
+              userId: userId,
+              id: updatedItem.itemId || updatedItem.id,
+            },
+            itemId: updatedItem.itemId || updatedItem.id,
+            itemCode: updatedItem.itemCode,
+            description: updatedItem.description,
+            desc2: updatedItem.desc2,
+            itemGroupId: updatedItem.itemGroupId,
+            itemTypeId: updatedItem.itemTypeId,
+            isActive: updatedItem.isActive ?? true,
+            image: updatedItem.image,
+            itemUOMs: updatedItem.itemUOMs ?? [], // ✅ Ensure UOMs are passed
+          }),
+        });
+  
+        const data = await response.json();
+        console.log("API Response:", data); // ✅ Debugging output
+  
+        if (response.ok && data.success) {
+          setSuccessModal({ isOpen: true, title: "Item saved successfully!" });
+  
+          await fetchItems();
           setIsPopupOpen(false);
-          setSuccessModal({ isOpen: true, title: "Update Successfully!"});
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
+        } else {
+          throw new Error(data.errorMessage || "Failed to save item.");
         }
-      }, 500);
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Saving Item", message: error.message });
+      } finally {
+        setLoading(false);
+      }
     });
-
-    setConfirmMessage(
-      newItem.id
-        ? `Do you want to update this item "${newItem.itemName}"?`
-        : `Do you want to add this item "${newItem.itemName}"?`
-    );
+  
     setIsConfirmOpen(true);
   };
 
-  const handleDelete = (id) => {
-    const itemToDelete = items.find((item) => item.id === id);
-
-    if (!itemToDelete) {
-      console.error("Item not found");
-      return;
-    }
-
-    setConfirmAction(() => () => {
+  const handleDelete = (itemId) => {
+    const confirmMessage = `Are you sure you want to delete the item?`;
+  
+    setConfirmAction(() => async () => {
       setLoading(true);
-      setTimeout(() => {
-        try {
-          setItems((prevItems) => prevItems.filter((item) => item.id !== id));
-          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/Item/Delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            id: itemId, 
+            userId: userId,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          setSuccessModal({ isOpen: true, title: "Item deleted successfully!" });
+  
+          await fetchItems(); 
+        } else {
+          throw new Error(data.errorMessage || "Failed to delete item.");
         }
-      }, 500);
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Deleting Item", message: error.message });
+      } finally {
+        setLoading(false);
+      }
     });
-
-    setConfirmMessage(`Do you want to delete this item "${itemToDelete.itemName}"?`);
+  
+    setConfirmMessage(confirmMessage);
     setIsConfirmOpen(true);
   };
 
@@ -297,58 +432,43 @@ const ItemMaintenance = () => {
             <tr>
               <th>No</th>
               <th>Item Code</th>
-              <th>Item Name</th>
-              <th>Batch No</th>
-              <th>Item Group ID</th>
-              <th>Item Type ID</th>
-              <th>Item Description</th>
-              <th>Stock Quantity</th>
-              <th>Selling Price</th>
-              <th>Purchase Price</th>
-              <th>Commission Type</th>
-              <th>Commission Value</th>
-              <th>Location ID</th>
+              <th>Description</th>
+              <th>Item Group Code</th>
+              <th>Item Type Code</th>
+              {/* <th>UOM</th>
+              <th>Unit Price</th>
+              <th>Barcode</th> */}
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {items.map((item, index) => (
-              <tr key={item.id}>
-                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{item.itemCode || "-"}</td>
-                <td>{item.itemName || "-"}</td>
-                <td>{item.batchNo || "-"}</td>
-                <td>{item.itemGroupId || "-"}</td>
-                <td>{item.itemTypeId || "-"}</td>
-                <td>{item.itemDescription || "-"}</td>
-                <td>{item.stockQuantity || "-"}</td>
-                <td>{item.sellingPrice || "-"}</td>
-                <td>{item.purchasePrice || "-"}</td>
-                <td>{item.commissionType || "-"}</td>
-                <td>{item.commissionValue || "-"}</td>
-                <td>{item.locationId || "-"}</td>
-                <td>
-                  <button
-                    onClick={() => handleOpenModal(item, "Edit Item")}
-                    className="action-button edit"
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="action-button delete"
-                  >
-                    <FaTrash />
-                  </button>
-                  <button
-                    onClick={() => handleOpenModal(item, "View Item", true)}
-                    className="action-button view"
-                  >
-                    <FaEye />
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {Array.isArray(items) && items.length > 0 &&
+              items.map((item, index) => {
+                const firstUOM = item.itemUOMs?.[0] || {};
+                return (
+                  <tr key={item.id}>
+                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                    <td>{item.itemCode || "-"}</td>
+                    <td>{item.description || "-"}</td>
+                    <td>{itemGroupMapping[item.itemGroupId] || "-"}</td>
+                    <td>{itemTypeMapping[item.itemTypeId] || "-"}</td>
+                    {/* <td>{firstUOM.uom || "-"}</td>
+                    <td>{firstUOM.unitPrice !== undefined ? firstUOM.unitPrice.toFixed(2) : "-"}</td>
+                    <td>{firstUOM.barCode || "-"}</td> */}
+                    <td>
+                      <button onClick={() => handleOpenModal(item, "Edit Item")} className="action-button edit">
+                        <FaEdit />
+                      </button>
+                      <button onClick={() => handleDelete(item.itemId)} className="action-button delete">
+                        <FaTrash />
+                      </button>
+                      <button onClick={() => handleOpenModal(item, "View Item", true)} className="action-button view">
+                        <FaEye />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
       )}
@@ -375,7 +495,7 @@ const ItemMaintenance = () => {
         fields={fields}
         data={newItem}
         onClose={handleCloseModal}
-        onSave={handleSave}
+        onSave={handleSave} 
         onInputChange={handleInputChange}
         isViewing={isViewing}
       />

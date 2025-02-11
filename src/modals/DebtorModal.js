@@ -4,39 +4,29 @@ import ErrorModal from "./ErrorModal";
 import ConfirmationModal from "./ConfirmationModal";
 import Select from "react-select";
 
-const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing }) => {
-  const [expandedSections, setExpandedSections] = useState({
-    debtorInfo: false,
-    glassesProfile: false,
-    contactLensProfile: false,
-  });
-
-  const [sectionData, setSectionData] = useState({ ...data });
+const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTypeOptions }) => {
+  const [sectionData, setSectionData] = useState({});
   const [errors, setErrors] = useState({});
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
 
+  // ✅ Ensure correct default values on modal open
   useEffect(() => {
     if (isOpen) {
-      setSectionData({ ...data });
-      setErrors({});
-    } else {
-      setExpandedSections({
-        debtorInfo: false,
-        glassesProfile: false,
-        contactLensProfile: false,
+      setSectionData({
+        ...data,
+        medicalIsDiabetes: data.medicalIsDiabetes ?? false,
+        medicalIsHypertension: data.medicalIsHypertension ?? false,
+        ocularIsSquint: data.ocularIsSquint ?? false,
+        ocularIsLazyEye: data.ocularIsLazyEye ?? false,
+        ocularHasSurgery: data.ocularHasSurgery ?? false,
       });
+      setErrors({});
     }
   }, [isOpen, data]);
 
-  const toggleSection = (section) => {
-    setExpandedSections((prevState) => ({
-      ...prevState,
-      [section]: !prevState[section],
-    }));
-  };
-
+  // ✅ Validate required fields
   const validateFields = (fields) => {
     const validationErrors = {};
     fields.forEach(({ label, name }) => {
@@ -48,246 +38,137 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing }) => {
     return validationErrors;
   };
 
-  const sectionKeys = {
-    "Debtor Information": "debtorInfo",
-    "Glasses Profile": "glassesProfile",
-    "Contact Lens Profile": "contactLensProfile",
-  };
-
-  const handleSaveSection = (sectionName) => {
-    let fieldsToValidate = [];
-
-    if (sectionName === "Debtor Information") {
-      fieldsToValidate = [
-        { label: "Email Address", name: "emailAddress" },
-        { label: "Mobile", name: "mobile" },
-        { label: "Debtor Code", name: "debtorCode" },
-        { label: "Debtor Name", name: "debtorName" },
-        { label: "Debtor Type ID", name: "debtorTypeId" },
-        { label: "Address", name: "address1" },
-        { label: "Postcode", name: "postCode" },
-        { label: "Location ID", name: "locationId" },
-        { label: "Sales Agent", name: "salesAgent" },
-        { label: "Currency Code", name: "currencyCode" },
-        { label: "IC", name: "ic" },
-        { label: "Name on IC", name: "nameOnIC" },
-        { label: "TIN", name: "tin" },
-      ];
-    } else if (sectionName === "Glasses Profile") {
-      fieldsToValidate = [
-        { label: "Right Eye SPH", name: "glassesRightSPH" },
-        { label: "Right Eye CYL", name: "glassesRightCYL" },
-        { label: "Right Eye AXIS", name: "glassesRightAXIS" },
-        { label: "Left Eye SPH", name: "glassesLeftSPH" },
-        { label: "Left Eye CYL", name: "glassesLeftCYL" },
-        { label: "Left Eye AXIS", name: "glassesLeftAXIS" },
-      ];
-    } else if (sectionName === "Contact Lens Profile") {
-      fieldsToValidate = [
-        { label: "Right Eye SPH", name: "lensRightSPH" },
-        { label: "Right Eye CYL", name: "lensRightCYL" },
-        { label: "Right Eye AXIS", name: "lensRightAXIS" },
-        { label: "Left Eye SPH", name: "lensLeftSPH" },
-        { label: "Left Eye CYL", name: "lensLeftCYL" },
-        { label: "Left Eye AXIS", name: "lensLeftAXIS" },
-      ];
-    }
-
+  // ✅ Handle Save Button Click
+  const handleSave = () => {
+    const fieldsToValidate = [
+      { label: "Debtor Code", name: "debtorCode" },
+      { label: "Company Name", name: "companyName" },
+      { label: "Debtor Type Code", name: "debtorTypeId", type: "select", options: debtorTypeOptions },
+    ];
+  
     const validationErrors = validateFields(fieldsToValidate);
     if (Object.keys(validationErrors).length === 0) {
-      const updatedSectionData = {
+      onSave({
         ...sectionData,
-        id: data.id, 
-      };
-
-      onSave(updatedSectionData);
+        medicalIsDiabetes: !!sectionData.medicalIsDiabetes,
+        medicalIsHypertension: !!sectionData.medicalIsHypertension,
+        ocularIsSquint: !!sectionData.ocularIsSquint,
+        ocularIsLazyEye: !!sectionData.ocularIsLazyEye,
+        ocularHasSurgery: !!sectionData.ocularHasSurgery,
+      });
     } else {
       setErrorModal({
         isOpen: true,
-        title: "Error",
+        title: "Validation Error",
         message: "Please fill out all required fields highlighted in red.",
       });
     }
   };
 
-  const handleCancelSection = (sectionName) => {
+  // ✅ Handle Cancel Button Click
+  const handleCancelSection = () => {
     const action = () => {
-      setSectionData({ ...data }); 
+      setSectionData({ ...data });
       setErrors({});
-
-      setExpandedSections((prevState) => ({
-        ...prevState,
-        [sectionKeys[sectionName]]: false,
-      }));
+      onClose();
     };
-
     setConfirmAction(() => action);
     setIsConfirmOpen(true);
   };
 
+  // ✅ Confirm Cancel Action
   const handleConfirmAction = () => {
     if (confirmAction) confirmAction();
     setIsConfirmOpen(false);
   };
-  
+
   if (!isOpen) return null;
 
-
-
   return (
-    <div className="debtor-popup-overlay">
-      <div className="debtor-popup-content">
-        <h3 className="debtor-modal-title">{title}</h3>
-        {[
-          {
-            name: "Debtor Information",
-            key: "debtorInfo",
-            fields: [
-              { label: "Debtor Code", name: "debtorCode" },
-              { label: "Debtor Name", name: "debtorName" },
-              {
-                label: "Debtor Type ID",
-                name: "debtorTypeId",
-                type: "select", 
-                options: [
-                  { label: "DT001", value: "DT001" },
-                  { label: "DT002", value: "DT002" },
-                  { label: "DT003", value: "DT003" },
-                ],
-              },
-              { label: "IC", name: "ic" },
-              { label: "Name on IC", name: "nameOnIC" },
-              { label: "TIN", name: "tin" }, 
-              { label: "Email Address", name: "emailAddress" },
-              { label: "Mobile", name: "mobile" },
-              { 
-                label: "Currency Code", 
-                name: "currencyCode",
-                type: "select",
-                options: [
-                  {label: "USD", value: "USD"},
-                  {label: "EUR", value: "EUR"},
-                  {label: "MYR", value: "MYR"},
-                ] 
-              },
-              {
-                label: "Location ID",
-                name: "locationId",
-                type: "select", 
-                options: [
-                  { label: "L001", value: "L001" },
-                  { label: "L002", value: "L002" },
-                  { label: "L003", value: "L003" },
-                ],
-              }, 
-              { label: "Sales Agent", name: "salesAgent" },
-              { label: "Postcode", name: "postCode" },
-              { label: "Address", name: "address1" },
-              { label: "Remark", name: "remark" },
-            ],
-          },
-          {
-            name: "Glasses Profile",
-            key: "glassesProfile",
-            fields: [
-              { label: "Right Eye SPH", name: "glassesRightSPH" },
-              { label: "Right Eye CYL", name: "glassesRightCYL" },
-              { label: "Right Eye AXIS", name: "glassesRightAXIS" },
-              { label: "Left Eye SPH", name: "glassesLeftSPH" },
-              { label: "Left Eye CYL", name: "glassesLeftCYL" },
-              { label: "Left Eye AXIS", name: "glassesLeftAXIS" },
-            ],
-          },
-          {
-            name: "Contact Lens Profile",
-            key: "contactLensProfile",
-            fields: [
-              { label: "Right Eye SPH", name: "lensRightSPH" },
-              { label: "Right Eye CYL", name: "lensRightCYL" },
-              { label: "Right Eye AXIS", name: "lensRightAXIS" },
-              { label: "Left Eye SPH", name: "lensLeftSPH" },
-              { label: "Left Eye CYL", name: "lensLeftCYL" },
-              { label: "Left Eye AXIS", name: "lensLeftAXIS" },
-            ],
-          },
-        ].map(({ name, key, fields, specialField }) => (
-        <div className={`debtor-section ${key === "debtorInfo" ? "debtor-info-section" : "profile-section"}`} key={key}>
-          <div
-              className="debtor-section-header"
-              onClick={() => toggleSection(key)}
-            >
-              <h4>{name}</h4>
-              <span>{expandedSections[key] ? "-" : "+"}</span>
+    <div className="creditor-popup-overlay">
+      <div className="creditor-popup-content">
+        <h3 className="creditor-modal-title">{title}</h3>
+        <div className="creditor-section-content">
+          {[
+            { label: "Debtor Code", name: "debtorCode" },
+            { label: "Company Name", name: "companyName" },
+            { label: "Debtor Type Code", name: "debtorTypeId", type: "select", options: debtorTypeOptions },
+            { label: "Address 1", name: "address1" },
+            { label: "Address 2", name: "address2" },
+            { label: "Address 3", name: "address3" },
+            { label: "Address 4", name: "address4" },
+            { label: "Postcode", name: "postCode" },
+            { label: "Phone 1", name: "phone1" },
+            { label: "Phone 2", name: "phone2" },
+            { label: "Mobile", name: "mobile" },
+            { label: "Medical Is Diabetes", name: "medicalIsDiabetes", type: "checkbox" },
+            { label: "Medical Is Hypertension", name: "medicalIsHypertension", type: "checkbox" },
+            { label: "Ocular Is Squint", name: "ocularIsSquint", type: "checkbox" },
+            { label: "Ocular Is Lazy Eye", name: "ocularIsLazyEye", type: "checkbox" },
+            { label: "Ocular Has Surgery", name: "ocularHasSurgery", type: "checkbox" },
+            { label: "Medical Others", name: "medicalOthers" },
+            { label: "Ocular Others", name: "ocularOthers" },
+          ].map(({ label, name, type = "text", options }) => (
+            <div key={name} className="creditor-form-group">
+              <label className="creditor-form-label">{label}</label>
+              {type === "select" ? (
+                <Select
+                  name={name}
+                  value={options.find((option) => option.value === sectionData[name]) || ""}
+                  onChange={(selectedOption) =>
+                    setSectionData({ ...sectionData, [name]: selectedOption.value })
+                  }
+                  options={options}
+                  isDisabled={isViewing}
+                  isSearchable={true}
+                  placeholder={`Select ${label}`}
+                />
+              ) : type === "checkbox" ? (
+                <input
+                  type="checkbox"
+                  name={name}
+                  checked={!!sectionData[name]}
+                  onChange={(e) =>
+                    setSectionData({ ...sectionData, [name]: e.target.checked })
+                  }
+                  disabled={isViewing}
+                />
+              ) : (
+                <input
+                  type={type}
+                  name={name}
+                  className="creditor-form-input"
+                  value={sectionData[name] || ""}
+                  onChange={(e) =>
+                    setSectionData({ ...sectionData, [name]: e.target.value })
+                  }
+                  disabled={isViewing}
+                />
+              )}
+              {errors[name] && <p className="error-message">{errors[name]}</p>}
             </div>
-            {expandedSections[key] && (
-              <div>
-                <div className="debtor-section-content">
-                {fields.map(({ label, name, type = "text", options}) => (
-                  <div key={name} className="debtor-form-group">
-                    <label className="debtor-form-label">
-                      {label}
-                    </label>
-                    {type === "select" ? (
-                    <Select
-                      name={name}
-                      value={options.find((option) => option.value === sectionData[name]) || ""}
-                      onChange={(selectedOption) =>
-                        setSectionData({ ...sectionData, [name]: selectedOption.value })
-                      }
-                      options={options}
-                      isDisabled={isViewing}
-                      isSearchable={true}
-                      placeholder={`Select ${label}`}
-                    />
-                    ) : name === "remark" || name.includes("address1") ? ( 
-                      <textarea
-                        className="debtor-form-textarea"
-                        name={name}
-                        value={sectionData[name] || ""}
-                        onChange={(e) =>
-                          setSectionData({ ...sectionData, [name]: e.target.value })
-                        }
-                        disabled={isViewing}
-                        rows={3} 
-                      />
-                    ) : (
-                      <input
-                        className="debtor-form-input"
-                        type={type}
-                        name={name}
-                        value={sectionData[name] || ""}
-                        onChange={(e) =>
-                          setSectionData({ ...sectionData, [name]: e.target.value })
-                        }
-                        disabled={isViewing}
-                      />
-                    )}
-                    {errors[name] && <p className="error-message">{errors[name]}</p>}
-                  </div>
-                ))}
-                  {specialField}
-                </div>
-                {!isViewing && (
-                  <div className="debtor-section-buttons">
-                    <button
-                      className="save-button"
-                      onClick={() => handleSaveSection(name)}
-                    >
-                      Save Changes
-                    </button>
-                    <button
-                      className="cancel-button"
-                      onClick={() => handleCancelSection(name)}
-                    >
-                      Cancel / Close
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
 
+        <div className="section-buttons">
+          {!isViewing && (
+            <>
+              <button className="save-button" onClick={handleSave}>
+                Save Changes
+              </button>
+              <button className="cancel-button" onClick={handleCancelSection}>
+                Cancel / Close
+              </button>
+            </>
+          )}
+          {isViewing && (
+            <button className="cancel-button" onClick={onClose}>
+              Close
+            </button>
+          )}
+        </div>
+
+        {/* Error Modal */}
         <ErrorModal
           isOpen={errorModal.isOpen}
           title={errorModal.title}
@@ -295,6 +176,7 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing }) => {
           onClose={() => setErrorModal({ isOpen: false, title: "", message: "" })}
         />
 
+        {/* Confirmation Modal */}
         <ConfirmationModal
           isOpen={isConfirmOpen}
           title="Confirm Action"
@@ -302,12 +184,6 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing }) => {
           onConfirm={handleConfirmAction}
           onCancel={() => setIsConfirmOpen(false)}
         />
-
-        <div className="modal-footer">
-          <button className="close-modal-button" onClick={onClose}>
-            Close Modal
-          </button>
-        </div>
       </div>
     </div>
   );

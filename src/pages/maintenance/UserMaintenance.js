@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import "../../css/Maintenance.css";
-import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+import { FaEdit, FaTrash, FaEye, FaSearch } from "react-icons/fa";
 import CrudModal from "../../modals/CrudModal";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
@@ -9,6 +9,9 @@ import SuccessModal from "../../modals/SuccessModal";
 
 const UserMaintenance = () => {
   const [users, setUsers] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [locationMap, setLocationMap] = useState({}); 
+  const [accessRights, setAccessRights] = useState([]); 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
@@ -24,71 +27,201 @@ const UserMaintenance = () => {
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
   const navigate = useNavigate();
+  const customerId = localStorage.getItem("customerId"); 
+  const userId = localStorage.getItem("userId");
+
+  // useEffect(() => {
+  //   const fetchLocations = async () => {
+  //     try {
+  //       const response = await fetch("https://optikposbackend.absplt.com/Location/GetRecords", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
+  //       });
+
+  //       const data = await response.json();
+  //       if (response.ok && data.success) {
+  //         const locationMapping = {};
+  //         data.data.forEach(location => {
+  //           locationMapping[location.locationId] = location.locationCode;
+  //         });
+  //         setLocationMap(locationMapping);
+  //       } else {
+  //         throw new Error(data.errorMessage || "Failed to fetch locations.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching locations:", error);
+  //     }
+  //   };
+
+  //   fetchLocations();
+  // }, [customerId]);
+
+  // /** 🔹 Fetch Access Rights */
+  // useEffect(() => {
+  //   const fetchAccessRights = async () => {
+  //     try {
+  //       const response = await fetch("https://optikposbackend.absplt.com/AccessRight/GetRecords", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
+  //       });
+
+  //       const data = await response.json();
+  //       if (response.ok && data.success) {
+  //         // ✅ Format access rights as dropdown options
+  //         const accessRightsList = data.data.map(accessRight => ({
+  //           value: accessRight.accessRightId, // Store AccessRightId as Value
+  //           label: accessRight.description, // Show Description in Dropdown
+  //         }));
+  //         setAccessRights(accessRightsList);
+  //       } else {
+  //         throw new Error(data.errorMessage || "Failed to fetch access rights.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching access rights:", error);
+  //     }
+  //   };
+
+  //   fetchAccessRights();
+  // }, [customerId]);
+
+  // useEffect(() => {
+  //   const fetchUsers = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const response = await fetch("https://optikposbackend.absplt.com/Users/GetUsers", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({
+  //           customerId: Number(customerId),
+  //           keyword: "",
+  //           offset: (currentPage - 1) * itemsPerPage,
+  //           limit: itemsPerPage,
+  //         }),
+  //       });
+
+  //       const data = await response.json();
+  //       if (response.ok && data.success) {
+  //         setUsers(data.data);
+  //         setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+  //       } else {
+  //         throw new Error(data.errorMessage || "Failed to fetch users.");
+  //       }
+  //     } catch (error) {
+  //       setErrorModal({ isOpen: true, title: "Error Fetching Users", message: error.message });
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchUsers();
+
+  //   setFields([
+  //     { name: "userName", label: "Username", type: "text", required: true },
+  //     { name: "userEmail", label: "Email", type: "email", required: true },
+  //     {
+  //       name: "accessRightId",
+  //       label: "User Role",
+  //       type: "select",
+  //       options: accessRights, // ✅ Use mapped access rights
+  //       required: true,
+  //     },
+  //     {
+  //       name: "locationId",
+  //       label: "Location",
+  //       type: "select",
+  //       options: Object.keys(locationMap).map(locationId => ({
+  //         label: locationMap[locationId], // Show locationCode
+  //         value: locationId, // Store locationId
+  //       })),
+  //       required: true,
+  //     },
+  //   ]);
+  // }, [currentPage, itemsPerPage, locationMap, accessRights]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const mockData = {
-          items: [
-            { id: 1, name: "John Doe", role: "Super Admin", email: "john.doe@example.com", locationId: "L001" },
-            { id: 2, name: "Jane Smith", role: "User", email: "jane.smith@example.com", locationId: "L002" },
-            { id: 3, name: "Alice Johnson", role: "Admin", email: "alice.johnson@example.com", locationId: "L003" },
-            { id: 4, name: "Bob Brown", role: "Admin", email: "bob.brown@example.com", locationId: "L004" },
-          ],
-          totalPages: Math.ceil(5 / itemsPerPage),
-        };
+    fetchLocations();
+    fetchAccessRights();
+  }, [customerId]);
 
-        setTimeout(() => {
-          setUsers(
-            mockData.items.slice(
-              (currentPage - 1) * itemsPerPage,
-              currentPage * itemsPerPage
-            )
-          );
-          setTotalPages(mockData.totalPages);
-          setLoading(false);
-        }, 500);
-      } catch (error) {
-        setErrorModal({
-          isOpen: true,
-          title: "Error Fetching Data",
-          message: error.message,
+  useEffect(() => {
+    fetchUsers();
+  }, [currentPage, itemsPerPage, searchKeyword]);
+
+  const fetchLocations = async () => {
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Location/GetRecords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        const locationMapping = {};
+        data.data.forEach((location) => {
+          locationMapping[location.locationId] = location.locationCode;
         });
-        setLoading(false);
+        setLocationMap(locationMapping);
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch locations.");
       }
-    };
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+    }
+  };
 
-    fetchData();
+  const fetchAccessRights = async () => {
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/AccessRight/GetRecords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
+      });
 
-    setFields([
-      { name: "name", label: "Name", type: "text", required: true },
-      { name: "email", label: "Email", type: "email", required: true },
-      {
-        name: "role",
-        label: "User Role",
-        type: "select",
-        options: [
-          { label: "Admin", value: "Admin" },
-          { label: "User", value: "User" },
-          { label: "Super Admin", value: "Super Admin" },
-        ],
-        required: true,
-      },
-      {
-        name: "locationId",
-        label: "Location ID",
-        type: "select",
-        options: [
-          { label: "L001", value: "L001" },
-          { label: "L002", value: "L002" },
-          { label: "L003", value: "L003" },
-          { label: "L004", value: "L004" },
-        ],
-        required: true,
-      },
-    ]);
-  }, [currentPage, itemsPerPage]);
+      const data = await response.json();
+      if (response.ok && data.success) {
+        const accessRightsList = data.data.map((accessRight) => ({
+          value: accessRight.accessRightId,
+          label: accessRight.description,
+        }));
+        setAccessRights(accessRightsList);
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch access rights.");
+      }
+    } catch (error) {
+      console.error("Error fetching access rights:", error);
+    }
+  };
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Users/GetUsers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: Number(customerId),
+          keyword: searchKeyword,
+          offset: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setUsers(data.data);
+        setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch users.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error Fetching Users", message: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleItemsPerPageChange = (event) => {
     setItemsPerPage(Number(event.target.value));
@@ -108,9 +241,40 @@ const UserMaintenance = () => {
     setNewUser(user);
     setModalTitle(title);
     setIsViewing(viewing);
+  
+    // Dynamically set fields based on Add/Edit mode
+    const updatedFields = [
+      { name: "userName", label: "Username", type: "text", required: true },
+      { name: "userEmail", label: "Email", type: "email", required: true },
+    ];
+  
+    // If editing, add additional fields
+    if (user.userId) {
+      updatedFields.push(
+        {
+          name: "accessRightId",
+          label: "User Role",
+          type: "select",
+          options: accessRights, // ✅ Use mapped access rights
+          required: true,
+        },
+        {
+          name: "locationId",
+          label: "Location Code",
+          type: "select",
+          options: Object.keys(locationMap).map(locationId => ({
+            label: locationMap[locationId],
+            value: locationId,
+          })),
+          required: true,
+        }
+      );
+    }
+  
+    setFields(updatedFields);
     setIsPopupOpen(true);
   };
-
+  
   const handleCloseModal = () => {
     if (isViewing) {
       setIsPopupOpen(false); 
@@ -125,59 +289,109 @@ const UserMaintenance = () => {
     setIsConfirmOpen(true);
   };
 
-  const handleSave = () => {
-    setConfirmAction(() => () => {
+  const handleSave = async () => {
+    setConfirmAction(() => async () => {
       setLoading(true);
-      setTimeout(() => {
-        try {
-          const updatedUsers = newUser.id
-            ? users.map((user) =>
-                user.id === newUser.id ? { ...user, ...newUser } : user
+  
+      try {
+        if (!newUser.userId) {
+          // 🔹 Register New User API Call
+          const response = await fetch("https://optikposbackend.absplt.com/Users/RegisterUser", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              customerId: Number(customerId),
+              userName: newUser.userName,
+              userEmail: newUser.userEmail,
+              editorUserId: userId, // 
+            }),
+          });
+  
+          const data = await response.json();
+          if (response.ok && data.success) {
+            setSuccessModal({ isOpen: true, title: "User added successfully!" });
+  
+            setUsers((prevUsers) => [...prevUsers, data.data]);
+            setIsPopupOpen(false);
+          } else {
+            throw new Error(data.errorMessage || "Failed to register user.");
+          }
+        } else {
+          // 🔹 Update Existing User API Call
+          const response = await fetch("https://optikposbackend.absplt.com/Users/UpdateUser", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              customerId: Number(customerId),
+              userId: newUser.userId,
+              accessRightId: newUser.accessRightId,
+              locationId: newUser.locationId,
+            }),
+          });
+  
+          const data = await response.json();
+          if (response.ok && data.success) {
+            setSuccessModal({ isOpen: true, title: "User updated successfully!" });
+  
+            // 🔹 Update user list with modified user details
+            setUsers((prevUsers) =>
+              prevUsers.map((user) =>
+                user.userId === newUser.userId ? { ...user, ...newUser } : user
               )
-            : [...users, { ...newUser, id: users.length + 1 }];
-
-          setUsers(updatedUsers);
-          setIsPopupOpen(false);
-          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
+            );
+            setIsPopupOpen(false);
+          } else {
+            throw new Error(data.errorMessage || "Failed to update user.");
+          }
         }
-      }, 500);
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Saving User", message: error.message });
+      } finally {
+        setLoading(false);
+      }
     });
-
-    setConfirmMessage(
-      newUser.id 
-      ? `Do you want to update this user "${newUser.name}"?`
-      : `Do you want to add this user "${newUser.name}"?`
-    );
+  
+    setConfirmMessage(newUser.userId ? `Do you want to update this user?` : `Do you want to add this user?`);
     setIsConfirmOpen(true);
-  };
+  };  
 
-  const handleDelete = (id) => {
-    const userToDelete = users.find((user) => user.id === id);
+  const handleDelete = (userId) => {
+    const userToDelete = users.find((user) => user.userId === userId);
   
     if (!userToDelete) {
       console.error("User not found");
       return;
     }
-
-    setConfirmAction(() => () => {
+  
+    setConfirmAction(() => async () => {
       setLoading(true);
-      setTimeout(() => {
-        try {
-          setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
-          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/Users/DeleteUser", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            id: userToDelete.userId,
+            userId: userId, 
+          }),
+        });
+  
+        const data = await response.json();
+        if (response.ok && data.success) {
+          setSuccessModal({ isOpen: true, title: "User deleted successfully!" });
+  
+          setUsers((prevUsers) => prevUsers.filter((user) => user.userId !== userId));
+        } else {
+          throw new Error(data.errorMessage || "Failed to delete user.");
         }
-      }, 500);
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Deleting User", message: error.message });
+      } finally {
+        setLoading(false);
+      }
     });
-
-    setConfirmMessage(`Do you want to delete this user "${userToDelete.name}"?`);
+  
+    setConfirmMessage(`Do you want to delete this user "${userToDelete.userName}"?`);
     setIsConfirmOpen(true);
   };
 
@@ -214,6 +428,15 @@ const UserMaintenance = () => {
         title={successModal.title}
         onClose={closeSuccessModal}
       />
+      <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search by username or email"
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            className="search-input"
+          />
+        </div>
 
       <div className="maintenance-header">
         <div className="pagination-controls">
@@ -245,21 +468,23 @@ const UserMaintenance = () => {
           <thead>
             <tr>
               <th>No</th>
-              <th>Name</th>
+              <th>Username</th>
               <th>User Role</th>
               <th>Email</th>
-              <th>Location ID</th>
+              <th>Location Code</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user, index) => (
-              <tr key={user.id}>
+              <tr key={user.userId}>
                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{user.name}</td>
-                <td>{user.role}</td>
-                <td>{user.email}</td>
-                <td>{user.locationId}</td>
+                <td>{user.userName}</td>
+                <td>
+                    {accessRights.find(ar => ar.value === user.accessRightId)?.label || "-"}
+                  </td>                
+                <td>{user.userEmail}</td>
+                <td>{locationMap[user.locationId] || "-"}</td>
                 <td>
                   <button
                     onClick={() => handleOpenModal(user, "Edit User")}
@@ -268,7 +493,7 @@ const UserMaintenance = () => {
                     <FaEdit />
                   </button>
                   <button
-                    onClick={() => handleDelete(user.id)}
+                    onClick={() => handleDelete(user.userId)}
                     className="action-button delete"
                   >
                     <FaTrash />

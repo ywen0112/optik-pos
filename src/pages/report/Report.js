@@ -32,7 +32,7 @@ const Report = () => {
 
   return (
     <div className="report-container">
-      {/* Breadcrumb navigation */}
+      {/* Breadcrumb navigation
       <div className="breadcrumb">
         {pathSegments.length > 1 ? (
           <span className="back-link" onClick={() => navigate("/report")}>
@@ -61,7 +61,8 @@ const Report = () => {
             </ul>
           </div>
         ))}
-      </div>
+      </div> */}
+    <label>In Maintenance</label>
     </div>
   );
 };

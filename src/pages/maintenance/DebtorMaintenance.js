@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import "../../css/Maintenance.css";
-import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+import { FaEdit, FaTrash, FaEye, FaGlasses } from "react-icons/fa";
+import { MdVisibility } from "react-icons/md"; 
 import DebtorModal from "../../modals/DebtorModal";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
 import SuccessModal from "../../modals/SuccessModal";
+import EyePowerModal from "../../modals/EyePowerModal";
 
 const DebtorMaintenance = () => {
   const [debtors, setDebtors] = useState([]);
@@ -23,72 +25,77 @@ const DebtorMaintenance = () => {
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
   const navigate = useNavigate();
+  const customerId = localStorage.getItem("customerId"); 
+  const userId = localStorage.getItem("userId");
+  const [debtorTypeOptions, setDebtorTypesOptions] = useState([]);
+  const [isEyePowerOpen, setIsEyePowerOpen] = useState(false);
+  const [selectedEyePower, setSelectedEyePower] = useState({});
+  const [eyePowerType, setEyePowerType] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
+        fetchDebtors();
+      }, [currentPage, itemsPerPage]); 
+  
+      useEffect(() => {
+        if (debtors.length > 0) {
+          setTotalPages(Math.ceil(debtors.length / itemsPerPage)); // ✅ Correct calculation
+        }
+      }, [debtors, itemsPerPage]);
+  
+    useEffect(() => {
+      const fetchDebtorTypes = async () => {
+        try {
+          const response = await fetch("https://optikposbackend.absplt.com/DebtorType/GetRecords", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
+          });
+  
+          const data = await response.json();
+          if (response.ok && data.success) {
+            const options = data.data.map(type => ({
+              value: type.debtorTypeId,
+              label: type.debtorTypeCode,
+            }));
+            setDebtorTypesOptions(options);
+          } else {
+            throw new Error(data.errorMessage || "Failed to fetch debtor types.");
+          }
+        } catch (error) {
+          console.error("Error fetching debtor types:", error);
+        }
+      };
+  
+      fetchDebtorTypes();
+    }, [customerId]);
+
+    const fetchDebtors = async () => {
       setLoading(true);
       try {
-        const mockData = {
-          items: [
-            {
-              id: 1,
-              emailAddress: "john.doe@example.com",
-              mobile: "1234567890",
-              debtorCode: "D001",
-              debtorName: "John Doe",
-              debtorTypeId: "DT001",
-              address1: "123 Main St",
-              postCode: "12345",
-              locationId: "L001",
-              salesAgent: "Agent1",
-              currencyCode: "USD",
-              ic: "123456789",
-              nameOnIC: "John Doe",
-              tin: "TIN123456",
-            },
-            {
-              id: 2,
-              emailAddress: "jane.smith@example.com",
-              mobile: "0987654321",
-              debtorCode: "D002",
-              debtorName: "Jane Smith",
-              debtorTypeId: "DT002",
-              address1: "456 Elm St",
-              postCode: "54321",
-              locationId: "L002",
-              salesAgent: "Agent2",
-              currencyCode: "EUR",
-              ic: "987654321",
-              nameOnIC: "Alice Smith",
-              tin: "TIN987654",
-            },
-          ],
-          totalPages: Math.ceil(5 / itemsPerPage),
-        };
-  
-        setTimeout(() => {
-          setDebtors(
-            mockData.items.slice(
-              (currentPage - 1) * itemsPerPage,
-              currentPage * itemsPerPage
-            )
-          );
-          setTotalPages(mockData.totalPages);
-          setLoading(false);
-        }, 1000);
-      } catch (error) {
-        console.error("Error fetching debtors:", error);
-        setErrorModal({
-          isOpen: true,
-          title: "Error Fetching Data",
-          message: error.message,
+        const response = await fetch("https://optikposbackend.absplt.com/Debtor/GetRecords", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            keyword: "",
+            offset: 0,
+            limit: 9999,
+          }),
         });
+  
+        const data = await response.json();
+        if (response.ok && data.success) {
+          setDebtors(data.data);
+          setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+        } else {
+          throw new Error(data.errorMessage || "Failed to fetch debtors.");
+        }
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Fetching Data", message: error.message });
+      } finally {
         setLoading(false);
       }
     };
-  
-    fetchData();
-  }, [currentPage, itemsPerPage]);
 
   const handleItemsPerPageChange = (event) => {
     setItemsPerPage(Number(event.target.value));
@@ -99,11 +106,96 @@ const DebtorMaintenance = () => {
     setCurrentPage(page);
   };
 
-  const handleOpenModal = (debtor = {}, title = "", viewing = false) => {
-    setNewDebtor({ ...debtor, id: debtor.id || null });
-    setModalTitle(title);
-    setIsViewing(viewing);
-    setIsPopupOpen(true);
+  const handleOpenModal = async (debtor = {}, title = "", viewing = false) => {
+    try {
+      if (title === "Add Debtor") {
+        const response = await fetch("https://optikposbackend.absplt.com/Debtor/New", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            userId: userId,
+            id: "",
+          }),
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+          debtor = {
+            debtorId: data.data.debtorId,
+            debtorCode: data.data.debtorCode || "",
+            companyName: data.data.companyName || "",
+            debtorTypeId: data.data.debtorTypeId || "",
+            address1: data.data.address1 || "",
+            address2: data.data.address2 || "",
+            address3: data.data.address3 || "",
+            address4: data.data.address4 || "",
+            postCode: data.data.postCode || "",
+            phone1: data.data.phone1 || "",
+            phone2: data.data.phone2 || "",
+            mobile: data.data.mobile || "",
+            medicalIsDiabetes: data.data.medicalIsDiabetes,
+            medicalIsHypertension: data.data.medicalIsHypertension,
+            medicalOthers: data.data.medicalOthers || "",
+            ocularIsSquint: data.data.ocularIsSquint,
+            ocularIsLazyEye: data.data.ocularIsLazyEye,
+            ocularHasSurgery: data.data.ocularHasSurgery,
+            ocularOthers: data.data.ocularOthers || "",
+          };
+        } else {
+          throw new Error(data.errorMessage || "Failed to create new debtor.");
+        }
+      }
+      
+      else if ((title === "Edit Debtor" || title === "View Debtor") && debtor.debtorId) {
+        const response = await fetch("https://optikposbackend.absplt.com/Debtor/Edit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            userId: userId,
+            id: debtor.debtorId, 
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          debtor = {
+            debtorId: data.data.debtorId,
+            debtorCode: data.data.debtorCode || "",
+            companyName: data.data.companyName || "",
+            debtorTypeId: data.data.debtorTypeId || "",
+            address1: data.data.address1 || "",
+            address2: data.data.address2 || "",
+            address3: data.data.address3 || "",
+            address4: data.data.address4 || "",
+            postCode: data.data.postCode || "",
+            phone1: data.data.phone1 || "",
+            phone2: data.data.phone2 || "",
+            mobile: data.data.mobile || "",
+            medicalIsDiabetes: data.data.medicalIsDiabetes,
+            medicalIsHypertension: data.data.medicalIsHypertension,
+            medicalOthers: data.data.medicalOthers || "",
+            ocularIsSquint: data.data.ocularIsSquint,
+            ocularIsLazyEye: data.data.ocularIsLazyEye,
+            ocularHasSurgery: data.data.ocularHasSurgery,
+            ocularOthers: data.data.ocularOthers || "",
+          };
+        } else {
+          throw new Error(data.errorMessage || "Failed to fetch debtor data.");
+        }
+      }
+
+      setNewDebtor(debtor);
+      setModalTitle(title);
+      setIsViewing(viewing);
+      setIsPopupOpen(true);
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error Opening Modal", message: error.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCloseModal = () => {
@@ -112,62 +204,94 @@ const DebtorMaintenance = () => {
   };
 
   const handleSave = (updatedDebtor) => {
-    const confirmMessage = updatedDebtor.id
-      ? `Are you sure you want to update the debtor "${updatedDebtor.debtorName}"?`
-      : `Are you sure you want to add the debtor "${updatedDebtor.debtorName}"?`;
-  
-    setConfirmAction(() => async () => {
-      setLoading(true); 
-      setTimeout(() => {
-        try {
-          const updatedData = {
-            ...updatedDebtor,
-            id: updatedDebtor.id || new Date().getTime(),
-          };
-  
-          if (updatedDebtor.id) {
-            setDebtors((prev) =>
-              prev.map((debtor) =>
-                debtor.id === updatedDebtor.id ? updatedData : debtor
-              )
-            );
-          } else {
-            setDebtors((prev) => [...prev, updatedData]);
-          }
-          setSuccessModal({ isOpen: true, title: "Update Successfully!"});
-        } catch (error) {
-          console.error("Error saving debtor:", error);
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
-        }
-      }, 500); 
-    });
-  
-    setConfirmMessage(confirmMessage); 
-    setIsConfirmOpen(true);
-  };
-  
-  const handleDelete = (id) => {
-    const debtorToDelete = debtors.find((debtor) => debtor.id === id);
-    const confirmMessage = `Are you sure you want to delete the debtor "${debtorToDelete?.debtorName}"?`;
+    setConfirmMessage(`Do you want to save this debtor?`);
   
     setConfirmAction(() => async () => {
       setLoading(true);
-      setTimeout(() => {
-        try {
-          setDebtors((prev) => prev.filter((debtor) => debtor.id !== id)); 
-          setSuccessModal({ isOpen: true, title: "Update Successfully! "})
-        } catch (error) {
-          console.error("Error deleting debtor:", error);
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/Debtor/Save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            actionData: {
+              customerId: Number(customerId),
+              userId: userId,
+              id: updatedDebtor.debtorId || updatedDebtor.id, 
+            },
+            debtorId: updatedDebtor.debtorId || updatedDebtor.id, 
+            debtorCode: updatedDebtor.debtorCode,
+            companyName: updatedDebtor.companyName,
+            debtorTypeId: updatedDebtor.debtorTypeId,
+            address1: updatedDebtor.address1,
+            address2: updatedDebtor.address2,
+            address3: updatedDebtor.address3,
+            address4: updatedDebtor.address4,
+            postCode: updatedDebtor.postCode,
+            phone1: updatedDebtor.phone1,
+            phone2: updatedDebtor.phone2,
+            mobile: updatedDebtor.mobile,
+            medicalIsDiabetes: updatedDebtor.medicalIsDiabetes,
+            medicalIsHypertension: updatedDebtor.medicalIsHypertension,
+            medicalOthers: updatedDebtor.medicalOthers,
+            ocularIsSquint: updatedDebtor.ocularIsSquint,
+            ocularIsLazyEye: updatedDebtor.ocularIsLazyEye,
+            ocularHasSurgery: updatedDebtor.ocularHasSurgery,
+            ocularOthers:updatedDebtor.ocularOthers,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          setSuccessModal({ isOpen: true, title: "Debtor saved successfully!" });
+  
+          await fetchDebtors(); 
+          setIsPopupOpen(false); 
+        } else {
+          throw new Error(data.errorMessage || "Failed to save debtor.");
         }
-      }, 500); 
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Saving debtor", message: error.message });
+      } finally {
+        setLoading(false);
+      }
+    });
+    setIsConfirmOpen(true);
+  };
+  
+  const handleDelete = (debtorId) => {
+    const confirmMessage = `Are you sure you want to delete the debtor?`;
+  
+    setConfirmAction(() => async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/Debtor/Delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            id: debtorId, 
+            userId: userId,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          setSuccessModal({ isOpen: true, title: "Debtor deleted successfully!" });
+  
+          await fetchDebtors(); 
+        } else {
+          throw new Error(data.errorMessage || "Failed to delete debtor.");
+        }
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Deleting debtor", message: error.message });
+      } finally {
+        setLoading(false);
+      }
     });
   
-    setConfirmMessage(confirmMessage); 
+    setConfirmMessage(confirmMessage);
     setIsConfirmOpen(true);
   };
 
@@ -183,6 +307,111 @@ const DebtorMaintenance = () => {
   const closeSuccessModal = () => {
     setSuccessModal({ isOpen: false, title: ""});
   };
+
+  const handleOpenEyePowerModal = async (debtor, type) => {
+    try {
+        const getApiUrl =
+            type === "Glass"
+                ? "https://optikposbackend.absplt.com/EyePower/GetGlasss"
+                : "https://optikposbackend.absplt.com/EyePower/GetContactLenss";
+
+        const newApiUrl =
+            type === "Glass"
+                ? "https://optikposbackend.absplt.com/EyePower/NewGlass"
+                : "https://optikposbackend.absplt.com/EyePower/NewContactLens";
+
+        // Search for existing Eye Power record
+        const searchResponse = await fetch(getApiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                customerId: Number(customerId),
+                keyword: debtor.eyePowerId || "",  // Search by Eye Power ID
+                offset: 0,
+                limit: 10
+            }),
+        });
+
+        const searchData = await searchResponse.json();
+        if (searchData.success && searchData.data.length > 0) {
+            const foundEyePower = searchData.data[0];
+
+            // If Eye Power record exists, fetch details using Edit API
+            const editResponse = await fetch("https://optikposbackend.absplt.com/EyePower/Edit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    customerId: Number(customerId),
+                    userId: userId,
+                    id: foundEyePower.eyePowerId,  // Fetch using the existing ID
+                }),
+            });
+
+            const editData = await editResponse.json();
+            if (editData.success) {
+                setSelectedEyePower(editData.data);
+                setEyePowerType(type);
+                setIsEyePowerOpen(true);
+                return;
+            }
+        }
+
+        // If no record found, create a new one
+        const newResponse = await fetch(newApiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                customerId: Number(customerId),
+                userId: userId,
+                id: "",  // Create new record
+            }),
+        });
+
+        const newData = await newResponse.json();
+        if (newData.success) {
+            setSelectedEyePower({ ...newData.data, debtorId: debtor.debtorId });
+            setEyePowerType(type);
+            setIsEyePowerOpen(true);
+        } else {
+            throw new Error(newData.errorMessage || "Failed to create new Eye Power record.");
+        }
+    } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Fetching Eye Power", message: error.message });
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const handleSaveEyePower = async (updatedEyePower) => {
+    try {
+      setLoading(true);
+      const response = await fetch("https://optikposbackend.absplt.com/EyePower/Save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          actionData: {
+            customerId: customerId,
+            userId: userId,
+            id: updatedEyePower.eyePowerId,
+          },
+          ...updatedEyePower,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setSuccessModal({ isOpen: true, title: "Eye Power saved successfully!" });
+        setIsEyePowerOpen(false);
+      } else {
+        throw new Error(result.errorMessage || "Failed to save Eye Power.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error Saving Eye Power", message: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <div className="maintenance-container">
@@ -234,13 +463,12 @@ const DebtorMaintenance = () => {
             <thead>
               <tr>
                 <th>No</th>
-                <th>Debtor Name</th>
+                <th>Company Name</th>
                 <th>Debtor Code</th>
-                <th>Debtor Type ID</th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>TIN</th>
-                <th>Location ID</th>
+                <th>Debtor Type Code</th>
+                <th>Mobile</th>
+                <th>Contact Lens Eye Power</th>
+                <th>Glasses Eye Power</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -248,13 +476,20 @@ const DebtorMaintenance = () => {
               {debtors.map((debtor, index) => (
                 <tr key={debtor.id}>
                   <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                  <td>{debtor.debtorName || "-"}</td>
+                  <td>{debtor.companyName || "-"}</td>
                   <td>{debtor.debtorCode || "-"}</td>
-                  <td>{debtor.debtorTypeId || "-"}</td>
-                  <td>{debtor.emailAddress || "-"}</td>
+                  <td>{debtorTypeOptions.find(type => type.value === debtor.debtorTypeId)?.label || "-"}</td>
                   <td>{debtor.mobile || "-"}</td>
-                  <td>{debtor.tin || "-"}</td>
-                  <td>{debtor.locationId || "-"}</td>
+                  <td className="eye-power">
+                    <button className="eye-power-button" onClick={() => handleOpenEyePowerModal(debtor, "Contact Lens")}>
+                      <MdVisibility  /> 
+                    </button>
+                  </td>
+                  <td className="eye-power">
+                    <button className="eye-power-button" onClick={() => handleOpenEyePowerModal(debtor, "Glass")}>
+                      <FaGlasses /> 
+                    </button>
+                  </td>
                   <td>
                     <button
                       onClick={() => handleOpenModal(debtor, "Edit Debtor")}
@@ -263,7 +498,7 @@ const DebtorMaintenance = () => {
                       <FaEdit />
                     </button>
                     <button
-                      onClick={() => handleDelete(debtor.id)}
+                      onClick={() => handleDelete(debtor.debtorId)}
                       className="action-button delete"
                     >
                       <FaTrash />
@@ -306,6 +541,7 @@ const DebtorMaintenance = () => {
             onClose={handleCloseModal}
             onSave={handleSave}
             isViewing={isViewing}
+            debtorTypeOptions={debtorTypeOptions} 
           />
           <ConfirmationModal
             isOpen={isConfirmOpen}
@@ -314,7 +550,14 @@ const DebtorMaintenance = () => {
             onConfirm={handleConfirmAction}
             onCancel={() => setIsConfirmOpen(false)}
           />
-    </div>
+          <EyePowerModal
+            isOpen={isEyePowerOpen}
+            onClose={() => setIsEyePowerOpen(false)}
+            eyePowerType={eyePowerType}
+            data={selectedEyePower}
+            onSave={handleSaveEyePower}
+          />    
+          </div>
   );
 };
 

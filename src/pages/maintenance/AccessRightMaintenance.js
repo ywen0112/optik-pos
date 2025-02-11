@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom"; 
 import "../../css/Maintenance.css";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
@@ -22,57 +22,51 @@ const AccessRightMaintenance = () => {
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
   const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
 
   useEffect(() => {
-    const fetchRoles = async () => {
-      setLoading(true);
-      try {
-        const mockData = {
-          items: [
-            {
-              id: 1,
-              role: "Admin",
-              accessRights: [
-                { module: "Dashboard", permissions: ["Allow"] },
-                { module: "User Maintenance", permissions: ["View", "Add", "Edit", "Delete"] },
-              ],
-            },
-            {
-              id: 2,
-              role: "User",
-              accessRights: [
-                { module: "Dashboard", permissions: ["Allow"] },
-                { module: "User Maintenance", permissions: ["View"] },
-              ],
-            },
-          ],
-          totalPages: Math.ceil(5 / itemsPerPage),
-        };
-
-        setTimeout(() => {
-          setRoles(
-            mockData.items.slice(
-              (currentPage - 1) * itemsPerPage,
-              currentPage * itemsPerPage
-            )
-          );
-          setTotalPages(mockData.totalPages);
-          setLoading(false);
-        }, 500);
-      } catch (error) {
-        setErrorModal({
-          isOpen: true,
-          title: "Error Fetching Data",
-          message: error.message,
-        });
-        setLoading(false);
-      }
-    };
-
     fetchRoles();
-  }, [currentPage, itemsPerPage]);
+  }, [currentPage, itemsPerPage]); // 🟢 Ensure this runs when page changes
+
+  useEffect(() => {
+    if (roles.length > 0) {
+      setTotalPages(Math.ceil(roles.length / itemsPerPage)); // ✅ Correct calculation
+    }
+  }, [roles, itemsPerPage]);
+  
+  const fetchRoles = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/AccessRight/GetRecords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: Number(localStorage.getItem("customerId")),
+          keyword: "",
+          offset: 0, 
+          limit: 9999, 
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok && data.success) {
+        setRoles(data.data); 
+        setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch roles.");
+      }
+    } catch (error) {
+      setErrorModal({
+        isOpen: true,
+        title: "Error Fetching Data",
+        message: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleItemsPerPageChange = (event) => {
     setItemsPerPage(Number(event.target.value));
@@ -80,87 +74,192 @@ const AccessRightMaintenance = () => {
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
-  const handleOpenModal = (role = {}, title = "", viewing = false) => {
-    setNewRole({
-      ...role,
-      accessRights: role.accessRights || [],
-    });
-    setModalTitle(title);
-    setIsViewing(viewing);
-    setIsPopupOpen(true);
-  };
+  const handleOpenModal = async (role = {}, title = "", viewing = false) => {
+    try {
+      if (title === "Add Role") {
+        // ✅ Call "New" API when adding a new role
+        const response = await fetch("https://optikposbackend.absplt.com/AccessRight/New", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(localStorage.getItem("customerId")),
+            userId: localStorage.getItem("userId"),
+            id: "",
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          role = {
+            id: data.data.accessRightId,
+            accessRightId: data.data.accessRightId,
+            role: "", 
+            accessRights: [],
+          };
+        } else {
+          throw new Error(data.errorMessage || "Failed to create new access right.");
+        }
+      } 
+      
+      else if ((title === "Edit Role" || title === "View Role") && role.accessRightId) {
+        const response = await fetch("https://optikposbackend.absplt.com/AccessRight/Edit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(localStorage.getItem("customerId")),
+            userId: localStorage.getItem("userId"),
+            id: role.accessRightId, 
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          role = {
+            id: data.data.accessRightId,
+            accessRightId: data.data.accessRightId,
+            role: data.data.description, 
+            accessRights: data.data.accessRightActions.map((right) => ({
+              module: right.module,
+              permissions: [
+                right.allow && "Allow",
+                right.add && "Add",
+                right.view && "View",
+                right.edit && "Edit",
+                right.delete && "Delete",
+              ].filter(Boolean),
+            })),
+          };
+        } else {
+          throw new Error(data.errorMessage || "Failed to fetch role data.");
+        }
+      }
+  
+      setNewRole(role);
+      setModalTitle(title);
+      setIsViewing(viewing); 
+      setIsPopupOpen(true);
+      
+    } catch (error) {
+      setErrorModal({
+        isOpen: true,
+        title: "Error Opening Modal",
+        message: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }; 
 
   const handleCloseModal = () => {
     if (isViewing) {
       setIsPopupOpen(false); 
       return;
     }
-
+  
     setConfirmAction(() => () => {
       setIsPopupOpen(false);
     });
-
+  
     setConfirmMessage("Are you sure you want to cancel and discard unsaved changes?");
     setIsConfirmOpen(true);
   };
 
   const handleSave = (updatedRole) => {
-    const confirmMessage = updatedRole.id
-      ? `Are you sure you want to update the role "${updatedRole.role}"?`
-      : `Are you sure you want to add the role "${updatedRole.role}"?`;
-
+    setConfirmMessage(`Do you want to save this role?`);
+  
     setConfirmAction(() => async () => {
       setLoading(true);
-      setTimeout(() => {
-        try {
-          if (updatedRole.id) {
-            setRoles((prevRoles) =>
-              prevRoles.map((role) => (role.id === updatedRole.id ? updatedRole : role))
-            );
-          } else {
-            const newId = roles.length ? Math.max(...roles.map((role) => role.id)) + 1 : 1;
-            setRoles((prevRoles) => [...prevRoles, { ...updatedRole, id: newId }]);
-          }
-          setSuccessModal({ isOpen: true, title: "Update Successfully! "})
-          setIsPopupOpen(false);
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/AccessRight/Save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            actionData: {
+              customerId: Number(localStorage.getItem("customerId")),
+              userId: localStorage.getItem("userId"),
+              id: updatedRole.accessRightId || updatedRole.id, // ✅ Ensure correct ID
+            },
+            accessRightId: updatedRole.accessRightId || updatedRole.id, // ✅ Ensure the correct ID is passed
+            description: updatedRole.role, 
+            accessRightActions: updatedRole.accessRights.map((right) => ({
+              module: right.module, 
+              allow: right.permissions.includes("Allow"),
+              add: right.permissions.includes("Add"),
+              view: right.permissions.includes("View"),
+              edit: right.permissions.includes("Edit"),
+              delete: right.permissions.includes("Delete"),
+            })),
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          setSuccessModal({ isOpen: true, title: "Access Right saved successfully!" });
+  
+          await fetchRoles(); 
+          setIsPopupOpen(false); 
+        } else {
+          throw new Error(data.errorMessage || "Failed to save access right.");
         }
-      }, 500);
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Saving Role", message: error.message });
+      } finally {
+        setLoading(false);
+      }
     });
-
-    setConfirmMessage(confirmMessage);
-    setIsConfirmOpen(true);
+  
+    setIsConfirmOpen(true); 
   };
 
-  const handleDelete = (id) => {
-    const roleToDelete = roles.find((role) => role.id === id);
-    const confirmMessage = `Are you sure you want to delete the role "${roleToDelete?.role}"?`;
-
+  const handleDelete = (accessRightId) => {
+    const roleToDelete = roles.find((role) => role.accessRightId === accessRightId);
+    const confirmMessage = `Are you sure you want to delete the role "${roleToDelete?.description}"?`;
+  
     setConfirmAction(() => async () => {
       setLoading(true);
-      setTimeout(() => {
-        try {
-          setRoles((prevRoles) => prevRoles.filter((role) => role.id !== id));
-          setSuccessModal({ isOpen: true, title: "Update Successfully! "})
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/AccessRight/Delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(localStorage.getItem("customerId")),
+            id: accessRightId, 
+            userId: localStorage.getItem("userId"),
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          setSuccessModal({ isOpen: true, title: "Access Right deleted successfully!" });
+  
+          await fetchRoles(); 
+        } else {
+          throw new Error(data.errorMessage || "Failed to delete access right.");
         }
-      }, 500);
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Deleting Role", message: error.message });
+      } finally {
+        setLoading(false);
+      }
     });
+  
     setConfirmMessage(confirmMessage);
     setIsConfirmOpen(true);
   };
 
   const handleConfirmAction = async () => {
-    if (confirmAction) await confirmAction();
+    if (confirmAction) {
+      await confirmAction(); 
+    }
     setIsConfirmOpen(false);
   };
 
@@ -172,10 +271,12 @@ const AccessRightMaintenance = () => {
     setSuccessModal({ isOpen: false, title: ""});
   };
 
-  const currentRoles = roles.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  
+  const currentRoles = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return roles.slice(startIndex, endIndex); 
+  }, [roles, currentPage, itemsPerPage]);
 
   return (
     <div className="maintenance-container">
@@ -232,33 +333,24 @@ const AccessRightMaintenance = () => {
             </tr>
           </thead>
           <tbody>
-            {currentRoles.map((role, index) => (
-              <tr key={role.id}>
-                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{role.role || "-"}</td>
-                <td>
-                  <button
-                    onClick={() => handleOpenModal(role, "Edit Role")}
-                    className="action-button edit"
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(role.id)}
-                    className="action-button delete"
-                  >
-                    <FaTrash />
-                  </button>
-                  <button
-                    onClick={() => handleOpenModal(role, "View Role", true)}
-                    className="action-button view"
-                  >
-                    <FaEye />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+          {currentRoles.map((role, index) => (
+            <tr key={role.id}>
+              <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+              <td>{role.description || "-"}</td> 
+              <td>
+                <button onClick={() => handleOpenModal(role, "Edit Role")} className="action-button edit">
+                  <FaEdit />
+                </button>
+                <button onClick={() => handleDelete(role.accessRightId)} className="action-button delete">
+                  <FaTrash />
+                </button>
+                <button onClick={() => handleOpenModal(role, "View Role", true)} className="action-button view">
+                  <FaEye />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
         </table>
       )}
       <div className="pagination">

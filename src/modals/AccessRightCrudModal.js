@@ -170,15 +170,16 @@ const AccessRightCrudModal = ({
   };
 
   const handleSave = () => {
-    if (validateFields()) {
-      onSave(formData);
-    } else {
+    if (!validateFields()) {
       setErrorModal({
         isOpen: true,
         title: "Error",
-        message: "Please fill out all required fields highlighted in red.",
+        message: "Please fill out all required fields.",
       });
+      return;
     }
+  
+    onSave(formData); // ✅ Send form data to parent component, let parent handle API call
   };
 
   const closeErrorModal = () => {

@@ -8,10 +8,6 @@ import Dashboard from "../pages/overview/Dashboard";
 import AuditLogs from "../pages/overview/AuditLogs";
 import InquiryScreen from "../pages/overview/InquiryScreen";
 import Transaction from "../pages/overview/Transaction";
-import CashManagement from "../pages/overview/CashManagement";
-import SalesInvoice from "../pages/overview/SalesInvoice";
-import PurchaseInvoice from "../pages/overview/PurchaseInvoice";
-import CloseCounter from "../pages/overview/CloseCounter"
 
 import Maintenance from "../pages/maintenance/Maintenance";
 import UserMaintenance from "../pages/maintenance/UserMaintenance";
@@ -44,10 +40,6 @@ const MainLayout = () => {
     "/main/audit-logs": "Audit Logs",
     "/main/inquiry-screen": "Inquiry Screen",
     "/main/transaction": "Transaction",
-    "/main/transaction/cash-management": "Transaction",
-    "/main/transaction/sales-invoice": "Transaction",
-    "/main/transaction/purchase-invoice": "Transaction",
-    "/main/transaction/close-counter": "Transaction",
     "/maintenance": "Maintenance",
     "/maintenance/user-maintenance": "User Maintenance",
     "/maintenance/access-right-maintenance": "Access Right Maintenance",
@@ -93,12 +85,7 @@ const MainLayout = () => {
               <Route path="/main/dashboard" element={<Dashboard />} />
               <Route path="/main/audit-logs" element={<AuditLogs />} />
               <Route path="/main/inquiry-screen" element={<InquiryScreen />} />
-              <Route path="/main/transaction" element={<Transaction />}>
-                <Route path="cash-management" element={<CashManagement />} />
-                <Route path="sales-invoice" element={<SalesInvoice />} />
-                <Route path="purchase-invoice" element={<PurchaseInvoice />} />
-                <Route path="close-counter" element={<CloseCounter />} />
-              </Route>
+              <Route path="/main/transaction" element={<Transaction />} />
               <Route path="/maintenance" element={<Maintenance />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/maintenance/user-maintenance" element={<UserMaintenance />} />

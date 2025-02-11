@@ -242,8 +242,8 @@ const MemberMaintenance = () => {
       <div className="maintenance-header">
         <div className="pagination-controls">
           <label>
-            Show:
-            <select
+            In Maintenance </label>
+            {/* <select
               value={itemsPerPage}
               onChange={handleItemsPerPageChange}
               className="items-per-page-select"
@@ -348,7 +348,9 @@ const MemberMaintenance = () => {
         message={confirmMessage}
         onConfirm={handleConfirmAction}
         onCancel={() => setIsConfirmOpen(false)}
-      />
+      /> */}
+      </div>
+      </div>
     </div>
   );
 };

@@ -39,7 +39,7 @@ const CrudModal = ({
 
   const handleSave = () => {
     if (validateFields()) {
-      onSave();
+      onSave(data);
     } else {
       setErrorModal({
         isOpen: true,
@@ -60,35 +60,61 @@ const CrudModal = ({
       <div className="popup-content">
         <h3>{title}</h3>
         <div className="popup-form">
-          {fields.map((field) => (
-            <div className="form-group" key={field.name}>
-              <label>{field.label}</label>
-              {field.type === "select" ? (
-                <Select
-                  name={field.name}
-                  value={field.options.find((option) => option.value === data[field.name]) || ""}
-                  onChange={(selectedOption) =>
-                    onInputChange({ target: { name: field.name, value: selectedOption.value } })
-                  }
-                  options={field.options}
-                  isDisabled={isViewing}
-                  isSearchable={true} 
-                  placeholder={`Select ${field.label}`}
-                />
-              ) : (
-                <input
-                  type={field.type || "text"}
-                  name={field.name}
-                  value={data[field.name] || ""}
-                  onChange={onInputChange}
-                  disabled={isViewing}
-                />
-              )}
-              {errors[field.name] && (
-                <p className="error-message">{errors[field.name]}</p>
-              )}
-            </div>
-          ))}
+        {fields.map((field) => (
+          <div className="form-group" key={field.name}>
+            <label>{field.label}</label>
+            {field.type === "select" ? (
+              <Select
+                name={field.name}
+                value={field.options.find((option) => option.value === data[field.name]) || null}
+                onChange={(selectedOption) =>
+                  onInputChange({ target: { name: field.name, value: selectedOption.value } })
+                }
+                options={field.options || []}
+                isDisabled={isViewing}
+                isSearchable={true}
+                placeholder={`Select ${field.label}`}
+              />
+            ) : field.name === "itemUOMs" ? (
+              (data.itemUOMs || []).map((uom, index) => (
+                <div key={index} className="uom-group">
+                  <label>UOM {index + 1}</label>
+                  <input
+                    type="text"
+                    name={`itemUOMs.${index}.uom`}
+                    value={uom.uom || ""}
+                    onChange={(e) => onInputChange(e)}
+                    disabled={isViewing}
+                  />
+                  <input
+                    type="number"
+                    name={`itemUOMs.${index}.unitPrice`}
+                    value={uom.unitPrice || ""}
+                    onChange={(e) => onInputChange(e)}
+                    disabled={isViewing}
+                  />
+                  <input
+                    type="text"
+                    name={`itemUOMs.${index}.barCode`}
+                    value={uom.barCode || ""}
+                    onChange={(e) => onInputChange(e)}
+                    disabled={isViewing}
+                  />
+                </div>
+              ))
+            ) : (
+              <input
+                type={field.type || "text"}
+                name={field.name}
+                value={data[field.name] || ""}
+                onChange={(e) => onInputChange(e)}
+                disabled={isViewing || (field.name === "userName" && data.userId)}
+                placeholder={`Enter ${field.label}`}
+              />
+            )}
+            {errors[field.name] && <p className="error-message">{errors[field.name]}</p>}
+          </div>
+        ))}
         </div>
         <div className="popup-buttons">
           {!isViewing && (

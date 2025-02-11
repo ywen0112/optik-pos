@@ -80,7 +80,7 @@ const AuditLogs = () => {
         onClose={closeErrorModal}
       />
 
-      <div className="audit-header">
+      {/* <div className="audit-header">
         <label>
           Show:
           <select
@@ -141,7 +141,9 @@ const AuditLogs = () => {
         >
           Next
         </button>
-      </div>
+      </div> */}
+
+      <label>In Mantenance</label>
     </div>
   );
 };

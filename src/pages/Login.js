@@ -1,35 +1,64 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/Login.css";
-import ErrorModal from "../modals/ErrorModal"; 
+import ErrorModal from "../modals/ErrorModal";
 
 const Login = ({ logo }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState({ isOpen: false, message: "" }); 
+  const [error, setError] = useState({ isOpen: false, message: "" });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     if (!emailRegex.test(email)) {
       setError({
         isOpen: true,
         message: "Please enter a valid email address.",
       });
+      setIsLoading(false);
       return;
     }
 
-    if (email === "admin@example.com" && password === "password") {
-      localStorage.setItem("isLoggedIn", "true");
-      navigate("/dashboard");
-    } else {
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Users/GetUserLogins", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userEmail: email,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+      setIsLoading(false);
+
+      if (response.ok && data.success && data.data.length > 0) {
+        const userInfo = data.data[0];
+        
+        localStorage.setItem("userId", userInfo.userId);
+        localStorage.setItem("customerId", userInfo.customerId);
+        localStorage.setItem("isLoggedIn", "true");
+
+        navigate("/dashboard");
+      } else {
+        setError({
+          isOpen: true,
+          message: "Invalid credentials. Please try again.",
+        });
+      }
+    } catch (error) {
+      setIsLoading(false);
       setError({
         isOpen: true,
-        message: "Invalid credentials. Use admin@example.com/password.",
+        message: "Failed to connect to the server. Please try again later.",
       });
     }
   };
@@ -39,7 +68,7 @@ const Login = ({ logo }) => {
   };
 
   const closeErrorModal = () => {
-    setError({ isOpen: false, message: "" }); 
+    setError({ isOpen: false, message: "" });
   };
 
   return (
@@ -86,7 +115,9 @@ const Login = ({ logo }) => {
             </button>
           </div>
 
-          <button type="submit" className="login-button">LOGIN</button>
+          <button type="submit" className="login-button" disabled={isLoading}>
+            {isLoading ? "Logging in..." : "LOGIN"}
+          </button>
         </form>
 
         <div className="footer">
@@ -95,12 +126,7 @@ const Login = ({ logo }) => {
       </div>
 
       {/* Error Modal */}
-      <ErrorModal
-        isOpen={error.isOpen}
-        title="Error"
-        message={error.message}
-        onClose={closeErrorModal}
-      />
+      <ErrorModal isOpen={error.isOpen} title="Error" message={error.message} onClose={closeErrorModal} />
     </div>
   );
 };

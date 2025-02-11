@@ -23,80 +23,74 @@ const CreditorMaintenance = () => {
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: "" });
   const navigate = useNavigate();
+  const customerId = localStorage.getItem("customerId"); 
+  const userId = localStorage.getItem("userId");
+  const [creditorTypeOptions, setCreditorTypeOptions] = useState([]);
 
+    useEffect(() => {
+      fetchCreditors();
+    }, [currentPage, itemsPerPage]); 
+
+    useEffect(() => {
+      if (creditors.length > 0) {
+        setTotalPages(Math.ceil(creditors.length / itemsPerPage)); // ✅ Correct calculation
+      }
+    }, [creditors, itemsPerPage]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    const fetchCreditorTypes = async () => {
       try {
-        const mockData = {
-          items: [
-            {
-              id: 1,
-              creditorCode: "C001",
-              creditorTypeId: "CT001",
-              companyName: "ABC Corp",
-              registerNo: "202005123456",
-              isGroupCompany: true,
-              mobile: "1234567890",
-              emailAddress: "abc@corporate.com",
-              fax1: "123456789",
-              address1: "1 FerSelim Ltd",
-              postcode: "46300",
-              locationId: "L001",
-              attention: "ABC",
-              natureOfBusiness: "Corporation",
-              purchaseAgent: "Lily",
-              currencyCode: "USD",
-              displayTerm: "glasses",
-              tin: "C208305702101",
-            },
-            {
-              id: 2,
-              creditorCode: "C002",
-              creditorTypeId: "CT002",
-              companyName: "XYZ Ltd",
-              registerNo: "202105123456",
-              isGroupCompany: false,
-              mobile: "0987654321",
-              emailAddress: "xyz@corporate.com",
-              fax1: "0987654321",
-              address1: "25 Wilayah KL",
-              postcode: "46300",
-              locationId: "L002",
-              attention: "XYZ",
-              natureOfBusiness: "Corporation",
-              purchaseAgent: "Lauren",
-              currencyCode: "EUR",
-              displayTerm: "glasses",
-              tin: "C238305702102",
-            },
-          ],
-          totalPages: Math.ceil(5 / itemsPerPage),
-        };
-
-        setTimeout(() => {
-          setCreditors(
-            mockData.items.slice(
-              (currentPage - 1) * itemsPerPage,
-              currentPage * itemsPerPage
-            )
-          );
-          setTotalPages(mockData.totalPages);
-          setLoading(false);
-        }, 500);
-      } catch (error) {
-        setErrorModal({
-          isOpen: true,
-          title: "Error Fetching Data",
-          message: error.message,
+        const response = await fetch("https://optikposbackend.absplt.com/CreditorType/GetRecords", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
         });
-        setLoading(false);
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+          const options = data.data.map(type => ({
+            value: type.creditorTypeId,
+            label: type.creditorTypeCode,
+          }));
+          setCreditorTypeOptions(options);
+        } else {
+          throw new Error(data.errorMessage || "Failed to fetch creditor types.");
+        }
+      } catch (error) {
+        console.error("Error fetching creditor types:", error);
       }
     };
 
-    fetchData();
-  }, [currentPage, itemsPerPage]);
+    fetchCreditorTypes();
+  }, [customerId]);
+
+  const fetchCreditors = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Creditor/GetRecords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: Number(customerId),
+          keyword: "",
+          offset: 0,
+          limit: 9999,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setCreditors(data.data);
+        setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch creditors.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error Fetching Data", message: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleItemsPerPageChange = (event) => {
     setItemsPerPage(Number(event.target.value));
@@ -107,11 +101,82 @@ const CreditorMaintenance = () => {
     setCurrentPage(page);
   };
 
-  const handleOpenModal = (creditor = {}, title = "", viewing = false) => {
-    setNewCreditor({ ...creditor });
-    setModalTitle(title);
-    setIsViewing(viewing);
-    setIsPopupOpen(true);
+  const handleOpenModal = async (creditor = {}, title = "", viewing = false) => {
+    try {
+      if (title === "Add Creditor") {
+        const response = await fetch("https://optikposbackend.absplt.com/Creditor/New", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            userId: userId,
+            id: "",
+          }),
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+          creditor = {
+            creditorId: data.data.creditorId,
+            creditorCode: data.data.creditorCode || "",
+            companyName: data.data.companyName || "",
+            creditorTypeId: data.data.creditorTypeId || "",
+            address1: data.data.address1 || "",
+            address2: data.data.address2 || "",
+            address3: data.data.address3 || "",
+            address4: data.data.address4 || "",
+            postCode: data.data.postCode || "",
+            phone1: data.data.phone1 || "",
+            phone2: data.data.phone2 || "",
+            mobile: data.data.mobile || "",
+          };
+        } else {
+          throw new Error(data.errorMessage || "Failed to create new creditor.");
+        }
+      }
+      
+      else if ((title === "Edit Creditor" || title === "View Creditor") && creditor.creditorId) {
+        const response = await fetch("https://optikposbackend.absplt.com/Creditor/Edit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            userId: userId,
+            id: creditor.creditorId, 
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          creditor = {
+            creditorId: data.data.creditorId,
+            creditorCode: data.data.creditorCode || "",
+            companyName: data.data.companyName || "",
+            creditorTypeId: data.data.creditorTypeId || "",
+            address1: data.data.address1 || "",
+            address2: data.data.address2 || "",
+            address3: data.data.address3 || "",
+            address4: data.data.address4 || "",
+            postCode: data.data.postCode || "",
+            phone1: data.data.phone1 || "",
+            phone2: data.data.phone2 || "",
+            mobile: data.data.mobile || "",
+          };
+        } else {
+          throw new Error(data.errorMessage || "Failed to fetch creditor data.");
+        }
+      }
+
+      setNewCreditor(creditor);
+      setModalTitle(title);
+      setIsViewing(viewing);
+      setIsPopupOpen(true);
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error Opening Modal", message: error.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCloseModal = () => {
@@ -120,55 +185,87 @@ const CreditorMaintenance = () => {
   };
 
   const handleSave = (updatedCreditor) => {
-    const confirmMessage = updatedCreditor.id
-      ? `Do you want to update the creditor "${updatedCreditor.companyName}"?`
-      : `Do you want to add the creditor "${updatedCreditor.companyName}"?`;
-
-    setConfirmAction(() => () => {
+    setConfirmMessage(`Do you want to save this creditor?`);
+  
+    setConfirmAction(() => async () => {
       setLoading(true);
-      setTimeout(() => {
-        try {
-          const updatedCreditors = updatedCreditor.id
-            ? creditors.map((creditor) =>
-                creditor.id === updatedCreditor.id
-                  ? { ...creditor, ...updatedCreditor }
-                  : creditor
-              )
-            : [...creditors, { ...updatedCreditor, id: creditors.length + 1 }];
-
-          setCreditors(updatedCreditors);
-          setIsPopupOpen(false);
-          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/Creditor/Save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            actionData: {
+              customerId: Number(customerId),
+              userId: userId,
+              id: updatedCreditor.creditorId || updatedCreditor.id, 
+            },
+            creditorId: updatedCreditor.creditorId || updatedCreditor.id, 
+            creditorCode: updatedCreditor.creditorCode,
+            companyName: updatedCreditor.companyName,
+            creditorTypeId: updatedCreditor.creditorTypeId,
+            address1: updatedCreditor.address1,
+            address2: updatedCreditor.address2,
+            address3: updatedCreditor.address3,
+            address4: updatedCreditor.address4,
+            postCode: updatedCreditor.postCode,
+            phone1: updatedCreditor.phone1,
+            phone2: updatedCreditor.phone2,
+            mobile: updatedCreditor.mobile,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          setSuccessModal({ isOpen: true, title: "Creditor saved successfully!" });
+  
+          await fetchCreditors(); 
+          setIsPopupOpen(false); 
+        } else {
+          throw new Error(data.errorMessage || "Failed to save Creditor.");
         }
-      }, 500);
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Saving Creditor", message: error.message });
+      } finally {
+        setLoading(false);
+      }
     });
-
-    setConfirmMessage(confirmMessage);
-    setIsConfirmOpen(true);
+  
+    setIsConfirmOpen(true); 
   };
 
-  const handleDelete = (id) => {
-    const creditorToDelete = creditors.find((creditor) => creditor.id === id);
-    const confirmMessage = `Do you want to delete the creditor "${creditorToDelete?.companyName}"?`;
-
-    setConfirmAction(() => () => {
+  const handleDelete = (creditorId) => {
+    const confirmMessage = `Are you sure you want to delete the creditor?`;
+  
+    setConfirmAction(() => async () => {
       setLoading(true);
-      setTimeout(() => {
-        try {
-          setCreditors((prev) => prev.filter((creditor) => creditor.id !== id));
-          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/Creditor/Delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            id: creditorId, 
+            userId: userId,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          setSuccessModal({ isOpen: true, title: "Creditor deleted successfully!" });
+  
+          await fetchCreditors(); 
+        } else {
+          throw new Error(data.errorMessage || "Failed to delete creditor.");
         }
-      }, 500);
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Deleting Creditor", message: error.message });
+      } finally {
+        setLoading(false);
+      }
     });
-
+  
     setConfirmMessage(confirmMessage);
     setIsConfirmOpen(true);
   };
@@ -237,11 +334,9 @@ const CreditorMaintenance = () => {
             <tr>
               <th>No</th>
               <th>Creditor Code</th>
-              <th>Creditor Type ID</th>
+              <th>Creditor Type Code</th>
               <th>Company Name</th>
               <th>Mobile</th>
-              <th>Email Address</th>
-              <th>Location ID</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -250,12 +345,10 @@ const CreditorMaintenance = () => {
               <tr key={creditor.id}>
                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                 <td>{creditor.creditorCode || "-"}</td>
-                <td>{creditor.creditorTypeId || "-"}</td>
+                <td>{creditorTypeOptions.find(type => type.value === creditor.creditorTypeId)?.label || "-"}</td>
                 <td>{creditor.companyName || "-"}</td>
                 <td>{creditor.mobile || "-"}</td>
-                <td>{creditor.emailAddress || "-"}</td>
-                <td>{creditor.locationId || "-"}</td>
-                <td>
+                 <td>
                   <button
                     onClick={() => handleOpenModal(creditor, "Edit Creditor")}
                     className="action-button edit"
@@ -263,7 +356,7 @@ const CreditorMaintenance = () => {
                     <FaEdit />
                   </button>
                   <button
-                    onClick={() => handleDelete(creditor.id)}
+                    onClick={() => handleDelete(creditor.creditorId)}
                     className="action-button delete"
                   >
                     <FaTrash />
@@ -299,14 +392,8 @@ const CreditorMaintenance = () => {
           Next
         </button>
       </div>
-      <CreditorModal
-        isOpen={isPopupOpen}
-        title={modalTitle}
-        data={newCreditor}
-        onClose={handleCloseModal}
-        onSave={handleSave}
-        isViewing={isViewing}
-      />
+      <CreditorModal isOpen={isPopupOpen} title={modalTitle} data={newCreditor} onClose={handleCloseModal} onSave={handleSave} isViewing={isViewing} creditorTypeOptions={creditorTypeOptions} />
+
       <ConfirmationModal
         isOpen={isConfirmOpen}
         title="Confirm Action"

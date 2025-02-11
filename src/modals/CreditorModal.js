@@ -11,6 +11,7 @@ const CreditorModal = ({
   onClose,
   onSave,
   isViewing,
+  creditorTypeOptions
 }) => {
   const [sectionData, setSectionData] = useState({ ...data });
   const [errors, setErrors] = useState({});
@@ -40,47 +41,12 @@ const CreditorModal = ({
     const fieldsToValidate = [
       { label: "Creditor Code", name: "creditorCode" },
       {
-        label: "Creditor Type ID",
+        label: "Creditor Type Code",
         name: "creditorTypeId",
         type: "select",
-        options: [
-          { label: "CT001", value: "CT001" },
-          { label: "CT002", value: "CT002" },
-          { label: "CT003", value: "CT003" },
-        ],
+        options: creditorTypeOptions,
       },
       { label: "Company Name", name: "companyName" },
-      { label: "Registration Number", name: "registerNo" },
-      { label: "Mobile", name: "mobile" },
-      { label: "Fax 1", name: "fax1" },
-      { label: "Email Address", name: "emailAddress" },
-      { label: "Address", name: "address1" },
-      { label: "Postcode", name: "postcode" },
-      {
-        label: "Location ID",
-        name: "locationId",
-        type: "select",
-        options: [
-          { label: "L001", value: "L001" },
-          { label: "L002", value: "L002" },
-          { label: "L003", value: "L003" },
-        ],
-      },
-      { label: "Attention", name: "attention" },
-      { label: "Nature of Business", name: "natureOfBusiness" },
-      { label: "Purchase Agent", name: "purchaseAgent" },
-      { 
-        label: "Currency Code", 
-        name: "currencyCode",
-        type: "select",
-        options: [
-          {label: "USD", value: "USD"},
-          {label: "EUR", value: "EUR"},
-          {label: "MYR", value: "MYR"},
-        ] 
-      },
-      { label: "Display Term", name: "displayTerm" },
-      { label: "TIN", name: "tin" },
     ];
 
     const validationErrors = validateFields(fieldsToValidate);
@@ -122,107 +88,48 @@ const CreditorModal = ({
           {[
             { label: "Creditor Code", name: "creditorCode" },
             {
-              label: "Creditor Type ID",
+              label: "Creditor Type Code",
               name: "creditorTypeId",
               type: "select",
-              options: [
-                { label: "CT001", value: "CT001" },
-                { label: "CT002", value: "CT002" },
-                { label: "CT003", value: "CT003" },
-              ],
+              options: creditorTypeOptions,
             },
             { label: "Company Name", name: "companyName" },
-            { label: "Registration Number", name: "registerNo" },
+            { label: "Phone 1", name: "phone1" },
+            { label: "Phone 2", name: "phone2"},
             { label: "Mobile", name: "mobile" },
-            { label: "Phone 1", name: "phone1", required: false },
-            { label: "Phone 2", name: "phone2", required: false },
-            { label: "Fax 1", name: "fax1" },
-            { label: "Fax 2", name: "fax2", required: false },
-            { 
-              label: "Currency Code", 
-              name: "currencyCode",
-              type: "select",
-              options: [
-                {label: "USD", value: "USD"},
-                {label: "EUR", value: "EUR"},
-                {label: "MYR", value: "MYR"},
-              ] 
-            },
-            {
-              label: "Location ID",
-              name: "locationId",
-              type: "select",
-              options: [
-                { label: "L001", value: "L001" },
-                { label: "L002", value: "L002" },
-                { label: "L003", value: "L003" },
-              ],
-            },
-            { label: "Attention", name: "attention" },
-            { label: "Nature of Business", name: "natureOfBusiness" },
-            { label: "Purchase Agent", name: "purchaseAgent" },
-            { label: "Display Term", name: "displayTerm" },
             { label: "Postcode", name: "postcode" },
-            { label: "Address", name: "address1" },
-            { label: "Remark", name: "remark" },
-            { label: "Is Group Company", name: "isGroupCompany", type: "checkbox" },
-          ].map(({ label, name, type = "text", options}) => (
+            { label: "Address1", name: "address1" },
+            { label: "Address2", name: "address2" },
+            { label: "Address3", name: "address3" },
+            { label: "Address4", name: "address4" },
+          ].map(({ label, name, type = "text", options }) => (
             <div key={name} className="creditor-form-group">
-              {type === "checkbox" ? (
-                <div className="checkbox-container">
-                  <input
-                    className="creditor-form-checkbox"
-                    type="checkbox"
-                    name={name}
-                    checked={sectionData[name] || false}
-                    onChange={(e) =>
-                      setSectionData({ ...sectionData, [name]: e.target.checked })
-                    }
-                    disabled={isViewing}
-                  />
-                  <label>{label}</label>
-                </div>
+              <label className="creditor-form-label">
+                {label}
+              </label>
+              {type === "select" ? (
+                <Select
+                  name={name}
+                  value={options.find((option) => option.value === sectionData[name]) || ""}
+                  onChange={(selectedOption) =>
+                    setSectionData({ ...sectionData, [name]: selectedOption.value })
+                  }
+                  options={options}
+                  isDisabled={isViewing}
+                  isSearchable={true}
+                  placeholder={`Select ${label}`}
+                />
               ) : (
-                <>
-                  <label className="creditor-form-label">
-                    {label}
-                  </label>
-                  {type === "select" ? (
-                    <Select
-                      name={name}
-                      value={options.find((option) => option.value === sectionData[name]) || ""}
-                      onChange={(selectedOption) =>
-                        setSectionData({ ...sectionData, [name]: selectedOption.value })
-                      }
-                      options={options}
-                      isDisabled={isViewing}
-                      isSearchable={true}
-                      placeholder={`Select ${label}`}
-                    />
-                  ) : name === "remark" || name.includes("address1") ? ( // Apply textarea for Remark & Address fields
-                    <textarea
-                      className="creditor-form-textarea"
-                      name={name}
-                      value={sectionData[name] || ""}
-                      onChange={(e) =>
-                        setSectionData({ ...sectionData, [name]: e.target.value })
-                      }
-                      disabled={isViewing}
-                      rows={3} 
-                    />
-                  ) : (
-                    <input
-                      className="creditor-form-input"
-                      type={type}
-                      name={name}
-                      value={sectionData[name] || ""}
-                      onChange={(e) =>
-                        setSectionData({ ...sectionData, [name]: e.target.value })
-                      }
-                      disabled={isViewing}
-                    />
-                  )}
-                </>
+                <input
+                  className="creditor-form-input"
+                  type={type}
+                  name={name}
+                  value={sectionData[name] || ""}
+                  onChange={(e) =>
+                    setSectionData({ ...sectionData, [name]: e.target.value })
+                  }
+                  disabled={isViewing}
+                />
               )}
               {errors[name] && <p className="error-message">{errors[name]}</p>}
             </div>

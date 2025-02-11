@@ -26,197 +26,197 @@ const PWPMaintenance = () => {
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const mockItems = [
-          { itemCode: "A001", itemName: "Item A1", price: 50 },
-          { itemCode: "A002", itemName: "Item A2", price: 70 },
-          { itemCode: "B001", itemName: "Item B1", price: 30 },
-          { itemCode: "B002", itemName: "Item B2", price: 40 },
-        ];
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const mockItems = [
+  //         { itemCode: "A001", itemName: "Item A1", price: 50 },
+  //         { itemCode: "A002", itemName: "Item A2", price: 70 },
+  //         { itemCode: "B001", itemName: "Item B1", price: 30 },
+  //         { itemCode: "B002", itemName: "Item B2", price: 40 },
+  //       ];
 
-        const mockPWPs = [
-          {
-            id: 1,
-            itemACode: "A001",
-            itemBCode: "B001",
-            totalPrice: 80,
-          },
-          {
-            id: 2,
-            itemACode: "A002",
-            itemBCode: "B002",
-            totalPrice: 110,
-          },
-        ];
+  //       const mockPWPs = [
+  //         {
+  //           id: 1,
+  //           itemACode: "A001",
+  //           itemBCode: "B001",
+  //           totalPrice: 80,
+  //         },
+  //         {
+  //           id: 2,
+  //           itemACode: "A002",
+  //           itemBCode: "B002",
+  //           totalPrice: 110,
+  //         },
+  //       ];
 
-        setTimeout(() => {
-          setItems(mockItems);
-          setPWPs(mockPWPs);
-          setTotalPages(Math.ceil(mockPWPs.length / itemsPerPage));
-          setLoading(false);
-        }, 500);
-      } catch (error) {
-        setErrorModal({
-          isOpen: true,
-          title: "Error Fetching Data",
-          message: error.message,
-        });
-        setLoading(false);
-      }
-    };
+  //       setTimeout(() => {
+  //         setItems(mockItems);
+  //         setPWPs(mockPWPs);
+  //         setTotalPages(Math.ceil(mockPWPs.length / itemsPerPage));
+  //         setLoading(false);
+  //       }, 500);
+  //     } catch (error) {
+  //       setErrorModal({
+  //         isOpen: true,
+  //         title: "Error Fetching Data",
+  //         message: error.message,
+  //       });
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchData();
+  //   fetchData();
 
-    setFields([
-      {
-        name: "itemACode",
-        label: "Item A Code",
-        type: "select",
-        options: [],
-        required: true,
-      },
-      {
-        name: "itemBCode",
-        label: "Item B Code",
-        type: "select",
-        options: [],
-        required: true,
-      },
-      {
-        name: "totalPrice",
-        label: "PWP Total Price",
-        type: "number",
-        readOnly: true,
-      },
-    ]);
-  }, [currentPage, itemsPerPage]);
+  //   setFields([
+  //     {
+  //       name: "itemACode",
+  //       label: "Item A Code",
+  //       type: "select",
+  //       options: [],
+  //       required: true,
+  //     },
+  //     {
+  //       name: "itemBCode",
+  //       label: "Item B Code",
+  //       type: "select",
+  //       options: [],
+  //       required: true,
+  //     },
+  //     {
+  //       name: "totalPrice",
+  //       label: "PWP Total Price",
+  //       type: "number",
+  //       readOnly: true,
+  //     },
+  //   ]);
+  // }, [currentPage, itemsPerPage]);
 
-  useEffect(() => {
-    setFields((prevFields) =>
-      prevFields.map((field) =>
-        ["itemACode", "itemBCode"].includes(field.name)
-          ? {
-              ...field,
-              options: items.map((item) => ({
-                label: `${item.itemName} (${item.itemCode})`,
-                value: item.itemCode,
-              })),
-            }
-          : field
-      )
-    );
-  }, [items]);
+  // useEffect(() => {
+  //   setFields((prevFields) =>
+  //     prevFields.map((field) =>
+  //       ["itemACode", "itemBCode"].includes(field.name)
+  //         ? {
+  //             ...field,
+  //             options: items.map((item) => ({
+  //               label: `${item.itemName} (${item.itemCode})`,
+  //               value: item.itemCode,
+  //             })),
+  //           }
+  //         : field
+  //     )
+  //   );
+  // }, [items]);
 
-  const handleItemsPerPageChange = (event) => {
-    setItemsPerPage(Number(event.target.value));
-    setCurrentPage(1);
-  };
+  // const handleItemsPerPageChange = (event) => {
+  //   setItemsPerPage(Number(event.target.value));
+  //   setCurrentPage(1);
+  // };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+  // const handlePageChange = (page) => {
+  //   setCurrentPage(page);
+  // };
 
-  const calculateTotalPrice = (itemACode, itemBCode) => {
-    const itemA = items.find((item) => item.itemCode === itemACode);
-    const itemB = items.find((item) => item.itemCode === itemBCode);
-    return (itemA?.price || 0) + (itemB?.price || 0);
-  };
+  // const calculateTotalPrice = (itemACode, itemBCode) => {
+  //   const itemA = items.find((item) => item.itemCode === itemACode);
+  //   const itemB = items.find((item) => item.itemCode === itemBCode);
+  //   return (itemA?.price || 0) + (itemB?.price || 0);
+  // };
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    const updatedPWP = { ...newPWP, [name]: value };
+  // const handleInputChange = (event) => {
+  //   const { name, value } = event.target;
+  //   const updatedPWP = { ...newPWP, [name]: value };
 
-    if (name === "itemACode" || name === "itemBCode") {
-      updatedPWP.totalPrice = calculateTotalPrice(
-        updatedPWP.itemACode,
-        updatedPWP.itemBCode
-      );
-    }
+  //   if (name === "itemACode" || name === "itemBCode") {
+  //     updatedPWP.totalPrice = calculateTotalPrice(
+  //       updatedPWP.itemACode,
+  //       updatedPWP.itemBCode
+  //     );
+  //   }
 
-    setNewPWP(updatedPWP);
-  };
+  //   setNewPWP(updatedPWP);
+  // };
 
-  const handleOpenModal = (pwp = {}, title = "", viewing = false) => {
-    setNewPWP(pwp);
-    setModalTitle(title);
-    setIsViewing(viewing);
-    setIsPopupOpen(true);
-  };
+  // const handleOpenModal = (pwp = {}, title = "", viewing = false) => {
+  //   setNewPWP(pwp);
+  //   setModalTitle(title);
+  //   setIsViewing(viewing);
+  //   setIsPopupOpen(true);
+  // };
 
-  const handleCloseModal = () => {
-    if (isViewing) {
-      setIsPopupOpen(false);
-      return;
-    }
+  // const handleCloseModal = () => {
+  //   if (isViewing) {
+  //     setIsPopupOpen(false);
+  //     return;
+  //   }
 
-    setConfirmAction(() => () => {
-      setIsPopupOpen(false);
-    });
+  //   setConfirmAction(() => () => {
+  //     setIsPopupOpen(false);
+  //   });
 
-    setConfirmMessage("Are you sure you want to cancel and discard unsaved changes?");
-    setIsConfirmOpen(true);
-  };
+  //   setConfirmMessage("Are you sure you want to cancel and discard unsaved changes?");
+  //   setIsConfirmOpen(true);
+  // };
 
-  const handleSave = () => {
-    setConfirmAction(() => () => {
-      setLoading(true);
-      setTimeout(() => {
-        try {
-          const updatedPWPs = newPWP.id
-            ? pwps.map((pwp) =>
-                pwp.id === newPWP.id ? { ...pwp, ...newPWP } : pwp
-              )
-            : [...pwps, { ...newPWP, id: pwps.length + 1 }];
+  // const handleSave = () => {
+  //   setConfirmAction(() => () => {
+  //     setLoading(true);
+  //     setTimeout(() => {
+  //       try {
+  //         const updatedPWPs = newPWP.id
+  //           ? pwps.map((pwp) =>
+  //               pwp.id === newPWP.id ? { ...pwp, ...newPWP } : pwp
+  //             )
+  //           : [...pwps, { ...newPWP, id: pwps.length + 1 }];
 
-          setPWPs(updatedPWPs);
-          setIsPopupOpen(false);
-          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
-        }
-      }, 500);
-    });
+  //         setPWPs(updatedPWPs);
+  //         setIsPopupOpen(false);
+  //         setSuccessModal({ isOpen: true, title: "Update Successfully!" })
+  //       } catch (error) {
+  //         setErrorModal({ isOpen: true, title: "Error", message: error.message });
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     }, 500);
+  //   });
 
-    setConfirmMessage(newPWP.id ? "Do you want to update this PWP?" : "Do you want to add this PWP?");
-    setIsConfirmOpen(true);
-  };
+  //   setConfirmMessage(newPWP.id ? "Do you want to update this PWP?" : "Do you want to add this PWP?");
+  //   setIsConfirmOpen(true);
+  // };
 
-  const handleDelete = (id) => {
-    setConfirmAction(() => () => {
-      setLoading(true);
-      setTimeout(() => {
-        try {
-          setPWPs((prevPWPs) => prevPWPs.filter((pwp) => pwp.id !== id));
-          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
-        }
-      }, 500);
-    });
+  // const handleDelete = (id) => {
+  //   setConfirmAction(() => () => {
+  //     setLoading(true);
+  //     setTimeout(() => {
+  //       try {
+  //         setPWPs((prevPWPs) => prevPWPs.filter((pwp) => pwp.id !== id));
+  //         setSuccessModal({ isOpen: true, title: "Update Successfully!" })
+  //       } catch (error) {
+  //         setErrorModal({ isOpen: true, title: "Error", message: error.message });
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     }, 500);
+  //   });
 
-    setConfirmMessage("Do you want to delete this PWP?");
-    setIsConfirmOpen(true);
-  };
+  //   setConfirmMessage("Do you want to delete this PWP?");
+  //   setIsConfirmOpen(true);
+  // };
 
-  const handleConfirmAction = () => {
-    if (confirmAction) confirmAction();
-    setIsConfirmOpen(false);
-  };
+  // const handleConfirmAction = () => {
+  //   if (confirmAction) confirmAction();
+  //   setIsConfirmOpen(false);
+  // };
 
-  const closeErrorModal = () => {
-    setErrorModal({ isOpen: false, title: "", message: "" });
-  };
+  // const closeErrorModal = () => {
+  //   setErrorModal({ isOpen: false, title: "", message: "" });
+  // };
 
-  const closeSuccessModal = () => {
-    setSuccessModal({ isOpen: false, title: "" });
-  };
+  // const closeSuccessModal = () => {
+  //   setSuccessModal({ isOpen: false, title: "" });
+  // };
 
   return (
     <div className="maintenance-container">
@@ -227,7 +227,7 @@ const PWPMaintenance = () => {
         <span> / PWP Maintenance</span>
       </div>
 
-      <ErrorModal
+      {/* <ErrorModal
         isOpen={errorModal.isOpen}
         title={errorModal.title}
         message={errorModal.message}
@@ -237,13 +237,14 @@ const PWPMaintenance = () => {
         isOpen={successModal.isOpen}
         title={successModal.title}
         onClose={closeSuccessModal}
-      />
+      /> */}
 
       <div className="maintenance-header">
         <div className="pagination-controls">
           <label>
-            Show:
-            <select
+            In Maintenance
+            </label>
+            {/* <select
               value={itemsPerPage}
               onChange={handleItemsPerPageChange}
               className="items-per-page-select"
@@ -340,7 +341,9 @@ const PWPMaintenance = () => {
         message={confirmMessage}
         onConfirm={handleConfirmAction}
         onCancel={() => setIsConfirmOpen(false)}
-      />
+      />  */}
+      </div>
+      </div>
     </div>
   );
 };

@@ -1,0 +1,52 @@
+.eye-power-modal-overlay {
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5); 
+}
+
+.eye-power-modal-content {
+  background: white;
+  padding: 20px 20px;
+  width: auto;
+  max-height: 100vh;
+  border-radius: 8px;
+}
+
+.eye-power-fields{
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(6, 1fr); 
+}
+
+.eye-power-form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 45%;
+}
+
+.eye-power-label {
+  font-size: 13px;
+  color: #393939;
+}
+
+.eye-power-input {
+  padding: 7px;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.eye-power-button {
+  color: #1e90ff;
+  background-color: none;
+  border: none;
+  font-size: 16px;
+}
+

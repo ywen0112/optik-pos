@@ -24,49 +24,54 @@ const LocationMaintenance = () => {
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
   const navigate = useNavigate();
+  const customerId = localStorage.getItem("customerId"); 
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const mockData = {
-          items: [
-            { id: 1, locationName: "Warehouse A", locationId: "L001", address: "123 Warehouse St" },
-            { id: 2, locationName: "Office B", locationId: "L002", address: "456 Office Ave" },
-            { id: 3, locationName: "Store C", locationId: "L003", address: "789 Store Rd" },
-            { id: 4, locationName: "Factory D", locationId: "L004", address: "101 Factory Blvd" },
-          ],
-          totalPages: Math.ceil(5 / itemsPerPage),
-        };
-
-        setTimeout(() => {
-          setLocations(
-            mockData.items.slice(
-              (currentPage - 1) * itemsPerPage,
-              currentPage * itemsPerPage
-            )
-          );
-          setTotalPages(mockData.totalPages);
-          setLoading(false);
-        }, 500);
-      } catch (error) {
-        setErrorModal({
-          isOpen: true,
-          title: "Error Fetching Data",
-          message: error.message,
-        });
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-
+    fetchLocations();
     setFields([
-      { name: "locationName", label: "Location Name", type: "text", required: true },
-      { name: "locationId", label: "Location ID", type: "text", required: true },
-      { name: "address", label: "Address", type: "text", required: true },
-    ]);
-  }, [currentPage, itemsPerPage]);
+      { name: "locationCode", label: "Location Code", type: "text", required: true },
+      { name: "description", label: "Description", type: "text", required: true },
+    ])
+  }, [currentPage, itemsPerPage]); 
+
+  const fetchLocations = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Location/GetRecords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: Number(customerId),
+          keyword: "",
+          offset: 0,
+          limit: 9999,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setLocations(data.data);
+        setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch location.");
+      }
+    } catch (error) {
+      setErrorModal({
+        isOpen: true,
+        title: "Error Fetching Data",
+        message: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    if (locations.length > 0) {
+      setTotalPages(Math.ceil(locations.length / itemsPerPage)); 
+    }
+  }, [locations, itemsPerPage]);
 
   const handleItemsPerPageChange = (event) => {
     setItemsPerPage(Number(event.target.value));
@@ -74,7 +79,9 @@ const LocationMaintenance = () => {
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   const handleInputChange = (event) => {
@@ -82,12 +89,71 @@ const LocationMaintenance = () => {
     setNewLocation({ ...newLocation, [name]: value });
   };
 
-  const handleOpenModal = (location = {}, title = "", viewing = false) => {
-    setNewLocation(location);
-    setModalTitle(title);
-    setIsViewing(viewing);
-    setIsPopupOpen(true);
-  };
+  const handleOpenModal = async (location = {}, title = "", viewing = false) => {
+    try {
+      if (title === "Add Location") {
+        const response = await fetch("https://optikposbackend.absplt.com/Location/New", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            userId: userId,
+            id: "",
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          location = {
+            id: data.data.locationId,
+            locationCode: "",
+            description: "", 
+          };
+        } else {
+          throw new Error(data.errorMessage || "Failed to create new location.");
+        }
+      } 
+
+      else if ((title === "Edit Location" || title === "View Location") && location.locationId) {
+        const response = await fetch("https://optikposbackend.absplt.com/Location/Edit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            userId: userId,
+            id: location.locationId, 
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          location = {
+            id: data.data.locationId,
+            locationCode: data.data.locationCode,
+            description: data.data.description, 
+          };
+        } else {
+          throw new Error(data.errorMessage || "Failed to fetch role data.");
+        }
+      }
+
+      setNewLocation(location);
+      setModalTitle(title);
+      setIsViewing(viewing);
+      setIsPopupOpen(true);
+      
+    } catch (error) {
+      setErrorModal({
+        isOpen: true,
+        title: "Error Opening Modal",
+        message: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }; 
 
   const handleCloseModal = () => {
     if (isViewing) {
@@ -103,61 +169,82 @@ const LocationMaintenance = () => {
     setIsConfirmOpen(true);
   };
 
-  const handleSave = () => {
-    setConfirmAction(() => () => {
+
+  const handleSave = (updatedLocation) => {
+    setConfirmMessage(`Do you want to save this location?`);
+  
+    setConfirmAction(() => async () => {
       setLoading(true);
-      setTimeout(() => {
-        try {
-          const updatedLocations = newLocation.id
-            ? locations.map((location) =>
-                location.id === newLocation.id
-                  ? { ...location, ...newLocation }
-                  : location
-              )
-            : [...locations, { ...newLocation, id: locations.length + 1 }];
-
-          setLocations(updatedLocations);
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/Location/Save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            actionData: {
+              customerId: Number(customerId),
+              userId: userId,
+              id: updatedLocation.locationId || updatedLocation.id,
+            },
+            locationId: updatedLocation.locationId || updatedLocation.id,
+            locationCode: updatedLocation.locationCode, 
+            description: updatedLocation.description,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          setSuccessModal({ isOpen: true, title: "Location saved successfully!" });
+  
+          await fetchLocations();
           setIsPopupOpen(false);
-          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
+        } else {
+          throw new Error(data.errorMessage || "Failed to save location.");
         }
-      }, 500);
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Saving Location", message: error.message });
+      } finally {
+        setLoading(false);
+      }
     });
-
-    setConfirmMessage(
-      newLocation.id 
-      ? `Do you want to update this item group "${newLocation.locationName}"?`
-      : `Do you want to add this item group "${newLocation.locationName}"?`
-    );
+  
     setIsConfirmOpen(true);
   };
 
-  const handleDelete = (id) => {
-    const locationToDelete = locations.find((location) => location.id === id);
+
+  const handleDelete = (locationId) => {
+    const confirmMessage = `Are you sure you want to delete the location?`;
   
-    if (!locationToDelete) {
-      console.error("Location not found");
-      return;
-    }
-
-    setConfirmAction(() => () => {
+    setConfirmAction(() => async () => {
       setLoading(true);
-      setTimeout(() => {
-        try {
-          setLocations((prevLocations) => prevLocations.filter((location) => location.id !== id));
-          setSuccessModal({ isOpen: true, title: "Update Successfully!" })
-        } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
-        } finally {
-          setLoading(false);
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/Location/Delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: Number(customerId),
+            id: locationId, 
+            userId: userId,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          setSuccessModal({ isOpen: true, title: "Location deleted successfully!" });
+  
+          await fetchLocations(); 
+        } else {
+          throw new Error(data.errorMessage || "Failed to delete location.");
         }
-      }, 500);
+      } catch (error) {
+        setErrorModal({ isOpen: true, title: "Error Deleting Location", message: error.message });
+      } finally {
+        setLoading(false);
+      }
     });
-
-    setConfirmMessage(`Do you want to delete this location "${locationToDelete.locationName}"?`);
+  
+    setConfirmMessage(confirmMessage);
     setIsConfirmOpen(true);
   };
 
@@ -225,9 +312,8 @@ const LocationMaintenance = () => {
           <thead>
             <tr>
               <th>No</th>
-              <th>Location Name</th>
-              <th>Location ID</th>
-              <th>Address</th>
+              <th>Location Code</th>
+              <th>Decription</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -235,9 +321,8 @@ const LocationMaintenance = () => {
             {locations.map((location, index) => (
               <tr key={location.id}>
                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{location.locationName}</td>
-                <td>{location.locationId}</td>
-                <td>{location.address}</td>
+                <td>{location.locationCode}</td>
+                <td>{location.description}</td>
                 <td>
                   <button
                     onClick={() => handleOpenModal(location, "Edit Location")}
@@ -246,7 +331,7 @@ const LocationMaintenance = () => {
                     <FaEdit /> 
                   </button>
                   <button
-                    onClick={() => handleDelete(location.id)}
+                    onClick={() => handleDelete(location.locationId)}
                     className="action-button delete"
                   >
                     <FaTrash />

@@ -31,16 +31,18 @@ const DebtorMaintenance = () => {
   const [isEyePowerOpen, setIsEyePowerOpen] = useState(false);
   const [selectedEyePower, setSelectedEyePower] = useState({});
   const [eyePowerType, setEyePowerType] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
 
-  useEffect(() => {
-        fetchDebtors();
-      }, [currentPage, itemsPerPage]); 
   
-      useEffect(() => {
-        if (debtors.length > 0) {
-          setTotalPages(Math.ceil(debtors.length / itemsPerPage)); // ✅ Correct calculation
-        }
-      }, [debtors, itemsPerPage]);
+  useEffect(() => {
+    fetchDebtors();
+  }, [currentPage, itemsPerPage, searchKeyword]);
+  
+  useEffect(() => {
+    if (debtors.length > 0) {
+      setTotalPages(Math.ceil(debtors.length / itemsPerPage)); // ✅ Correct calculation
+    }
+  }, [debtors, itemsPerPage]);
   
     useEffect(() => {
       const fetchDebtorTypes = async () => {
@@ -77,16 +79,22 @@ const DebtorMaintenance = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             customerId: Number(customerId),
-            keyword: "",
+            keyword: "", 
             offset: 0,
             limit: 9999,
           }),
         });
-  
+    
         const data = await response.json();
         if (response.ok && data.success) {
-          setDebtors(data.data);
-          setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+          const filteredDebtors = data.data.filter(debtor =>
+            debtor.companyName?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+            debtor.debtorCode?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+            debtor.mobile?.includes(searchKeyword) 
+          );
+    
+          setDebtors(filteredDebtors);
+          setTotalPages(Math.ceil(filteredDebtors.length / itemsPerPage));
         } else {
           throw new Error(data.errorMessage || "Failed to fetch debtors.");
         }
@@ -433,6 +441,16 @@ const DebtorMaintenance = () => {
         title={successModal.title}
         onClose={closeSuccessModal}
       />
+       <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search by Company Name, Debtor Code, or Mobile"
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          className="search-input"
+        />
+        </div>
+
         <div className="maintenance-header">
           <div className="pagination-controls">
             <label>

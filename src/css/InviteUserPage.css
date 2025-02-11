@@ -1,0 +1,58 @@
+.invite-user-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    text-align: center;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .invite-user-container h2 {
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .invite-user-container p {
+    font-size: 14px;
+    color: #666;
+    margin: 5px 0;
+  }
+  
+  .invite-user-container label {
+    display: block;
+    margin: 15px 0 5px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .invite-user-container input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  .invite-user-container button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #1e90ff;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .invite-user-container button:hover {
+    background-color: #187bcd;
+  }
+  
+  .invite-user-container button:disabled {
+    background-color: #a0cfff;
+    cursor: not-allowed;
+  }
+  

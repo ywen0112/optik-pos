@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Login from "./pages/Login";
 import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./pages/ProtectedRoute";
+import InviteUserPage from "./InviteUserPage";
 
 const App = () => {
   const isAuthenticated = localStorage.getItem("isLoggedIn") === "true";
@@ -10,13 +11,8 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Redirect root to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
-
-        {/* Login Route */}
         <Route path="/login" element={<Login />} />
-
-        {/* Protected Routes */}
         <Route
           path="/*"
           element={
@@ -25,6 +21,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/invite" element={<InviteUserPage />} />
       </Routes>
     </Router>
   );

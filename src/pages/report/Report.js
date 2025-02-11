@@ -32,7 +32,6 @@ const Report = () => {
 
   return (
     <div className="report-container">
-      {/* Breadcrumb navigation
       <div className="breadcrumb">
         {pathSegments.length > 1 ? (
           <span className="back-link" onClick={() => navigate("/report")}>
@@ -44,7 +43,7 @@ const Report = () => {
         {pathSegments.length > 1 && ` / ${pathSegments[pathSegments.length - 1]}`}
       </div>
 
-      <div className="report-sections">
+      {/* <div className="report-sections">
         {reportSections.map((section, sectionIndex) => (
           <div className="report-section" key={sectionIndex}>
             <ul className="report-list">

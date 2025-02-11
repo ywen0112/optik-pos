@@ -28,60 +28,61 @@ const ItemMaintenance = () => {
   const [itemTypeMapping, setItemTypeMapping] = useState([]); 
   const customerId = localStorage.getItem("customerId"); 
   const userId = localStorage.getItem("userId");
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   useEffect(() => {
-      const fetchItemGroups = async () => {
-        try {
-          const response = await fetch("https://optikposbackend.absplt.com/ItemGroup/GetRecords", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
-          });
-  
-          const data = await response.json();
-          if (response.ok && data.success) {
-            const itemGroupMapping = {};
-            data.data.forEach(itemGroup => {
-              itemGroupMapping[itemGroup.itemGroupId] = itemGroup.itemGroupCode;
-            });
-            setItemGroupMapping(itemGroupMapping);
-          } else {
-            throw new Error(data.errorMessage || "Failed to fetch item groups.");
-          }
-        } catch (error) {
-          console.error("Error fetching Item Groups:", error);
-        }
-      };
-  
-      fetchItemGroups();
-    }, [customerId]);
+    const fetchItemGroups = async () => {
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/ItemGroup/GetRecords", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
+        });
 
-    useEffect(() => {
-      const fetchItemTypes = async () => {
-        try {
-          const response = await fetch("https://optikposbackend.absplt.com/ItemType/GetRecords", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
+        const data = await response.json();
+        if (response.ok && data.success) {
+          const itemGroupMapping = {};
+          data.data.forEach(itemGroup => {
+            itemGroupMapping[itemGroup.itemGroupId] = itemGroup.itemGroupCode;
           });
-  
-          const data = await response.json();
-          if (response.ok && data.success) {
-            const itemTypeMapping = {};
-            data.data.forEach(itemType => {
-              itemTypeMapping[itemType.itemTypeId] = itemType.itemTypeCode;
-            });
-            setItemTypeMapping(itemTypeMapping);
-          } else {
-            throw new Error(data.errorMessage || "Failed to fetch item types.");
-          }
-        } catch (error) {
-          console.error("Error fetching Item Types:", error);
+          setItemGroupMapping(itemGroupMapping);
+        } else {
+          throw new Error(data.errorMessage || "Failed to fetch item groups.");
         }
-      };
-  
-      fetchItemTypes();
-    }, [customerId]);
+      } catch (error) {
+        console.error("Error fetching Item Groups:", error);
+      }
+    };
+
+    fetchItemGroups();
+  }, [customerId]);
+
+  useEffect(() => {
+    const fetchItemTypes = async () => {
+      try {
+        const response = await fetch("https://optikposbackend.absplt.com/ItemType/GetRecords", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+          const itemTypeMapping = {};
+          data.data.forEach(itemType => {
+            itemTypeMapping[itemType.itemTypeId] = itemType.itemTypeCode;
+          });
+          setItemTypeMapping(itemTypeMapping);
+        } else {
+          throw new Error(data.errorMessage || "Failed to fetch item types.");
+        }
+      } catch (error) {
+        console.error("Error fetching Item Types:", error);
+      }
+    };
+
+    fetchItemTypes();
+  }, [customerId]);
 
   useEffect(() => {
     fetchItems();
@@ -109,12 +110,12 @@ const ItemMaintenance = () => {
         })),
         required: true,
       },
-      { name: "itemUOMId", label: "Item UOM Id", type: "text", required: true },
-      { name: "uom", label: "UOM", type: "text", required: true },
-      { name: "unitPrice", label: "Unit Price", type: "number", required: true },
-      { name: "barCode", label: "Barcode", type: "text", required: true },
     ])
     }, [itemGroupMapping, itemTypeMapping]); 
+
+    useEffect(() => {
+      fetchItems();
+    }, [currentPage, itemsPerPage, searchKeyword]);
   
     const fetchItems = async () => {
       setLoading(true);
@@ -124,18 +125,21 @@ const ItemMaintenance = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             customerId: Number(customerId),
-            keyword: "",
+            keyword: searchKeyword.trim(),
             offset: 0,
             limit: 9999,
           }),
         });
-
+  
         const data = await response.json();
         if (response.ok && data.success) {
-          if (Array.isArray(data.data)) { 
-            setItems(data.data);
-            setTotalPages(Math.ceil(data.data.length / itemsPerPage));
-          }
+          const filteredItems = data.data.filter(item =>
+            item.itemCode?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+            item.description?.toLowerCase().includes(searchKeyword.toLowerCase())
+          );
+  
+          setItems(filteredItems);
+          setTotalPages(Math.ceil(filteredItems.length / itemsPerPage));
         } else {
           throw new Error(data.errorMessage || "Failed to fetch items.");
         }
@@ -147,10 +151,10 @@ const ItemMaintenance = () => {
     };
 
     useEffect(() => {
-        if (items.length > 0) {
-          setTotalPages(Math.ceil(items.length / itemsPerPage)); 
-        }
-      }, [items, itemsPerPage]);
+      if (items.length > 0) {
+        setTotalPages(Math.ceil(items.length / itemsPerPage)); 
+      }
+    }, [items, itemsPerPage]);
     
 
   const handleItemsPerPageChange = (event) => {
@@ -179,7 +183,7 @@ const ItemMaintenance = () => {
   
         return {
           ...prevItem,
-          itemUOMs: updatedUOMs, // ✅ Updates UOM correctly
+          itemUOMs: updatedUOMs, 
         };
       } else {
         return {
@@ -189,7 +193,6 @@ const ItemMaintenance = () => {
       }
     });
   
-    console.log("Updated Item State:", newItem); // ✅ Debugging output
   };
   
   const handleOpenModal = async (item = {}, title = "", viewing = false) => {
@@ -204,59 +207,46 @@ const ItemMaintenance = () => {
             id: "",
           }),
         });
-  
+
         const data = await response.json();
-        if (response.ok && data.success) {
-          item = {
-            id: data.data.itemId,
-            itemCode: data.data.itemCode || "",
-            description: data.data.description || "",
-            desc2: data.data.desc2 || "",
-            itemGroupId: data.data.itemGroupId || "",
-            itemTypeId: data.data.itemTypeId || "",
-            isActive: data.data.isActive ?? true,
-            image: data.data.image || "",
-            itemUOMs: data.data.itemUOMs ?? [], // ✅ Ensure UOM is always an array
-          };
-        } else {
-          throw new Error(data.errorMessage || "Failed to create new item.");
-        }
-      } 
-      
-      else if ((title === "Edit Item" || title === "View Item") && item.itemId) {
-        const response = await fetch("https://optikposbackend.absplt.com/Item/Edit", {
+        if (!response.ok || !data.success) throw new Error(data.errorMessage || "Failed to create new item.");
+
+        let newItemData = {
+          id: data.data.itemId,
+          itemCode: data.data.itemCode || "",
+          description: data.data.description || "",
+          desc2: data.data.desc2 || "",
+          itemGroupId: data.data.itemGroupId || "",
+          itemTypeId: data.data.itemTypeId || "",
+          isActive: data.data.isActive ?? true,
+          image: data.data.image || "",
+          itemUOMs: [], 
+        };
+
+        const uomResponse = await fetch("https://optikposbackend.absplt.com/Item/NewDetail", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            customerId: Number(customerId),
-            userId: userId,
-            id: item.itemId, 
-          }),
+          body: JSON.stringify({}),
         });
-  
-        const data = await response.json();
-        if (response.ok && data.success) {
-          item = {
-            id: data.data.itemId,
-            itemCode: data.data.itemCode || "",
-            description: data.data.description || "",
-            desc2: data.data.desc2 || "",
-            itemGroupId: data.data.itemGroupId || "",
-            itemTypeId: data.data.itemTypeId || "",
-            isActive: data.data.isActive ?? true,
-            image: data.data.image || "",
-            itemUOMs: Array.isArray(data.data.itemUOMs) ? [...data.data.itemUOMs] : [], // ✅ Ensure array format
-          };
-        } else {
-          throw new Error(data.errorMessage || "Failed to fetch item.");
-        }
+
+        const uomData = await uomResponse.json();
+        if (!uomResponse.ok || !uomData.success) throw new Error(uomData.errorMessage || "Failed to create new UOM.");
+
+        newItemData.itemUOMs.push({
+          itemUOMId: uomData.data.itemUOMId,
+          uom: uomData.data.uom || "",
+          unitPrice: uomData.data.unitPrice || 0,
+          barCode: uomData.data.barCode || "",
+        });
+
+        setNewItem(newItemData);
+      } else {
+        setNewItem(item);
       }
-  
-      setNewItem(item); // ✅ Ensure UOM data is passed
+
       setModalTitle(title);
       setIsViewing(viewing);
       setIsPopupOpen(true);
-  
     } catch (error) {
       setErrorModal({
         isOpen: true,
@@ -266,7 +256,7 @@ const ItemMaintenance = () => {
     } finally {
       setLoading(false);
     }
-  };   
+  }; 
 
   const handleCloseModal = () => {
     if (isViewing) {
@@ -284,12 +274,10 @@ const ItemMaintenance = () => {
 
   const handleSave = (updatedItem) => {
     setConfirmMessage(`Do you want to save this item?`);
-  
+
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
-        console.log("Saving Item Data:", updatedItem); // ✅ Debugging output
-  
         const response = await fetch("https://optikposbackend.absplt.com/Item/Save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -307,16 +295,14 @@ const ItemMaintenance = () => {
             itemTypeId: updatedItem.itemTypeId,
             isActive: updatedItem.isActive ?? true,
             image: updatedItem.image,
-            itemUOMs: updatedItem.itemUOMs ?? [], // ✅ Ensure UOMs are passed
+            itemUOMs: updatedItem.itemUOMs ?? [],
           }),
         });
-  
+
         const data = await response.json();
-        console.log("API Response:", data); // ✅ Debugging output
-  
+
         if (response.ok && data.success) {
           setSuccessModal({ isOpen: true, title: "Item saved successfully!" });
-  
           await fetchItems();
           setIsPopupOpen(false);
         } else {
@@ -328,7 +314,7 @@ const ItemMaintenance = () => {
         setLoading(false);
       }
     });
-  
+
     setIsConfirmOpen(true);
   };
 
@@ -401,6 +387,17 @@ const ItemMaintenance = () => {
         title={successModal.title}
         onClose={closeSuccessModal}
       />
+
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search by Item Code or Description"
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          className="search-input"
+        />
+      </div>
+
       <div className="maintenance-header">
         <div className="pagination-controls">
           <label>
@@ -435,16 +432,12 @@ const ItemMaintenance = () => {
               <th>Description</th>
               <th>Item Group Code</th>
               <th>Item Type Code</th>
-              {/* <th>UOM</th>
-              <th>Unit Price</th>
-              <th>Barcode</th> */}
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {Array.isArray(items) && items.length > 0 &&
               items.map((item, index) => {
-                const firstUOM = item.itemUOMs?.[0] || {};
                 return (
                   <tr key={item.id}>
                     <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
@@ -452,9 +445,6 @@ const ItemMaintenance = () => {
                     <td>{item.description || "-"}</td>
                     <td>{itemGroupMapping[item.itemGroupId] || "-"}</td>
                     <td>{itemTypeMapping[item.itemTypeId] || "-"}</td>
-                    {/* <td>{firstUOM.uom || "-"}</td>
-                    <td>{firstUOM.unitPrice !== undefined ? firstUOM.unitPrice.toFixed(2) : "-"}</td>
-                    <td>{firstUOM.barCode || "-"}</td> */}
                     <td>
                       <button onClick={() => handleOpenModal(item, "Edit Item")} className="action-button edit">
                         <FaEdit />

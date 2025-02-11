@@ -26,6 +26,7 @@ const LocationMaintenance = () => {
   const navigate = useNavigate();
   const customerId = localStorage.getItem("customerId"); 
   const userId = localStorage.getItem("userId");
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   useEffect(() => {
     fetchLocations();
@@ -33,7 +34,7 @@ const LocationMaintenance = () => {
       { name: "locationCode", label: "Location Code", type: "text", required: true },
       { name: "description", label: "Description", type: "text", required: true },
     ])
-  }, [currentPage, itemsPerPage]); 
+  }, [currentPage, itemsPerPage, searchKeyword]); 
 
   const fetchLocations = async () => {
     setLoading(true);
@@ -43,7 +44,7 @@ const LocationMaintenance = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           customerId: Number(customerId),
-          keyword: "",
+          keyword: searchKeyword.trim(),
           offset: 0,
           limit: 9999,
         }),
@@ -281,6 +282,16 @@ const LocationMaintenance = () => {
         title={successModal.title}
         onClose={closeSuccessModal}
       />
+
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search by Location Code or Description"
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          className="search-input"
+        />
+      </div>
 
       <div className="maintenance-header">
         <div className="pagination-controls">

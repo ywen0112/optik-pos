@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import "../../css/Maintenance.css";
-import { FaEdit, FaTrash, FaEye, FaSearch } from "react-icons/fa";
+import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import CrudModal from "../../modals/CrudModal";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
@@ -30,115 +30,6 @@ const UserMaintenance = () => {
   const customerId = localStorage.getItem("customerId"); 
   const userId = localStorage.getItem("userId");
 
-  // useEffect(() => {
-  //   const fetchLocations = async () => {
-  //     try {
-  //       const response = await fetch("https://optikposbackend.absplt.com/Location/GetRecords", {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
-  //       });
-
-  //       const data = await response.json();
-  //       if (response.ok && data.success) {
-  //         const locationMapping = {};
-  //         data.data.forEach(location => {
-  //           locationMapping[location.locationId] = location.locationCode;
-  //         });
-  //         setLocationMap(locationMapping);
-  //       } else {
-  //         throw new Error(data.errorMessage || "Failed to fetch locations.");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching locations:", error);
-  //     }
-  //   };
-
-  //   fetchLocations();
-  // }, [customerId]);
-
-  // /** 🔹 Fetch Access Rights */
-  // useEffect(() => {
-  //   const fetchAccessRights = async () => {
-  //     try {
-  //       const response = await fetch("https://optikposbackend.absplt.com/AccessRight/GetRecords", {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
-  //       });
-
-  //       const data = await response.json();
-  //       if (response.ok && data.success) {
-  //         // ✅ Format access rights as dropdown options
-  //         const accessRightsList = data.data.map(accessRight => ({
-  //           value: accessRight.accessRightId, // Store AccessRightId as Value
-  //           label: accessRight.description, // Show Description in Dropdown
-  //         }));
-  //         setAccessRights(accessRightsList);
-  //       } else {
-  //         throw new Error(data.errorMessage || "Failed to fetch access rights.");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching access rights:", error);
-  //     }
-  //   };
-
-  //   fetchAccessRights();
-  // }, [customerId]);
-
-  // useEffect(() => {
-  //   const fetchUsers = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const response = await fetch("https://optikposbackend.absplt.com/Users/GetUsers", {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           customerId: Number(customerId),
-  //           keyword: "",
-  //           offset: (currentPage - 1) * itemsPerPage,
-  //           limit: itemsPerPage,
-  //         }),
-  //       });
-
-  //       const data = await response.json();
-  //       if (response.ok && data.success) {
-  //         setUsers(data.data);
-  //         setTotalPages(Math.ceil(data.data.length / itemsPerPage));
-  //       } else {
-  //         throw new Error(data.errorMessage || "Failed to fetch users.");
-  //       }
-  //     } catch (error) {
-  //       setErrorModal({ isOpen: true, title: "Error Fetching Users", message: error.message });
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchUsers();
-
-  //   setFields([
-  //     { name: "userName", label: "Username", type: "text", required: true },
-  //     { name: "userEmail", label: "Email", type: "email", required: true },
-  //     {
-  //       name: "accessRightId",
-  //       label: "User Role",
-  //       type: "select",
-  //       options: accessRights, // ✅ Use mapped access rights
-  //       required: true,
-  //     },
-  //     {
-  //       name: "locationId",
-  //       label: "Location",
-  //       type: "select",
-  //       options: Object.keys(locationMap).map(locationId => ({
-  //         label: locationMap[locationId], // Show locationCode
-  //         value: locationId, // Store locationId
-  //       })),
-  //       required: true,
-  //     },
-  //   ]);
-  // }, [currentPage, itemsPerPage, locationMap, accessRights]);
 
   useEffect(() => {
     fetchLocations();
@@ -242,20 +133,18 @@ const UserMaintenance = () => {
     setModalTitle(title);
     setIsViewing(viewing);
   
-    // Dynamically set fields based on Add/Edit mode
     const updatedFields = [
       { name: "userName", label: "Username", type: "text", required: true },
       { name: "userEmail", label: "Email", type: "email", required: true },
     ];
   
-    // If editing, add additional fields
     if (user.userId) {
       updatedFields.push(
         {
           name: "accessRightId",
           label: "User Role",
           type: "select",
-          options: accessRights, // ✅ Use mapped access rights
+          options: accessRights, 
           required: true,
         },
         {
@@ -295,29 +184,35 @@ const UserMaintenance = () => {
   
       try {
         if (!newUser.userId) {
-          // 🔹 Register New User API Call
-          const response = await fetch("https://optikposbackend.absplt.com/Users/RegisterUser", {
+          const response = await fetch("https://optikposbackend.absplt.com/Users/InviteUser", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               customerId: Number(customerId),
+              companyName: "", 
               userName: newUser.userName,
               userEmail: newUser.userEmail,
-              editorUserId: userId, // 
+              userPassword: "", 
+              editorUserId: userId,
             }),
           });
   
-          const data = await response.json();
-          if (response.ok && data.success) {
-            setSuccessModal({ isOpen: true, title: "User added successfully!" });
+          const data = await response.text(); 
+          if (response.ok) {
+            const inviteLink = `https://externalpage.com/invite${data}`; 
+            
+            setSuccessModal({ 
+              isOpen: true, 
+              title: "User Invited Successfully!", 
+              message: `Invitation Link: ${inviteLink}` 
+            });
   
-            setUsers((prevUsers) => [...prevUsers, data.data]);
+            setUsers((prevUsers) => [...prevUsers, newUser]);
             setIsPopupOpen(false);
           } else {
-            throw new Error(data.errorMessage || "Failed to register user.");
+            throw new Error(data || "Failed to invite user.");
           }
         } else {
-          // 🔹 Update Existing User API Call
           const response = await fetch("https://optikposbackend.absplt.com/Users/UpdateUser", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -333,7 +228,6 @@ const UserMaintenance = () => {
           if (response.ok && data.success) {
             setSuccessModal({ isOpen: true, title: "User updated successfully!" });
   
-            // 🔹 Update user list with modified user details
             setUsers((prevUsers) =>
               prevUsers.map((user) =>
                 user.userId === newUser.userId ? { ...user, ...newUser } : user
@@ -408,6 +302,14 @@ const UserMaintenance = () => {
     setSuccessModal({ isOpen: false, title: "" });
   };
 
+  const filteredUsers = users.filter((user) => {
+    const usernameMatch = user.userName.toLowerCase().includes(searchKeyword.toLowerCase());
+    const emailMatch = user.userEmail.toLowerCase().includes(searchKeyword.toLowerCase());
+
+    return usernameMatch || emailMatch 
+  });
+
+
   return (
     <div className="maintenance-container">
       <div className="breadcrumb">
@@ -426,6 +328,7 @@ const UserMaintenance = () => {
       <SuccessModal
         isOpen={successModal.isOpen}
         title={successModal.title}
+        message={successModal.message}
         onClose={closeSuccessModal}
       />
       <div className="search-container">
@@ -476,13 +379,11 @@ const UserMaintenance = () => {
             </tr>
           </thead>
           <tbody>
-            {users.map((user, index) => (
+          {filteredUsers.map((user, index) => (
               <tr key={user.userId}>
                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                 <td>{user.userName}</td>
-                <td>
-                    {accessRights.find(ar => ar.value === user.accessRightId)?.label || "-"}
-                  </td>                
+                <td>{accessRights.find((ar) => ar.value === user.accessRightId)?.label || "-"}</td>
                 <td>{user.userEmail}</td>
                 <td>{locationMap[user.locationId] || "-"}</td>
                 <td>

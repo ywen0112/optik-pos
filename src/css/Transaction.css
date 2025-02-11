@@ -274,14 +274,12 @@
   font-weight: bold;
 }
 
-/* Action Buttons */
 .transaction-modal-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 15px;
 }
 
-/* Buttons */
 .modal-add-button,
 .modal-close-button {
   background-color: #1e90ff;

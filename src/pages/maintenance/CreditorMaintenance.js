@@ -26,10 +26,11 @@ const CreditorMaintenance = () => {
   const customerId = localStorage.getItem("customerId"); 
   const userId = localStorage.getItem("userId");
   const [creditorTypeOptions, setCreditorTypeOptions] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState(""); 
 
-    useEffect(() => {
-      fetchCreditors();
-    }, [currentPage, itemsPerPage]); 
+  useEffect(() => {
+    fetchCreditors();
+  }, [currentPage, itemsPerPage, searchKeyword]);  
 
     useEffect(() => {
       if (creditors.length > 0) {
@@ -72,7 +73,7 @@ const CreditorMaintenance = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           customerId: Number(customerId),
-          keyword: "",
+          keyword: "", 
           offset: 0,
           limit: 9999,
         }),
@@ -80,7 +81,13 @@ const CreditorMaintenance = () => {
 
       const data = await response.json();
       if (response.ok && data.success) {
-        setCreditors(data.data);
+        const filteredCreditor = data.data.filter(creditor =>
+          creditor.companyName?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+          creditor.creditorCode?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+          creditor.mobile?.includes(searchKeyword) 
+        );
+
+        setCreditors(filteredCreditor);
         setTotalPages(Math.ceil(data.data.length / itemsPerPage));
       } else {
         throw new Error(data.errorMessage || "Failed to fetch creditors.");
@@ -303,6 +310,15 @@ const CreditorMaintenance = () => {
         title={successModal.title}
         onClose={closeSuccessModal}
       />
+       <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search by Creditor Code, Company Name, or Mobile"
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          className="search-input"
+        />
+      </div>
       <div className="maintenance-header">
         <div className="pagination-controls">
           <label>

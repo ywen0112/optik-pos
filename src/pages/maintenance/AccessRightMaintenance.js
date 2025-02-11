@@ -9,6 +9,7 @@ import SuccessModal from "../../modals/SuccessModal";
 
 const AccessRightMaintenance = () => {
   const [roles, setRoles] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
@@ -27,7 +28,7 @@ const AccessRightMaintenance = () => {
 
   useEffect(() => {
     fetchRoles();
-  }, [currentPage, itemsPerPage]); // 🟢 Ensure this runs when page changes
+  }, [currentPage, itemsPerPage, searchKeyword]);
 
   useEffect(() => {
     if (roles.length > 0) {
@@ -43,7 +44,7 @@ const AccessRightMaintenance = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           customerId: Number(localStorage.getItem("customerId")),
-          keyword: "",
+          keyword: searchKeyword,
           offset: 0, 
           limit: 9999, 
         }),
@@ -298,6 +299,16 @@ const AccessRightMaintenance = () => {
         title={successModal.title}
         onClose={closeSuccessModal}
       />
+       <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search by user role"
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            className="search-input"
+          />
+        </div>
+
       <div className="maintenance-header">
         <div className="pagination-controls">
           <label>

@@ -135,7 +135,6 @@ const UserMaintenance = () => {
   
     const updatedFields = [
       { name: "userEmail", label: "Email", type: "email", required: true },
-      { name: "companyName", label: "Company Name", type: "text", required: true },
     ];
   
     if (user.userId) {

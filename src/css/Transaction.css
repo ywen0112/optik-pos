@@ -19,12 +19,13 @@
 
 .open-counter-button,
 .transaction-button,
-.modal-add-button {
+.modal-add-button,
+.payment-button{
   background-color: #1e90ff;
   color: white;
   padding: 8px 15px;
   border-radius: 5px;
-  font-weight: bold;
+  font-weight: normal;
   border: none;
   cursor: pointer;
 }
@@ -42,7 +43,8 @@
 .open-counter-button:hover,
 .transaction-button:hover,
 .modal-add-button:hover,
-.modal-close-button:hover {
+.modal-close-button:hover,
+.payment-button:hover {
   opacity: 0.8;
 }
 
@@ -106,65 +108,6 @@
   margin-top: 0;
 }
 
-/* .sales-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sales-modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  max-width: 500px;
-  width: 100%;
-}
-
-.sales-modal-input,
-.sales-modal-textarea {
-  width: 100%;
-  padding: 10px 4px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.sales-modal-textarea {
-  height: 80px;
-  resize: none;
-}
-
-.transaction-table table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.transaction-table th,
-.transaction-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-  font-size: 12px;
-}
-
-.transaction-table th {
-  background-color: #f2f2f2;
-}
-
-.transaction-table tfoot td {
-  font-weight: bold;
-} */
-
-/* General Modal Overlay */
 .sales-modal-overlay {
   position: fixed;
   top: 0;
@@ -173,82 +116,48 @@
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: flex-start;
 }
 
-/* Sales Modal Container */
 .sales-modal-content {
   background: white;
   padding: 20px;
   border-radius: 8px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
   width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Section Layout */
 .sales-popup-form {
   display: flex;
   flex-direction: column;
-  text-align: left;
+  gap: 5px;
 }
 
-/* Section Header */
-.sales-popup-form h3 {
-  margin-bottom: 0px;
-  font-size: 16px;
-  font-weight: bold;
-  background-color: #eeeeee;
-  padding: 5px;
-  margin-top: 0px;
-  width: 18%;
+.sales-form-row {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
 }
 
-.sales-form-section {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 25px;
-}
-
-.sales-profile-form-section {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 25px;
-}
-
-.sales-form-section,
-.sales-profile-form-section {
-  width: 97%;
-  padding: 10px;
-}
-
-.sales-form-group option {
-  font-size: 10px;
-  width: auto;
-}
-
-/* Input Fields */
 .sales-form-group {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .sales-form-group label {
-  font-size: 14px;
+  font-size: 13px;
+  color: #393939;
+
 }
 
-.sales-form-group input,
-.sales-form-group select {
+.sales-form-group input {
   padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  width: 100%;
+  border-radius: 4px;
 }
+
 
 /* Item Table */
 .transaction-table table {
@@ -259,42 +168,89 @@
 
 .transaction-table th,
 .transaction-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+  border: 1px solid #d2d2d2;
   text-align: left;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: normal;
+  padding: 5px;
+  max-width: 50px;
 }
 
 .transaction-table th {
-  background-color: #f2f2f2;
+  background-color: #1e90ff;
+  color: white;
+}
+
+.transaction-table input {
+  width: 95%;
+  border: 1px solid #d2d2d2;
+}
+
+.readonly-field {
+  background-color: #e6e6e6;
+}
+
+.readonly-field input {
+  background-color: #e6e6e6;
+  border: none;
 }
 
 .transaction-table tfoot td {
   font-weight: bold;
 }
 
-.transaction-modal-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.modal-add-button,
-.modal-close-button {
+.modal-add-item-button {
+  align-self: flex-end;
   background-color: #1e90ff;
+  border: 0px;
   color: white;
-  padding: 8px 15px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
+  padding: 5px;
+  border-radius: 3px;
 }
 
-.modal-close-button {
+.modal-add-payment-button {
+  background-color: #1e90ff;
+  border: 0px;
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.payment-options {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.payment-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.payment-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.payment-method-select {
+  flex: 2;
+}
+
+.payment-amount-input {
+  flex: 1;
+}
+
+.remove-btn {
   background-color: red;
+  border: 0px;
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
 }
 
-.modal-add-button:hover,
-.modal-close-button:hover {
-  opacity: 0.8;
+.sales-popup-form p {
+  margin: 0px;
 }
-

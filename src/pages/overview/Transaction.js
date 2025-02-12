@@ -21,7 +21,8 @@ const Transaction = () => {
   const [isCreditNoteOpen, setIsCreditNoteOpen] = useState(false);
   const [isCloseCounterOpen, setIsCloseCounterOpen] = useState(false);
   const navigate = useNavigate();
-
+  const customerId = localStorage.getItem("customerId"); 
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     const storedSessionId = localStorage.getItem("counterSessionId");
@@ -30,7 +31,7 @@ const Transaction = () => {
     if (storedSessionId) {
       setIsCounterOpen(true);
       setCounterSessionId(storedSessionId);
-      setOpenCounterAmount(storedOpeningBalance || ""); // ✅ Show stored opening balance
+      setOpenCounterAmount(storedOpeningBalance || ""); 
     }
   }, []);
 
@@ -49,8 +50,8 @@ const Transaction = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: Number(localStorage.getItem("customerId")),
-          userId: localStorage.getItem("userId"),
+          customerId: Number("customerId"),
+          userId: userId,
           openingBalance: parseFloat(openCounterAmount),
         }),
       });
@@ -77,8 +78,8 @@ const Transaction = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: Number(localStorage.getItem("customerId")),
-          userId: localStorage.getItem("userId"),
+          customerId: Number(customerId),
+          userId: userId,
           counterSessionId: counterSessionId,
           closingBalance: parseFloat(amount),
         }),
@@ -111,8 +112,8 @@ const Transaction = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: Number(localStorage.getItem("customerId")),
-          userId: localStorage.getItem("userId"),
+          customerId: Number(customerId),
+          userId: userId,
           counterSessionId: counterSessionId,
           isCashOut: type === "cashout",
           remarks: description,
@@ -144,24 +145,101 @@ const Transaction = () => {
     setIsModalOpen(false);
   };
 
-  const handleOpenSalesInvoice = () => {
-    setIsSalesInvoiceOpen(true);
+  const handleOpenSalesInvoice = async () => {
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Sales/New", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: Number(customerId),
+          userId: userId,
+          id: "",
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Sales Invoice API Response:", data);
+
+      if (response.ok && data.success) {
+        const { salesId, docNo } = data.data;
+
+        localStorage.setItem("salesId", salesId);
+        localStorage.setItem("docNo", docNo);
+
+        setIsSalesInvoiceOpen(true);
+      } else {
+        throw new Error(data.errorMessage || "Failed to create sales invoice.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Sales Invoice Error", message: error.message });
+    }
   };
 
   const handleCloseSalesInvoice = () => {
     setIsSalesInvoiceOpen(false);
   };
 
-  const handleOpenPurchaseInvoice = () => {
-    setIsPurchanseInvoiceOpen(true);
+  const handleOpenPurchaseInvoice = async () => {
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Purchases/New", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: Number(customerId),
+          userId: userId,
+          id: "",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        const { purchaseId, docNo } = data.data;
+
+        localStorage.setItem("purchaseId", purchaseId);
+        localStorage.setItem("docNo", docNo);
+
+        setIsPurchanseInvoiceOpen(true);
+      } else {
+        throw new Error(data.errorMessage || "Failed to create purchase invoice.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Purchase Invoice Error", message: error.message });
+    }
   };
+;
 
   const handleClosePurchaseInvoice = () => {
     setIsPurchanseInvoiceOpen(false);
   };
 
-  const handleOpenCreditNote = () => {
-    setIsCreditNoteOpen(true);
+  const handleOpenCreditNote = async () => {
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/New", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: Number(customerId),
+          userId: userId,
+          id: "",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        const { creditNoteId, docNo } = data.data;
+
+        localStorage.setItem("creditNoteId", creditNoteId);
+        localStorage.setItem("docNo", docNo);
+
+        setIsCreditNoteOpen(true);
+      } else {
+        throw new Error(data.errorMessage || "Failed to create credit note.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Credit Note Error", message: error.message });
+    }
   };
 
   const handleCloseCreditNote = () => {

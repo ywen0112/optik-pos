@@ -1,7 +1,7 @@
 import React from "react";
 import "../css/SuccessModal.css";
 
-const SuccessModal = ({ isOpen, title, message, onClose }) => {
+const SuccessModal = ({ isOpen, title, message, onClose, onExportReport }) => {
   if (!isOpen) return null;
 
   return (
@@ -12,9 +12,16 @@ const SuccessModal = ({ isOpen, title, message, onClose }) => {
         </div>
         <h3 className="success-modal-title">{title}</h3>
         <p className="success-modal-message">{message}</p>
-        <button className="success-modal-button" onClick={onClose}>
-          OK
-        </button>
+        <div className="success-modal-buttons">
+          <button className="success-modal-button" onClick={onClose}>
+            OK
+          </button>
+        </div>
+        {onExportReport && (
+            <button className="export-report-button" onClick={onExportReport}>
+              Export Report
+            </button>
+          )}
       </div>
     </div>
   );

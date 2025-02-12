@@ -1,0 +1,84 @@
+.inquiry-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-inquiry-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .search-inquiry-container input[type="text"] {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 200px;
+  }
+
+  .search-inquiry-container label {
+    font-size: 13px;
+  }
+  
+  .inquiry-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .inquiry-table th,
+  .inquiry-table td {
+    padding: 8px 8px;
+    text-align: left;
+    font-size: 13px;
+  }
+  
+  .inquiry-table th {
+    color: black;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .inquiry-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .inquiry-tabs button {
+    background-color: #f0f0f0;
+    color: black;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: normal;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .inquiry-tabs button.active {
+    background-color: #1e90ff;
+    color: white;
+  }
+  
+  .void-button {
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px red;
+  }
+  
+  .disabled-void {
+    background-color: gray;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: not-allowed;
+  }
+  
+  

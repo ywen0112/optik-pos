@@ -26,8 +26,12 @@ const InquiryScreen = () => {
   const [creditorCode, setCreditorCode] = useState("");
   const [creditNote, setCreditNote] = useState([]);
   const [showAllCreditNote, setShowAllCreditNote] = useState(true);
-  const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: "", message: "" });
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, transactionId: null, message: "" });
+  const [confirmSalesModal, setConfirmSalesModal] = useState({ isOpen: false, salesId: null, message: "" });
+  const [confirmPurchasesModal, setConfirmPurchasesModal] = useState({ isOpen: false, purchaseId: null, message: "" });
+  const [confirmCreditNoteModal, setConfirmCreditNoteModal] = useState({ isOpen: false, creditNoteId: null, message: "" });
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const customerId = Number(localStorage.getItem("customerId"));
 
   useEffect(() => {
     if (activeTab === "cashTransaction") {
@@ -51,7 +55,7 @@ const InquiryScreen = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: 0,
+          customerId: customerId,
           keyword: "",
           offset: 0,
           limit: 9999,
@@ -66,33 +70,42 @@ const InquiryScreen = () => {
         throw new Error(data.errorMessage || "Failed to fetch transactions.");
       }
     } catch (error) {
-      console.error("Error fetching transactions:", error);
+      setErrorModal({ isOpen: true, title: "Fetch Error", message: error.message });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleVoidTransaction = async (cashTransactionId) => {
+  const confirmVoidTransaction = (transactionId) => {
+    setConfirmModal({
+      isOpen: true,
+      transactionId,
+      message: "Are you sure you want to void this transaction? This action cannot be undone.",
+    });
+  };
+
+  const handleVoidTransaction = async () => {
+    if (!confirmModal.transactionId) return;
+    setConfirmModal({ isOpen: false, transactionId: null, message: "" });
     try {
       const userId = localStorage.getItem("userId");
-
       const response = await fetch("https://optikposbackend.absplt.com/CashCounter/VoidCashTransaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: 0,
-          id: cashTransactionId,
+          customerId: customerId,
+          id: confirmModal.transactionId,
           userId,
         }),
       });
-
       const data = await response.json();
       if (response.ok && data.success) {
-        fetchTransactions(); // Refresh table after voiding
+        fetchTransactions();
       } else {
         throw new Error(data.errorMessage || "Failed to void transaction.");
       }
     } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error", message: error.message });
     }
   };
 
@@ -130,7 +143,7 @@ const InquiryScreen = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: 0,
+          customerId: customerId,
           keyword: "",
           offset: 0,
           limit: 9999,
@@ -144,34 +157,42 @@ const InquiryScreen = () => {
         throw new Error(data.errorMessage || "Failed to fetch sales transactions.");
       }
     } catch (error) {
-      console.error("Error fetching sales transactions:", error);
+      setErrorModal({ isOpen: true, title: "Fetch Error", message: error.message });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleVoidSales = async (salesId) => {
+  const confirmVoidSalesTransaction = (salesId) => {
+    setConfirmSalesModal({
+      isOpen: true,
+      salesId,
+      message: "Are you sure you want to void this transaction? This action cannot be undone.",
+    });
+  };
+
+  const handleVoidSalesTransaction = async () => {
+    if (!confirmSalesModal.salesId) return;
+    setConfirmSalesModal({ isOpen: false, salesId: null, message: "" });
     try {
       const userId = localStorage.getItem("userId");
-
       const response = await fetch("https://optikposbackend.absplt.com/Sales/Void", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: 0,
-          id: salesId,
+          customerId: customerId,
+          id: confirmSalesModal.salesId,
           userId,
         }),
       });
-
       const data = await response.json();
       if (response.ok && data.success) {
-        fetchSalesTransactions(); // Refresh table after voiding
+        fetchSalesTransactions();
       } else {
         throw new Error(data.errorMessage || "Failed to void transaction.");
       }
     } catch (error) {
-      alert("Error voiding transaction. Please try again.");
+      setErrorModal({ isOpen: true, title: "Error", message: error.message });
     }
   };
 
@@ -211,7 +232,7 @@ const InquiryScreen = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: 0,
+          customerId: customerId,
           keyword: "",
           offset: 0,
           limit: 9999,
@@ -225,61 +246,42 @@ const InquiryScreen = () => {
         throw new Error(data.errorMessage || "Failed to fetch purchase transactions.");
       }
     } catch (error) {
-      console.error("Error fetching purchase transactions:", error);
+      setErrorModal({ isOpen: true, title: "Fetch Error", message: error.message });
     } finally {
       setLoading(false);
     }
   };
-
-  const fetchCreditNotes = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/GetRecords", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: 0,
-          keyword: "",
-          offset: 0,
-          limit: 9999,
-        }),
-      });
-
-      const data = await response.json();
-      if (response.ok && data.success) {
-        setCreditNote([...data.data]);
-      } else {
-        throw new Error(data.errorMessage || "Failed to fetch credit note.");
-      }
-    } catch (error) {
-      console.error("Error fetching credit note:", error);
-    } finally {
-      setLoading(false);
-    }
+  
+  const confirmVoidPurchasesTransaction = (purchaseId) => {
+    setConfirmPurchasesModal({
+      isOpen: true,
+      purchaseId,
+      message: "Are you sure you want to void this transaction? This action cannot be undone.",
+    });
   };
 
-  const handleVoidPurchase = async (purchaseId) => {
+  const handleVoidPurchasesTransaction = async () => {
+    if (!confirmPurchasesModal.purchaseId) return;
+    setConfirmPurchasesModal({ isOpen: false, purchaseId: null, message: "" });
     try {
       const userId = localStorage.getItem("userId");
-
       const response = await fetch("https://optikposbackend.absplt.com/Purchases/Void", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: 0,
-          id: purchaseId,
+          customerId: customerId,
+          id: confirmPurchasesModal.purchaseId,
           userId,
         }),
       });
-
       const data = await response.json();
       if (response.ok && data.success) {
-        fetchPurchaseTransactions(); // Refresh table after voiding
+        fetchPurchaseTransactions();
       } else {
         throw new Error(data.errorMessage || "Failed to void transaction.");
       }
     } catch (error) {
-      alert("Error voiding transaction. Please try again.");
+      setErrorModal({ isOpen: true, title: "Error", message: error.message });
     }
   };
 
@@ -312,28 +314,88 @@ const InquiryScreen = () => {
     return matchesDocNo && matchesCreditorCode;
   });
 
-  const handleVoidCreditNote = async (creditNoteId) => {
+  const fetchCreditNotes = async () => {
+    setLoading(true);
     try {
-      const userId = localStorage.getItem("userId");
-
-      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/Void", {
+      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: 0,
-          id: creditNoteId,
-          userId,
+          customerId: customerId,
+          keyword: "",
+          offset: 0,
+          limit: 9999,
         }),
       });
 
       const data = await response.json();
       if (response.ok && data.success) {
-        fetchCreditNotes(); // Refresh table after voiding
+        setCreditNote([...data.data]);
       } else {
-        throw new Error(data.errorMessage || "Failed to void credit note.");
+        throw new Error(data.errorMessage || "Failed to fetch credit note.");
       }
     } catch (error) {
-      console.error("Error voiding credit note:", error);
+      setErrorModal({ isOpen: true, title: "Fetch Error", message: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // const handleVoidCreditNote = async (creditNoteId) => {
+  //   try {
+  //     const userId = localStorage.getItem("userId");
+
+  //     const response = await fetch("https://optikposbackend.absplt.com/CreditNote/Void", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         customerId: 0,
+  //         id: creditNoteId,
+  //         userId,
+  //       }),
+  //     });
+
+  //     const data = await response.json();
+  //     if (response.ok && data.success) {
+  //       fetchCreditNotes(); 
+  //     } else {
+  //       throw new Error(data.errorMessage || "Failed to void credit note.");
+  //     }
+  //   } catch (error) {
+  //     setErrorModal({ isOpen: true, title: "Error", message: error.message });
+  //   }
+  // };
+
+  const confirmVoidCreditNote = (creditNoteId) => {
+    setConfirmCreditNoteModal({
+      isOpen: true,
+      creditNoteId,
+      message: "Are you sure you want to void this transaction? This action cannot be undone.",
+    });
+  };
+
+  const handleVoidCreditNote = async () => {
+    if (!confirmCreditNoteModal.creditNoteId) return;
+    setConfirmCreditNoteModal({ isOpen: false, creditNoteId: null, message: "" });
+    try {
+      const userId = localStorage.getItem("userId");
+      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/Void", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: customerId,
+          id: confirmCreditNoteModal.creditNoteId,
+          userId,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        fetchCreditNotes();
+      } else {
+        throw new Error(data.errorMessage || "Failed to void transaction.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error", message: error.message });
     }
   };
 
@@ -374,7 +436,7 @@ const InquiryScreen = () => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              customerId: 0,
+              customerId: customerId,
               userId,
               id: userId,
             }),
@@ -498,8 +560,12 @@ const InquiryScreen = () => {
                   <td>{usersCache[txn.lastModifiedBy] || "-"}</td>
                   <td>{formatDateTime(txn.lastModifiedTimeStamp)}</td>
                   <td>
-                    {txn.isVoid ? <button className="disabled-void" disabled>Voided</button> : <button className="void-button" onClick={() => handleVoidTransaction(txn.cashTransactionId)}>Void</button>}
-                  </td>
+                  {txn.isVoid ? (
+                    <button className="disabled-void" disabled>Voided</button>
+                  ) : (
+                    <button className="void-button" onClick={() => confirmVoidTransaction(txn.cashTransactionId)}>Void</button>
+                  )}
+                </td>
                 </tr>
               ))}
             </tbody>
@@ -550,7 +616,11 @@ const InquiryScreen = () => {
                   <td>{txn.isVoid ? "Yes" : "No"}</td>
                   <td>{formatDateTime(txn.docDate)}</td>
                   <td>
-                    {txn.isVoid ? <button className="disabled-void" disabled>Voided</button> : <button className="void-button" onClick={() => handleVoidSales(txn.salesId)}>Void</button>}
+                  {txn.isVoid ? (
+                    <button className="disabled-void" disabled>Voided</button>
+                  ) : (
+                    <button className="void-button" onClick={() => confirmVoidSalesTransaction(txn.salesId)}>Void</button>
+                  )}
                   </td>
                 </tr>
               ))}
@@ -602,7 +672,11 @@ const InquiryScreen = () => {
                   <td>{txn.isVoid ? "Yes" : "No"}</td>
                   <td>{formatDateTime(txn.docDate)}</td>
                   <td>
-                    {txn.isVoid ? <button className="disabled-void" disabled>Voided</button> : <button className="void-button" onClick={() => handleVoidPurchase(txn.purchaseId)}>Void</button>}
+                  {txn.isVoid ? (
+                    <button className="disabled-void" disabled>Voided</button>
+                  ) : (
+                    <button className="void-button" onClick={() => confirmVoidPurchasesTransaction(txn.purchaseId)}>Void</button>
+                  )}
                   </td>
                 </tr>
               ))}
@@ -648,7 +722,11 @@ const InquiryScreen = () => {
                     <td>{txn.isVoid ? "Yes" : "No"}</td>
                     <td>{formatDateTime(txn.docDate)}</td>
                     <td>
-                      {txn.isVoid ? <button className="disabled-void" disabled>Voided</button> : <button className="void-button" onClick={() => handleVoidCreditNote(txn.creditNoteId)}>Void</button>}
+                    {txn.isVoid ? (
+                      <button className="disabled-void" disabled>Voided</button>
+                    ) : (
+                      <button className="void-button" onClick={() => confirmVoidCreditNote(txn.creditNoteId)}>Void</button>
+                    )}
                     </td>
                   </tr>
                 ))}
@@ -657,6 +735,49 @@ const InquiryScreen = () => {
             )}
           </>
         )}
+      {confirmModal.isOpen && (
+        <ConfirmationModal
+          isOpen={confirmModal.isOpen}
+          title="Confirm Void"
+          message={confirmModal.message}
+          onConfirm={handleVoidTransaction}
+          onCancel={() => setConfirmModal({ isOpen: false, transactionId: null, message: "" })}
+        />
+      )}
+      {confirmSalesModal.isOpen && (
+        <ConfirmationModal
+          isOpen={confirmSalesModal.isOpen}
+          title="Confirm Void"
+          message={confirmSalesModal.message}
+          onConfirm={handleVoidSalesTransaction}
+          onCancel={() => setConfirmSalesModal({ isOpen: false, salesId: null, message: "" })}
+        />
+      )}
+      {confirmPurchasesModal.isOpen && (
+        <ConfirmationModal
+          isOpen={confirmPurchasesModal.isOpen}
+          title="Confirm Void"
+          message={confirmPurchasesModal.message}
+          onConfirm={handleVoidPurchasesTransaction}
+          onCancel={() => setConfirmPurchasesModal({ isOpen: false, purchaseId: null, message: "" })}
+        />
+      )}
+      {confirmCreditNoteModal.isOpen && (
+        <ConfirmationModal
+          isOpen={confirmCreditNoteModal.isOpen}
+          title="Confirm Void"
+          message={confirmCreditNoteModal.message}
+          onConfirm={handleVoidCreditNote}
+          onCancel={() => setConfirmCreditNoteModal({ isOpen: false, creditNoteId: null, message: "" })}
+        />
+      )}
+      {errorModal.isOpen && (
+        <ErrorModal
+          title={errorModal.title}
+          message={errorModal.message}
+          onClose={() => setErrorModal({ isOpen: false, title: "", message: "" })}
+        />
+      )}
     </div>
   );
 };

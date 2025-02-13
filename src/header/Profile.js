@@ -206,10 +206,10 @@ const Profile = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userName: userData.username, // Using the logged-in user's username
-          userEmail: userData.email, // Using the logged-in user's email
-          userPassword: oldPassword, // The current password entered by the user
-          newPassword: newPassword, // The new password entered by the user
+          userName: userData.username, 
+          userEmail: userData.email,
+          userPassword: oldPassword, 
+          newPassword: newPassword,
         }),
       });
   

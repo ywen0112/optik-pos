@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../../css/InquiryScreen.css";
+import ConfirmationModal from "../../modals/ConfirmationModal";
+import ErrorModal from "../../modals/ErrorModal";
 
 const InquiryScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -24,6 +26,8 @@ const InquiryScreen = () => {
   const [creditorCode, setCreditorCode] = useState("");
   const [creditNote, setCreditNote] = useState([]);
   const [showAllCreditNote, setShowAllCreditNote] = useState(true);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: "", message: "" });
+  const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
 
   useEffect(() => {
     if (activeTab === "cashTransaction") {
@@ -38,7 +42,6 @@ const InquiryScreen = () => {
     else if (activeTab === "creditNote") {
       fetchCreditNotes();
     }
- 
   }, [activeTab]);
 
   const fetchTransactions = async () => {
@@ -69,124 +72,6 @@ const InquiryScreen = () => {
     }
   };
 
-  const fetchSalesTransactions = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("https://optikposbackend.absplt.com/Sales/GetRecords", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: 0,
-          keyword: "",
-          offset: 0,
-          limit: 9999,
-        }),
-      });
-
-      const data = await response.json();
-      if (response.ok && data.success) {
-        setSalesTransactions([...data.data]);
-      } else {
-        throw new Error(data.errorMessage || "Failed to fetch sales transactions.");
-      }
-    } catch (error) {
-      console.error("Error fetching sales transactions:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchPurchaseTransactions = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("https://optikposbackend.absplt.com/Purchases/GetRecords", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: 0,
-          keyword: "",
-          offset: 0,
-          limit: 9999,
-        }),
-      });
-
-      const data = await response.json();
-      if (response.ok && data.success) {
-        setPurchaseTransactions([...data.data]);
-      } else {
-        throw new Error(data.errorMessage || "Failed to fetch purchase transactions.");
-      }
-    } catch (error) {
-      console.error("Error fetching purchase transactions:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCreditNotes = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/GetRecords", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: 0,
-          keyword: "",
-          offset: 0,
-          limit: 9999,
-        }),
-      });
-
-      const data = await response.json();
-      if (response.ok && data.success) {
-        setCreditNote([...data.data]);
-      } else {
-        throw new Error(data.errorMessage || "Failed to fetch credit note.");
-      }
-    } catch (error) {
-      console.error("Error fetching credit note:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchUserNames = async (transactions) => {
-    let userIds = new Set();
-    transactions.forEach((txn) => {
-      if (txn.createdBy) userIds.add(txn.createdBy);
-      if (txn.lastModifiedBy) userIds.add(txn.lastModifiedBy);
-    });
-
-    const userNames = { ...usersCache };
-
-    for (let userId of userIds) {
-      if (!userNames[userId]) {
-        try {
-          const response = await fetch("https://optikposbackend.absplt.com/Users/GetSpecificUser", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              customerId: 0,
-              userId,
-              id: userId,
-            }),
-          });
-
-          const data = await response.json();
-          if (response.ok && data.success) {
-            userNames[userId] = data.data.userName;
-          } else {
-            userNames[userId] = "Unknown User";
-          }
-        } catch (error) {
-          console.error(`Error fetching username for ${userId}:`, error);
-          userNames[userId] = "Unknown User";
-        }
-      }
-    }
-    setUsersCache(userNames);
-  };
-
   const handleVoidTransaction = async (cashTransactionId) => {
     try {
       const userId = localStorage.getItem("userId");
@@ -208,7 +93,6 @@ const InquiryScreen = () => {
         throw new Error(data.errorMessage || "Failed to void transaction.");
       }
     } catch (error) {
-      alert("Error voiding transaction. Please try again.");
     }
   };
 
@@ -238,6 +122,33 @@ const InquiryScreen = () => {
     }
     return matchesDocNo;
   });
+
+  const fetchSalesTransactions = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Sales/GetRecords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: 0,
+          keyword: "",
+          offset: 0,
+          limit: 9999,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setSalesTransactions([...data.data]);
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch sales transactions.");
+      }
+    } catch (error) {
+      console.error("Error fetching sales transactions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleVoidSales = async (salesId) => {
     try {
@@ -292,6 +203,60 @@ const InquiryScreen = () => {
     }
     return matchesDocNo && matchesDebtorCode;
   });
+
+  const fetchPurchaseTransactions = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Purchases/GetRecords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: 0,
+          keyword: "",
+          offset: 0,
+          limit: 9999,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setPurchaseTransactions([...data.data]);
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch purchase transactions.");
+      }
+    } catch (error) {
+      console.error("Error fetching purchase transactions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCreditNotes = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/GetRecords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: 0,
+          keyword: "",
+          offset: 0,
+          limit: 9999,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setCreditNote([...data.data]);
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch credit note.");
+      }
+    } catch (error) {
+      console.error("Error fetching credit note:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleVoidPurchase = async (purchaseId) => {
     try {
@@ -392,6 +357,43 @@ const InquiryScreen = () => {
     }
     return matchesDocNo && matchesDebtorCode;
   });
+
+  const fetchUserNames = async (transactions) => {
+    let userIds = new Set();
+    transactions.forEach((txn) => {
+      if (txn.createdBy) userIds.add(txn.createdBy);
+      if (txn.lastModifiedBy) userIds.add(txn.lastModifiedBy);
+    });
+
+    const userNames = { ...usersCache };
+
+    for (let userId of userIds) {
+      if (!userNames[userId]) {
+        try {
+          const response = await fetch("https://optikposbackend.absplt.com/Users/GetSpecificUser", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              customerId: 0,
+              userId,
+              id: userId,
+            }),
+          });
+
+          const data = await response.json();
+          if (response.ok && data.success) {
+            userNames[userId] = data.data.userName;
+          } else {
+            userNames[userId] = "Unknown User";
+          }
+        } catch (error) {
+          console.error(`Error fetching username for ${userId}:`, error);
+          userNames[userId] = "Unknown User";
+        }
+      }
+    }
+    setUsersCache(userNames);
+  };
   
   const formatDateTime = (dateString) => {
     if (!dateString) return "-";
@@ -610,7 +612,7 @@ const InquiryScreen = () => {
         </>
       )}
 
-{activeTab === "creditNote" && (
+        {activeTab === "creditNote" && (
           <>
             <div className="search-inquiry-container">
               <input type="text" placeholder="Enter Doc No" value={docNo} onChange={(e) => setDocNo(e.target.value)} />

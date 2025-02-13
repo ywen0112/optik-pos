@@ -18,8 +18,8 @@ const Sidebar = ({ onMenuClick }) => {
       title: "OVERVIEW",
       items: [
         { name: "Dashboard", icon: "fal fa-home", path: "/main/dashboard" },
-        { name: "Transaction Inquiry", icon: "fal fa-search", path: "/main/inquiry-screen" },
         { name: "Transaction", icon: "fal fa-briefcase", path: "/main/transaction" },
+        { name: "Transaction Inquiry", icon: "fal fa-search", path: "/main/inquiry-screen" },
         { name: "Audit Logs", icon: "fal fa-scroll", path: "/main/audit-logs" },
       ],
     },

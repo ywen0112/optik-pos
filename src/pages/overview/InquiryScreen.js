@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../css/InquiryScreen.css";
 
 const InquiryScreen = () => {
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("cashTransaction");
   const [docNo, setDocNo] = useState("");
   const [isVoid, setIsVoid] = useState(false);
@@ -14,24 +15,34 @@ const InquiryScreen = () => {
   const [isComplete, setIsComplete] = useState(false);
   const [isSalesVoid, setIsSalesVoid] = useState(false);
   const [showAllSales, setShowAllSales] = useState(true);
+  const [isSalesVoidAndCompleted, setIsSalesVoidAndCompleted] = useState(false);
   const [debtorCode, setDebtorCode] = useState("");
   const [purchaseTransactions, setPurchaseTransactions] = useState([]);
   const [isPurchaseVoid, setIsPurchaseVoid] = useState(false);
+  const [isPurchaseVoidAndCompleted, setIsPurchaseVoidAndCompleted] = useState(false);
   const [showAllPurchases, setShowAllPurchases] = useState(true);
   const [creditorCode, setCreditorCode] = useState("");
+  const [creditNote, setCreditNote] = useState([]);
+  const [showAllCreditNote, setShowAllCreditNote] = useState(true);
 
   useEffect(() => {
     if (activeTab === "cashTransaction") {
       fetchTransactions();
-    } else if (activeTab === "salesInvoice") {
+    } 
+    else if (activeTab === "salesInvoice") {
       fetchSalesTransactions();
-    } else if (activeTab === "purchaseInvoice") {
+    } 
+    else if (activeTab === "purchaseInvoice") {
       fetchPurchaseTransactions();
+    } 
+    else if (activeTab === "creditNote") {
+      fetchCreditNotes();
     }
-    
+ 
   }, [activeTab]);
 
   const fetchTransactions = async () => {
+    setLoading(true);
     try {
       const response = await fetch("https://optikposbackend.absplt.com/CashCounter/GetCashTransactionsRecords", {
         method: "POST",
@@ -53,10 +64,13 @@ const InquiryScreen = () => {
       }
     } catch (error) {
       console.error("Error fetching transactions:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchSalesTransactions = async () => {
+    setLoading(true);
     try {
       const response = await fetch("https://optikposbackend.absplt.com/Sales/GetRecords", {
         method: "POST",
@@ -77,10 +91,13 @@ const InquiryScreen = () => {
       }
     } catch (error) {
       console.error("Error fetching sales transactions:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchPurchaseTransactions = async () => {
+    setLoading(true);
     try {
       const response = await fetch("https://optikposbackend.absplt.com/Purchases/GetRecords", {
         method: "POST",
@@ -101,6 +118,35 @@ const InquiryScreen = () => {
       }
     } catch (error) {
       console.error("Error fetching purchase transactions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCreditNotes = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/GetRecords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: 0,
+          keyword: "",
+          offset: 0,
+          limit: 9999,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setCreditNote([...data.data]);
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch credit note.");
+      }
+    } catch (error) {
+      console.error("Error fetching credit note:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -162,7 +208,6 @@ const InquiryScreen = () => {
         throw new Error(data.errorMessage || "Failed to void transaction.");
       }
     } catch (error) {
-      console.error("Error voiding transaction:", error);
       alert("Error voiding transaction. Please try again.");
     }
   };
@@ -215,7 +260,6 @@ const InquiryScreen = () => {
         throw new Error(data.errorMessage || "Failed to void transaction.");
       }
     } catch (error) {
-      console.error("Error voiding transaction:", error);
       alert("Error voiding transaction. Please try again.");
     }
   };
@@ -223,6 +267,7 @@ const InquiryScreen = () => {
   const handleSalesFilterChange = (filterType) => {
     setIsComplete(filterType === "isComplete");
     setIsSalesVoid(filterType === "isSalesVoid");
+    setIsSalesVoidAndCompleted(filterType === "isSalesVoidAndCompleted");
     setShowAllSales(filterType === "showAllSales");
   };
 
@@ -238,6 +283,9 @@ const InquiryScreen = () => {
     }
     if (isComplete) {
       return txn.isComplete === true && matchesDocNo && matchesDebtorCode;
+    }
+    if (isSalesVoidAndCompleted) {
+      return txn.isVoid === true && txn.isComplete === true && matchesDocNo && matchesDebtorCode;
     }
     if (showAllSales) {
       return matchesDocNo && matchesDebtorCode;
@@ -266,7 +314,6 @@ const InquiryScreen = () => {
         throw new Error(data.errorMessage || "Failed to void transaction.");
       }
     } catch (error) {
-      console.error("Error voiding transaction:", error);
       alert("Error voiding transaction. Please try again.");
     }
   };
@@ -274,6 +321,7 @@ const InquiryScreen = () => {
   const handlePurchasesFilterChange = (filterType) => {
     setIsComplete(filterType === "isComplete");
     setIsPurchaseVoid(filterType === "isPurchaseVoid");
+    setIsPurchaseVoidAndCompleted(filterType === "isPurchaseVoidAndCompleted");
     setShowAllPurchases(filterType === "showAllPurchases");
   };
 
@@ -290,10 +338,59 @@ const InquiryScreen = () => {
     if (isComplete) {
       return txn.isComplete === true && matchesDocNo && matchesCreditorCode;
     }
+    if (isPurchaseVoidAndCompleted) {
+      return txn.isVoid === true && txn.isComplete === true && matchesDocNo && matchesCreditorCode;
+    }
     if (showAllPurchases) {
       return matchesDocNo && matchesCreditorCode;
     }
     return matchesDocNo && matchesCreditorCode;
+  });
+
+  const handleVoidCreditNote = async (creditNoteId) => {
+    try {
+      const userId = localStorage.getItem("userId");
+
+      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/Void", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: 0,
+          id: creditNoteId,
+          userId,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        fetchCreditNotes(); // Refresh table after voiding
+      } else {
+        throw new Error(data.errorMessage || "Failed to void credit note.");
+      }
+    } catch (error) {
+      console.error("Error voiding credit note:", error);
+    }
+  };
+
+  const handleCreditNoteFilterChange = (filterType) => {
+    setIsVoid(filterType === "isVoid");
+    setShowAllCreditNote(filterType === "showAllCreditNote");
+  };
+
+  const filteredCreditNote = creditNote.filter((txn) => {
+    const lowerDocNo = docNo.toLowerCase();
+    const lowerDebtorCode = debtorCode.toLowerCase();
+  
+    const matchesDocNo = !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
+    const matchesDebtorCode = !debtorCode || (txn.debtorCode && txn.debtorCode.toLowerCase().includes(lowerDebtorCode));
+  
+    if (isVoid) {
+      return txn.isVoid === true && matchesDocNo && matchesDebtorCode;
+    }
+    if (showAllCreditNote) {
+      return matchesDocNo && matchesDebtorCode;
+    }
+    return matchesDocNo && matchesDebtorCode;
   });
   
   const formatDateTime = (dateString) => {
@@ -366,6 +463,9 @@ const InquiryScreen = () => {
             </label>
           </div>
 
+        {loading ? (
+        <p>Loading...</p>
+        ) : (
           <table className="inquiry-table">
             <thead>
               <tr>
@@ -402,8 +502,10 @@ const InquiryScreen = () => {
               ))}
             </tbody>
           </table>
+        )}
         </>
       )}
+
       {activeTab === "salesInvoice" && (
         <>
           <div className="search-inquiry-container">
@@ -411,9 +513,13 @@ const InquiryScreen = () => {
             <input type="text" placeholder="Enter Debtor Code" value={debtorCode} onChange={(e) => setDebtorCode(e.target.value)} />
             <label><input type="checkbox" checked={isComplete} onChange={() => handleSalesFilterChange("isComplete")} /> Show Only Completed</label>
             <label><input type="checkbox" checked={isSalesVoid} onChange={() => handleSalesFilterChange("isSalesVoid")} /> Show Only Voided</label>
+            <label><input type="checkbox" checked={isSalesVoidAndCompleted} onChange={() => handleSalesFilterChange("isSalesVoidAndCompleted")} /> Show Only Voided and Completed</label>
             <label><input type="checkbox" checked={showAllSales} onChange={() => handleSalesFilterChange("showAllSales")} /> Show All</label>
           </div>
 
+          {loading ? (
+            <p>Loading...</p>
+            ) : (
           <table className="inquiry-table">
             <thead>
               <tr>
@@ -448,6 +554,7 @@ const InquiryScreen = () => {
               ))}
             </tbody>
           </table>
+          )}
         </>
       )}
 
@@ -458,9 +565,13 @@ const InquiryScreen = () => {
             <input type="text" placeholder="Enter Creditor Code" value={creditorCode} onChange={(e) => setCreditorCode(e.target.value)} />
             <label><input type="checkbox" checked={isComplete} onChange={() => handlePurchasesFilterChange("isComplete")} /> Show Only Completed</label>
             <label><input type="checkbox" checked={isPurchaseVoid} onChange={() => handlePurchasesFilterChange("isPurchaseVoid")} /> Show Only Voided</label>
+            <label><input type="checkbox" checked={isPurchaseVoidAndCompleted} onChange={() => handleSalesFilterChange("isPurchaseVoidAndCompleted")} /> Show Only Voided and Completed</label>
             <label><input type="checkbox" checked={showAllPurchases} onChange={() => handlePurchasesFilterChange("showAllPurchases")} /> Show All</label>
           </div>
 
+          {loading ? (
+            <p>Loading...</p>
+            ) : (
           <table className="inquiry-table">
             <thead>
               <tr>
@@ -495,8 +606,55 @@ const InquiryScreen = () => {
               ))}
             </tbody>
           </table>
+          )}
         </>
       )}
+
+{activeTab === "creditNote" && (
+          <>
+            <div className="search-inquiry-container">
+              <input type="text" placeholder="Enter Doc No" value={docNo} onChange={(e) => setDocNo(e.target.value)} />
+              <input type="text" placeholder="Enter Debtor Code" value={debtorCode} onChange={(e) => setDebtorCode(e.target.value)} />
+              <label><input type="checkbox" checked={isVoid} onChange={() => handleCreditNoteFilterChange("isVoid")} /> Show Only Voided</label>
+              <label><input type="checkbox" checked={showAllCreditNote} onChange={() => handleCreditNoteFilterChange("showAllCreditNote")} /> Show All</label>
+            </div>
+
+            {loading ? (
+              <p>Loading...</p>
+              ) : (
+            <table className="inquiry-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Doc No</th>
+                  <th>Debtor Code</th>
+                  <th>Total</th>
+                  <th>Location</th>
+                  <th>Void</th>
+                  <th>Doc Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCreditNote.map((txn, index) => (
+                  <tr key={txn.creditNoteId}>
+                    <td>{index + 1}</td>
+                    <td>{txn.docNo}</td>
+                    <td>{txn.debtorCode}</td>
+                    <td>{txn.total}</td>
+                    <td>{txn.locationCode}</td>
+                    <td>{txn.isVoid ? "Yes" : "No"}</td>
+                    <td>{formatDateTime(txn.docDate)}</td>
+                    <td>
+                      {txn.isVoid ? <button className="disabled-void" disabled>Voided</button> : <button className="void-button" onClick={() => handleVoidCreditNote(txn.creditNoteId)}>Void</button>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            )}
+          </>
+        )}
     </div>
   );
 };

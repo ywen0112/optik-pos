@@ -334,7 +334,7 @@ const AccessRightMaintenance = () => {
       </div>
       {loading ? (
         <p>Loading...</p>
-      ) : (
+        ) : (
         <table className="table">
           <thead>
             <tr>

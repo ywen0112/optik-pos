@@ -13,7 +13,7 @@ const DebtorMaintenance = () => {
   const [debtors, setDebtors] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
   const [newDebtor, setNewDebtor] = useState({});
@@ -37,12 +37,7 @@ const DebtorMaintenance = () => {
   useEffect(() => {
     fetchDebtors();
   }, [currentPage, itemsPerPage, searchKeyword]);
-  
-  useEffect(() => {
-    if (debtors.length > 0) {
-      setTotalPages(Math.ceil(debtors.length / itemsPerPage)); // ✅ Correct calculation
-    }
-  }, [debtors, itemsPerPage]);
+
   
     useEffect(() => {
       const fetchDebtorTypes = async () => {
@@ -80,8 +75,8 @@ const DebtorMaintenance = () => {
           body: JSON.stringify({
             customerId: Number(customerId),
             keyword: "", 
-            offset: 0,
-            limit: 9999,
+            offset: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage,
           }),
         });
     
@@ -94,7 +89,7 @@ const DebtorMaintenance = () => {
           );
     
           setDebtors(filteredDebtors);
-          setTotalPages(Math.ceil(filteredDebtors.length / itemsPerPage));
+          setTotalRecords(Math.ceil(filteredDebtors.length / itemsPerPage));
         } else {
           throw new Error(data.errorMessage || "Failed to fetch debtors.");
         }
@@ -105,14 +100,17 @@ const DebtorMaintenance = () => {
       }
     };
 
-  const handleItemsPerPageChange = (event) => {
-    setItemsPerPage(Number(event.target.value));
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+    const handleItemsPerPageChange = (event) => {
+      const newItemsPerPage = Number(event.target.value);
+      setItemsPerPage(newItemsPerPage);
+      setCurrentPage(1); 
+    };
+    
+    const handlePageChange = (page) => {
+      if (page >= 1) {
+        setCurrentPage(page);
+      }
+    };
 
   const handleOpenModal = async (debtor = {}, title = "", viewing = false) => {
     try {
@@ -328,13 +326,12 @@ const DebtorMaintenance = () => {
                 ? "https://optikposbackend.absplt.com/EyePower/NewGlass"
                 : "https://optikposbackend.absplt.com/EyePower/NewContactLens";
 
-        // Search for existing Eye Power record
         const searchResponse = await fetch(getApiUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 customerId: Number(customerId),
-                keyword: debtor.eyePowerId || "",  // Search by Eye Power ID
+                keyword: debtor.eyePowerId || "",  
                 offset: 0,
                 limit: 10
             }),
@@ -344,7 +341,6 @@ const DebtorMaintenance = () => {
         if (searchData.success && searchData.data.length > 0) {
             const foundEyePower = searchData.data[0];
 
-            // If Eye Power record exists, fetch details using Edit API
             const editResponse = await fetch("https://optikposbackend.absplt.com/EyePower/Edit", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -543,10 +539,10 @@ const DebtorMaintenance = () => {
               Previous
             </button>
             <span>
-              Page {currentPage} of {totalPages}
+              Page {currentPage}
             </span>
             <button
-              disabled={currentPage === totalPages}
+              disabled={!totalRecords} 
               onClick={() => handlePageChange(currentPage + 1)}
             >
               Next

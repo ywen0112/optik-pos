@@ -11,7 +11,7 @@ const LocationMaintenance = () => {
   const [locations, setLocations] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
   const [newLocation, setNewLocation] = useState({});
@@ -45,15 +45,15 @@ const LocationMaintenance = () => {
         body: JSON.stringify({
           customerId: Number(customerId),
           keyword: searchKeyword.trim(),
-          offset: 0,
-          limit: 9999,
+          offset: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage,
         }),
       });
 
       const data = await response.json();
       if (response.ok && data.success) {
         setLocations(data.data);
-        setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+        setTotalRecords(Math.ceil(data.data.length / itemsPerPage));
       } else {
         throw new Error(data.errorMessage || "Failed to fetch location.");
       }
@@ -67,12 +67,6 @@ const LocationMaintenance = () => {
       setLoading(false);
     }
   };
-  
-  useEffect(() => {
-    if (locations.length > 0) {
-      setTotalPages(Math.ceil(locations.length / itemsPerPage)); 
-    }
-  }, [locations, itemsPerPage]);
 
   const handleItemsPerPageChange = (event) => {
     setItemsPerPage(Number(event.target.value));
@@ -80,7 +74,7 @@ const LocationMaintenance = () => {
   };
 
   const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
+    if (page >= 1) {
       setCurrentPage(page);
     }
   };
@@ -175,7 +169,6 @@ const LocationMaintenance = () => {
     setConfirmMessage(`Do you want to save this location?`);
   
     setConfirmAction(() => async () => {
-      setLoading(true);
       try {
         const response = await fetch("https://optikposbackend.absplt.com/Location/Save", {
           method: "POST",
@@ -367,10 +360,10 @@ const LocationMaintenance = () => {
           Previous
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          Page {currentPage}
         </span>
         <button
-          disabled={currentPage === totalPages}
+          disabled={!totalRecords}
           onClick={() => handlePageChange(currentPage + 1)}
         >
           Next

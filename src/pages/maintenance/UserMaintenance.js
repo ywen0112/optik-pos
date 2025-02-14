@@ -14,7 +14,7 @@ const UserMaintenance = () => {
   const [accessRights, setAccessRights] = useState([]); 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
   const [newUser, setNewUser] = useState({});
@@ -29,7 +29,6 @@ const UserMaintenance = () => {
   const navigate = useNavigate();
   const customerId = localStorage.getItem("customerId"); 
   const userId = localStorage.getItem("userId");
-
 
   useEffect(() => {
     fetchLocations();
@@ -95,15 +94,15 @@ const UserMaintenance = () => {
         body: JSON.stringify({
           customerId: Number(customerId),
           keyword: searchKeyword,
-          offset: (currentPage - 1) * itemsPerPage,
+          offset: (currentPage - 1) * itemsPerPage, 
           limit: itemsPerPage,
         }),
       });
 
       const data = await response.json();
       if (response.ok && data.success) {
-        setUsers(data.data);
-        setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+        setUsers(data.data); 
+        setTotalRecords(Math.ceil(data.data.length === itemsPerPage));
       } else {
         throw new Error(data.errorMessage || "Failed to fetch users.");
       }
@@ -115,12 +114,15 @@ const UserMaintenance = () => {
   };
 
   const handleItemsPerPageChange = (event) => {
-    setItemsPerPage(Number(event.target.value));
+    const newItemsPerPage = Number(event.target.value);
+    setItemsPerPage(newItemsPerPage);
     setCurrentPage(1);
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (page >= 1) {
+      setCurrentPage(page);
+    }
   };
 
   const handleInputChange = (event) => {
@@ -418,10 +420,10 @@ const UserMaintenance = () => {
           Previous
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          Page {currentPage}
         </span>
         <button
-          disabled={currentPage === totalPages}
+          disabled={!totalRecords} 
           onClick={() => handlePageChange(currentPage + 1)}
         >
           Next

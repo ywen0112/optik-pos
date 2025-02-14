@@ -14,7 +14,7 @@
 .popup-content {
   background: white;
   padding: 20px 20px;
-  width: 50%;
+  width: auto;
   max-height: 100vh;
   border-radius: 8px;
 }

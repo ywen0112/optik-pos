@@ -11,7 +11,7 @@ const ItemMaintenance = () => {
   const [items, setItems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
   const [newItem, setNewItem] = useState({});
@@ -126,8 +126,8 @@ const ItemMaintenance = () => {
           body: JSON.stringify({
             customerId: Number(customerId),
             keyword: searchKeyword.trim(),
-            offset: 0,
-            limit: 9999,
+            offset: (currentPage - 1) * itemsPerPage, 
+            limit: itemsPerPage,
           }),
         });
   
@@ -139,7 +139,7 @@ const ItemMaintenance = () => {
           );
   
           setItems(filteredItems);
-          setTotalPages(Math.ceil(filteredItems.length / itemsPerPage));
+          setTotalRecords(Math.ceil(filteredItems.length / itemsPerPage));
         } else {
           throw new Error(data.errorMessage || "Failed to fetch items.");
         }
@@ -149,24 +149,19 @@ const ItemMaintenance = () => {
         setLoading(false);
       }
     };
-
-    useEffect(() => {
-      if (items.length > 0) {
-        setTotalPages(Math.ceil(items.length / itemsPerPage)); 
-      }
-    }, [items, itemsPerPage]);
     
 
-  const handleItemsPerPageChange = (event) => {
-    setItemsPerPage(Number(event.target.value));
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
+    const handleItemsPerPageChange = (event) => {
+      const newItemsPerPage = Number(event.target.value);
+      setItemsPerPage(newItemsPerPage);
+      setCurrentPage(1); 
+    };
+    
+    const handlePageChange = (page) => {
+      if (page >= 1) {
+        setCurrentPage(page);
+      }
+    };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -470,10 +465,10 @@ const ItemMaintenance = () => {
           Previous
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          Page {currentPage}
         </span>
         <button
-          disabled={currentPage === totalPages}
+          disabled={!totalRecords}
           onClick={() => handlePageChange(currentPage + 1)}
         >
           Next

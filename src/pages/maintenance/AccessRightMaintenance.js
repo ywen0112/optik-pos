@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import "../../css/Maintenance.css";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
@@ -12,7 +12,7 @@ const AccessRightMaintenance = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
   const [newRole, setNewRole] = useState({});
@@ -29,12 +29,6 @@ const AccessRightMaintenance = () => {
   useEffect(() => {
     fetchRoles();
   }, [currentPage, itemsPerPage, searchKeyword]);
-
-  useEffect(() => {
-    if (roles.length > 0) {
-      setTotalPages(Math.ceil(roles.length / itemsPerPage)); // ✅ Correct calculation
-    }
-  }, [roles, itemsPerPage]);
   
   const fetchRoles = async () => {
     setLoading(true);
@@ -45,8 +39,8 @@ const AccessRightMaintenance = () => {
         body: JSON.stringify({
           customerId: Number(localStorage.getItem("customerId")),
           keyword: searchKeyword,
-          offset: 0, 
-          limit: 9999, 
+          offset: (currentPage - 1) * itemsPerPage, 
+          limit: itemsPerPage,
         }),
       });
   
@@ -54,7 +48,7 @@ const AccessRightMaintenance = () => {
   
       if (response.ok && data.success) {
         setRoles(data.data); 
-        setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+        setTotalRecords(data.data.length === itemsPerPage);
       } else {
         throw new Error(data.errorMessage || "Failed to fetch roles.");
       }
@@ -70,12 +64,13 @@ const AccessRightMaintenance = () => {
   };
 
   const handleItemsPerPageChange = (event) => {
-    setItemsPerPage(Number(event.target.value));
-    setCurrentPage(1);
+    const newItemsPerPage = Number(event.target.value);
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); 
   };
 
   const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
+    if (page >= 1) {
       setCurrentPage(page);
     }
   };
@@ -83,7 +78,6 @@ const AccessRightMaintenance = () => {
   const handleOpenModal = async (role = {}, title = "", viewing = false) => {
     try {
       if (title === "Add Role") {
-        // ✅ Call "New" API when adding a new role
         const response = await fetch("https://optikposbackend.absplt.com/AccessRight/New", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -272,12 +266,6 @@ const AccessRightMaintenance = () => {
     setSuccessModal({ isOpen: false, title: ""});
   };
 
-  
-  const currentRoles = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return roles.slice(startIndex, endIndex); 
-  }, [roles, currentPage, itemsPerPage]);
 
   return (
     <div className="maintenance-container">
@@ -344,7 +332,7 @@ const AccessRightMaintenance = () => {
             </tr>
           </thead>
           <tbody>
-          {currentRoles.map((role, index) => (
+          {roles.map((role, index) => (
             <tr key={role.id}>
               <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
               <td>{role.description || "-"}</td> 
@@ -366,16 +354,16 @@ const AccessRightMaintenance = () => {
       )}
       <div className="pagination">
         <button
-          disabled={currentPage === 1}
+          disabled={currentPage === 1}  
           onClick={() => handlePageChange(currentPage - 1)}
         >
           Previous
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          Page {currentPage}
         </span>
         <button
-          disabled={currentPage === totalPages}
+          disabled={!totalRecords}  
           onClick={() => handlePageChange(currentPage + 1)}
         >
           Next

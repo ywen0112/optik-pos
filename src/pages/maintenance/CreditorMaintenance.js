@@ -11,7 +11,7 @@ const CreditorMaintenance = () => {
   const [creditors, setCreditors] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
   const [newCreditor, setNewCreditor] = useState({});
@@ -31,12 +31,6 @@ const CreditorMaintenance = () => {
   useEffect(() => {
     fetchCreditors();
   }, [currentPage, itemsPerPage, searchKeyword]);  
-
-    useEffect(() => {
-      if (creditors.length > 0) {
-        setTotalPages(Math.ceil(creditors.length / itemsPerPage)); // ✅ Correct calculation
-      }
-    }, [creditors, itemsPerPage]);
 
   useEffect(() => {
     const fetchCreditorTypes = async () => {
@@ -74,8 +68,8 @@ const CreditorMaintenance = () => {
         body: JSON.stringify({
           customerId: Number(customerId),
           keyword: "", 
-          offset: 0,
-          limit: 9999,
+          offset: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage, 
         }),
       });
 
@@ -88,7 +82,7 @@ const CreditorMaintenance = () => {
         );
 
         setCreditors(filteredCreditor);
-        setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+        setTotalRecords(Math.ceil(filteredCreditor.length / itemsPerPage));
       } else {
         throw new Error(data.errorMessage || "Failed to fetch creditors.");
       }
@@ -100,12 +94,15 @@ const CreditorMaintenance = () => {
   };
 
   const handleItemsPerPageChange = (event) => {
-    setItemsPerPage(Number(event.target.value));
+    const newItemsPerPage = Number(event.target.value);
+    setItemsPerPage(newItemsPerPage);
     setCurrentPage(1);
   };
-
+  
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (page >= 1) {
+      setCurrentPage(page);
+    }
   };
 
   const handleOpenModal = async (creditor = {}, title = "", viewing = false) => {
@@ -399,10 +396,10 @@ const CreditorMaintenance = () => {
           Previous
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          Page {currentPage}
         </span>
         <button
-          disabled={currentPage === totalPages}
+          disabled={!totalRecords} 
           onClick={() => handlePageChange(currentPage + 1)}
         >
           Next

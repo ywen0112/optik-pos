@@ -112,62 +112,114 @@ const AccessRightCrudModal = ({
     });
   };
 
+  // const handleModuleCheckboxChange = (moduleName, permissions = []) => {
+  //   setFormData((prevState) => {
+  //     const updatedRights = prevState.accessRights.map((module) => {
+  //       if (module.module === moduleName) {
+  //         const isAllSelected = permissions.every((permission) =>
+  //           module.permissions?.includes(permission)
+  //         );
+
+  //         return {
+  //           ...module,
+  //           permissions: isAllSelected ? [] : permissions,
+  //         };
+  //       }
+  //       return module;
+  //     });
+
+  //     const fullAccess = defaultModules.every((module) => {
+  //       const moduleRights = updatedRights.find(
+  //         (right) => right.module === module.name
+  //       );
+  //       return module.singlePermission
+  //         ? moduleRights?.permissions.includes("Allow")
+  //         : moduleRights?.permissions.length ===
+  //             (module.permissions?.length || 0);
+  //     });
+
+  //     return { ...prevState, accessRights: updatedRights, fullAccess };
+  //   });
+  // };
+
   const handleModuleCheckboxChange = (moduleName, permissions = []) => {
     setFormData((prevState) => {
       const updatedRights = prevState.accessRights.map((module) => {
         if (module.module === moduleName) {
-          const isAllSelected = permissions.every((permission) =>
-            module.permissions?.includes(permission)
-          );
-
+          const moduleDefinition = defaultModules.find((mod) => mod.name === moduleName);
+          const isSinglePermission = moduleDefinition?.singlePermission;
+  
+          const isAllSelected = permissions.every((permission) => module.permissions?.includes(permission));
+  
           return {
             ...module,
-            permissions: isAllSelected ? [] : permissions,
+            permissions: isAllSelected
+              ? []  // If already selected, uncheck all
+              : isSinglePermission
+              ? ["Allow", "Add", "View", "Edit", "Delete"]  // Auto-set all for single-permission modules
+              : permissions,
           };
         }
         return module;
       });
-
-      const fullAccess = defaultModules.every((module) => {
-        const moduleRights = updatedRights.find(
-          (right) => right.module === module.name
-        );
-        return module.singlePermission
-          ? moduleRights?.permissions.includes("Allow")
-          : moduleRights?.permissions.length ===
-              (module.permissions?.length || 0);
-      });
-
-      return { ...prevState, accessRights: updatedRights, fullAccess };
+  
+      return { ...prevState, accessRights: updatedRights };
     });
   };
-
+  
   const handlePermissionChange = (moduleName, permission) => {
     setFormData((prevState) => {
       const updatedRights = prevState.accessRights.map((module) => {
         if (module.module === moduleName) {
-          const permissions = module.permissions.includes(permission)
-            ? module.permissions.filter((perm) => perm !== permission)
-            : [...module.permissions, permission];
-
+          const moduleDefinition = defaultModules.find((mod) => mod.name === moduleName);
+          const isSinglePermission = moduleDefinition?.singlePermission;
+  
+          let permissions;
+          if (isSinglePermission) {
+            permissions = module.permissions.includes("Allow")
+              ? []  // If checked, uncheck all
+              : ["Allow", "Add", "View", "Edit", "Delete"];  // Otherwise, set all
+          } else {
+            permissions = module.permissions.includes(permission)
+              ? module.permissions.filter((perm) => perm !== permission)
+              : [...module.permissions, permission];
+          }
+  
           return { ...module, permissions };
         }
         return module;
       });
-
-      const fullAccess = defaultModules.every((module) => {
-        const moduleRights = updatedRights.find(
-          (right) => right.module === module.name
-        );
-        return module.singlePermission
-          ? moduleRights?.permissions.includes("Allow")
-          : moduleRights?.permissions.length ===
-              (module.permissions?.length || 0);
-      });
-
-      return { ...prevState, accessRights: updatedRights, fullAccess };
+  
+      return { ...prevState, accessRights: updatedRights };
     });
-  };
+  };  
+
+  // const handlePermissionChange = (moduleName, permission) => {
+  //   setFormData((prevState) => {
+  //     const updatedRights = prevState.accessRights.map((module) => {
+  //       if (module.module === moduleName) {
+  //         const permissions = module.permissions.includes(permission)
+  //           ? module.permissions.filter((perm) => perm !== permission)
+  //           : [...module.permissions, permission];
+
+  //         return { ...module, permissions };
+  //       }
+  //       return module;
+  //     });
+
+  //     const fullAccess = defaultModules.every((module) => {
+  //       const moduleRights = updatedRights.find(
+  //         (right) => right.module === module.name
+  //       );
+  //       return module.singlePermission
+  //         ? moduleRights?.permissions.includes("Allow")
+  //         : moduleRights?.permissions.length ===
+  //             (module.permissions?.length || 0);
+  //     });
+
+  //     return { ...prevState, accessRights: updatedRights, fullAccess };
+  //   });
+  // };
 
   const handleSave = () => {
     if (!validateFields()) {

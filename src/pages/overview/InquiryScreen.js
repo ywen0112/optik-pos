@@ -5,6 +5,9 @@ import ErrorModal from "../../modals/ErrorModal";
 
 const InquiryScreen = () => {
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [totalRecords, setTotalRecords] = useState(true);
   const [activeTab, setActiveTab] = useState("cashTransaction");
   const [docNo, setDocNo] = useState("");
   const [isVoid, setIsVoid] = useState(false);
@@ -46,7 +49,7 @@ const InquiryScreen = () => {
     else if (activeTab === "creditNote") {
       fetchCreditNotes();
     }
-  }, [activeTab]);
+  }, [activeTab, itemsPerPage, currentPage]);
 
   const fetchTransactions = async () => {
     setLoading(true);
@@ -57,8 +60,8 @@ const InquiryScreen = () => {
         body: JSON.stringify({
           customerId: customerId,
           keyword: "",
-          offset: 0,
-          limit: 9999,
+          offset: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage,
         }),
       });
 
@@ -66,6 +69,7 @@ const InquiryScreen = () => {
       if (response.ok && data.success) {
         setTransactions([...data.data]);
         fetchUserNames(data.data);
+        setTotalRecords(Math.ceil(data.data.length === itemsPerPage))
       } else {
         throw new Error(data.errorMessage || "Failed to fetch transactions.");
       }
@@ -145,14 +149,15 @@ const InquiryScreen = () => {
         body: JSON.stringify({
           customerId: customerId,
           keyword: "",
-          offset: 0,
-          limit: 9999,
+          offset: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage,
         }),
       });
 
       const data = await response.json();
       if (response.ok && data.success) {
         setSalesTransactions([...data.data]);
+        setTotalRecords(Math.ceil(data.data.length === itemsPerPage))
       } else {
         throw new Error(data.errorMessage || "Failed to fetch sales transactions.");
       }
@@ -234,14 +239,15 @@ const InquiryScreen = () => {
         body: JSON.stringify({
           customerId: customerId,
           keyword: "",
-          offset: 0,
-          limit: 9999,
+          offset: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage,
         }),
       });
 
       const data = await response.json();
       if (response.ok && data.success) {
         setPurchaseTransactions([...data.data]);
+        setTotalRecords(Math.ceil(data.data.length === itemsPerPage))
       } else {
         throw new Error(data.errorMessage || "Failed to fetch purchase transactions.");
       }
@@ -323,14 +329,15 @@ const InquiryScreen = () => {
         body: JSON.stringify({
           customerId: customerId,
           keyword: "",
-          offset: 0,
-          limit: 9999,
+          offset: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage,
         }),
       });
 
       const data = await response.json();
       if (response.ok && data.success) {
         setCreditNote([...data.data]);
+        setTotalRecords(Math.ceil(data.data.length === itemsPerPage))
       } else {
         throw new Error(data.errorMessage || "Failed to fetch credit note.");
       }
@@ -340,31 +347,6 @@ const InquiryScreen = () => {
       setLoading(false);
     }
   };
-
-  // const handleVoidCreditNote = async (creditNoteId) => {
-  //   try {
-  //     const userId = localStorage.getItem("userId");
-
-  //     const response = await fetch("https://optikposbackend.absplt.com/CreditNote/Void", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         customerId: 0,
-  //         id: creditNoteId,
-  //         userId,
-  //       }),
-  //     });
-
-  //     const data = await response.json();
-  //     if (response.ok && data.success) {
-  //       fetchCreditNotes(); 
-  //     } else {
-  //       throw new Error(data.errorMessage || "Failed to void credit note.");
-  //     }
-  //   } catch (error) {
-  //     setErrorModal({ isOpen: true, title: "Error", message: error.message });
-  //   }
-  // };
 
   const confirmVoidCreditNote = (creditNoteId) => {
     setConfirmCreditNoteModal({
@@ -463,6 +445,18 @@ const InquiryScreen = () => {
     return date.toLocaleString();
   };
 
+  const handleItemsPerPageChange = (event) => {
+    const newItemsPerPage = Number(event.target.value);
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); 
+  };
+  
+  const handlePageChange = (page) => {
+    if (page >= 1) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
     <div className="inquiry-container">
       <h3>Transaction Inquiry</h3>
@@ -527,6 +521,22 @@ const InquiryScreen = () => {
             </label>
           </div>
 
+          <div className="pagination-controls">
+            <label>
+              Show:
+              <select
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+                className="items-per-page-select"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+              </select>
+              items per page
+            </label>
+          </div>
+
         {loading ? (
         <p>Loading...</p>
         ) : (
@@ -549,7 +559,7 @@ const InquiryScreen = () => {
             <tbody>
               {filteredTransactions.map((txn, index) => (
                 <tr key={txn.cashTransactionId}>
-                  <td>{index + 1}</td>
+                  <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                   <td>{txn.docNo}</td>
                   <td>{txn.effectedAmount}</td>
                   <td>{txn.remarks}</td>
@@ -571,6 +581,23 @@ const InquiryScreen = () => {
             </tbody>
           </table>
         )}
+        <div className="pagination">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage}
+            </span>
+            <button
+              disabled={!totalRecords} 
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              Next
+            </button>
+          </div>
         </>
       )}
 
@@ -583,6 +610,22 @@ const InquiryScreen = () => {
             <label><input type="checkbox" checked={isSalesVoid} onChange={() => handleSalesFilterChange("isSalesVoid")} /> Show Only Voided</label>
             <label><input type="checkbox" checked={isSalesVoidAndCompleted} onChange={() => handleSalesFilterChange("isSalesVoidAndCompleted")} /> Show Only Voided and Completed</label>
             <label><input type="checkbox" checked={showAllSales} onChange={() => handleSalesFilterChange("showAllSales")} /> Show All</label>
+          </div>
+
+          <div className="pagination-controls">
+            <label>
+              Show:
+              <select
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+                className="items-per-page-select"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+              </select>
+              items per page
+            </label>
           </div>
 
           {loading ? (
@@ -606,7 +649,7 @@ const InquiryScreen = () => {
             <tbody>
               {filteredSalesTransactions.map((txn, index) => (
                 <tr key={txn.salesId}>
-                  <td>{index + 1}</td>
+                  <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                   <td>{txn.docNo}</td>
                   <td>{txn.debtorCode}</td>
                   <td>{txn.total}</td>
@@ -627,6 +670,23 @@ const InquiryScreen = () => {
             </tbody>
           </table>
           )}
+          <div className="pagination">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage}
+            </span>
+            <button
+              disabled={!totalRecords} 
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              Next
+            </button>
+          </div>
         </>
       )}
 
@@ -639,6 +699,22 @@ const InquiryScreen = () => {
             <label><input type="checkbox" checked={isPurchaseVoid} onChange={() => handlePurchasesFilterChange("isPurchaseVoid")} /> Show Only Voided</label>
             <label><input type="checkbox" checked={isPurchaseVoidAndCompleted} onChange={() => handleSalesFilterChange("isPurchaseVoidAndCompleted")} /> Show Only Voided and Completed</label>
             <label><input type="checkbox" checked={showAllPurchases} onChange={() => handlePurchasesFilterChange("showAllPurchases")} /> Show All</label>
+          </div>
+
+          <div className="pagination-controls">
+            <label>
+              Show:
+              <select
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+                className="items-per-page-select"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+              </select>
+              items per page
+            </label>
           </div>
 
           {loading ? (
@@ -662,7 +738,7 @@ const InquiryScreen = () => {
             <tbody>
               {filteredPurchasesTransactions.map((txn, index) => (
                 <tr key={txn.salesId}>
-                  <td>{index + 1}</td>
+                  <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                   <td>{txn.docNo}</td>
                   <td>{txn.creditorCode}</td>
                   <td>{txn.total}</td>
@@ -683,6 +759,23 @@ const InquiryScreen = () => {
             </tbody>
           </table>
           )}
+          <div className="pagination">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage}
+            </span>
+            <button
+              disabled={!totalRecords} 
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              Next
+            </button>
+          </div>
         </>
       )}
 
@@ -694,6 +787,22 @@ const InquiryScreen = () => {
               <label><input type="checkbox" checked={isVoid} onChange={() => handleCreditNoteFilterChange("isVoid")} /> Show Only Voided</label>
               <label><input type="checkbox" checked={showAllCreditNote} onChange={() => handleCreditNoteFilterChange("showAllCreditNote")} /> Show All</label>
             </div>
+
+            <div className="pagination-controls">
+            <label>
+              Show:
+              <select
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+                className="items-per-page-select"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+              </select>
+              items per page
+            </label>
+          </div>
 
             {loading ? (
               <p>Loading...</p>
@@ -714,7 +823,7 @@ const InquiryScreen = () => {
               <tbody>
                 {filteredCreditNote.map((txn, index) => (
                   <tr key={txn.creditNoteId}>
-                    <td>{index + 1}</td>
+                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                     <td>{txn.docNo}</td>
                     <td>{txn.debtorCode}</td>
                     <td>{txn.total}</td>
@@ -733,6 +842,23 @@ const InquiryScreen = () => {
               </tbody>
             </table>
             )}
+            <div className="pagination">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage}
+            </span>
+            <button
+              disabled={!totalRecords} 
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              Next
+            </button>
+          </div>
           </>
         )}
       {confirmModal.isOpen && (

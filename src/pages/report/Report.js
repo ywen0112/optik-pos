@@ -20,13 +20,12 @@ const reportSections = [
 
 const Report = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Get the current URL
+  const location = useLocation(); 
 
   const handleNavigation = (path) => {
     navigate(path);
   };
 
-  // Extract the last part of the pathname for breadcrumb display
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const currentPath = pathSegments.length > 1 ? pathSegments.join(" / ") : "Report";
 

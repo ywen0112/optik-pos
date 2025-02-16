@@ -196,19 +196,19 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
   const handleItemChange = (selectedOption, rowIndex) => {
     setFormData((prev) => {
       const updatedItems = prev.items.map((item, index) => ({
-        ...item, // Ensure a new object for each row
+        ...item, 
       }));
   
       updatedItems[rowIndex] = {
-        ...updatedItems[rowIndex], // Copy previous item properties
+        ...updatedItems[rowIndex], 
         itemId: selectedOption.value,
         itemCode: selectedOption.label,
         description: selectedOption.description,
         desc2: selectedOption.desc2,
-        itemUOMId: "", // Reset UOM when item changes
+        itemUOMId: "", 
         unitPrice: "",
-        subtotal: 0, // Reset subtotal
-        availableUOMs: selectedOption.itemUOMs.map(uom => ({ // Store UOMs per item
+        subtotal: 0, 
+        availableUOMs: selectedOption.itemUOMs.map(uom => ({
           value: uom.itemUOMId,
           label: uom.uom,
           unitPrice: uom.unitPrice,
@@ -222,7 +222,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
   const handleUOMChange = (selectedOption, rowIndex) => {
     setFormData((prev) => {
       const updatedItems = prev.items.map((item, index) => ({
-        ...item, // Create a new object for each row
+        ...item, 
       }));
   
       updatedItems[rowIndex] = {
@@ -241,7 +241,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
   
     setFormData((prev) => {
       const updatedItems = prev.items.map((item, index) => ({
-        ...item, // Ensure new object for each row
+        ...item, 
       }));
   
       updatedItems[rowIndex] = {
@@ -257,13 +257,13 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
     
 
   const handleDiscountChange = (e, rowIndex) => {
-    const discountValue = e.target.value; // Capture the entered discount value
+    const discountValue = e.target.value; 
   
     setFormData((prev) => {
       const updatedItems = [...prev.items];
       updatedItems[rowIndex] = {
         ...updatedItems[rowIndex],
-        discount: discountValue, // Update discount value
+        discount: discountValue, 
       };
   
       console.log(`Updating Discount for row ${rowIndex}:`, {
@@ -306,7 +306,6 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
   }, [item.unitPrice, item.qty, item.discountAmount]);
 
   const handleAddItem = () => {
-    // Ensure the last row has a valid item before adding a new one
     const lastItem = formData.items[formData.items.length - 1];
   
     if (!lastItem.itemId || lastItem.qty <= 0 || lastItem.unitPrice <= 0) {
@@ -318,11 +317,10 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
       return;
     }
   
-    // Append new row, preserving existing ones
     setFormData((prev) => ({
       ...prev,
       items: [
-        ...prev.items, // Preserve previous rows
+        ...prev.items, 
         {
           itemId: "",
           itemCode: "",
@@ -392,7 +390,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
         itemUOMId: item.itemUOMId,
         description: item.description,
         desc2: item.desc2,
-        itemBatchId: "", // If you have batch tracking, update this
+        itemBatchId: "",
         qty: item.qty,
         unitPrice: item.unitPrice,
         discount: item.discount,
@@ -480,7 +478,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
                   <td className="readonly-field"><input type="text" value={itm.description} readOnly /></td>
                   <td>
                     <Select 
-                      options={itm.availableUOMs || []} // Fetch UOMs specific to this item
+                      options={itm.availableUOMs || []} 
                       value={itm.availableUOMs?.find((uom) => uom.value === itm.itemUOMId) || null} 
                       onChange={(selectedOption) => handleUOMChange(selectedOption, index)}
                       isSearchable 

@@ -24,7 +24,6 @@ const CloseCounter = () => {
 
   const handleConfirmCloseCounter = () => {
     setConfirmationModal(false);
-    // Clear any data if necessary and navigate back to transaction
     setTimeout(() => {
       navigate("/main/transaction");
     }, 500);

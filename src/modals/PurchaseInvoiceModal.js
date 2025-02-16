@@ -203,19 +203,19 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
   const handleItemChange = (selectedOption, rowIndex) => {
     setFormData((prev) => {
       const updatedItems = prev.items.map((item, index) => ({
-        ...item, // Ensure a new object for each row
+        ...item, 
       }));
   
       updatedItems[rowIndex] = {
-        ...updatedItems[rowIndex], // Copy previous item properties
+        ...updatedItems[rowIndex],
         itemId: selectedOption.value,
         itemCode: selectedOption.label,
         description: selectedOption.description,
         desc2: selectedOption.desc2,
-        itemUOMId: "", // Reset UOM when item changes
+        itemUOMId: "",
         unitPrice: "",
-        subtotal: 0, // Reset subtotal
-        availableUOMs: selectedOption.itemUOMs.map(uom => ({ // Store UOMs per item
+        subtotal: 0, 
+        availableUOMs: selectedOption.itemUOMs.map(uom => ({ 
           value: uom.itemUOMId,
           label: uom.uom,
           unitPrice: uom.unitPrice,
@@ -229,7 +229,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
   const handleUOMChange = (selectedOption, rowIndex) => {
     setFormData((prev) => {
       const updatedItems = prev.items.map((item, index) => ({
-        ...item, // Create a new object for each row
+        ...item,
       }));
   
       updatedItems[rowIndex] = {
@@ -248,7 +248,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
   
     setFormData((prev) => {
       const updatedItems = prev.items.map((item, index) => ({
-        ...item, // Ensure new object for each row
+        ...item,
       }));
   
       updatedItems[rowIndex] = {
@@ -264,13 +264,13 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
     
 
   const handleDiscountChange = (e, rowIndex) => {
-    const discountValue = e.target.value; // Capture the entered discount value
+    const discountValue = e.target.value; 
   
     setFormData((prev) => {
       const updatedItems = [...prev.items];
       updatedItems[rowIndex] = {
         ...updatedItems[rowIndex],
-        discount: discountValue, // Update discount value
+        discount: discountValue,
       };
   
       console.log(`Updating Discount for row ${rowIndex}:`, {
@@ -313,7 +313,6 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
   }, [item.unitPrice, item.qty, item.discountAmount]);
 
   const handleAddItem = () => {
-    // Ensure the last row has a valid item before adding a new one
     const lastItem = formData.items[formData.items.length - 1];
   
     if (!lastItem.itemId || lastItem.qty <= 0 || lastItem.unitPrice <= 0) {
@@ -325,11 +324,10 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       return;
     }
   
-    // Append new row, preserving existing ones
     setFormData((prev) => ({
       ...prev,
       items: [
-        ...prev.items, // Preserve previous rows
+        ...prev.items,
         {
           itemId: "",
           itemCode: "",
@@ -379,7 +377,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       payments,
     }));
 
-    setIsPaymentConfirmed(true); // ✅ Disable further payments after confirmation
+    setIsPaymentConfirmed(true); 
     setPaymentModal({ isOpen: false, type: "" });
   };
 
@@ -421,7 +419,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
         itemUOMId: item.itemUOMId,
         description: item.description,
         desc2: item.desc2,
-        itemBatchId: "", // If you have batch tracking, update this
+        itemBatchId: "", 
         qty: item.qty,
         unitPrice: item.unitPrice,
         discount: item.discount,
@@ -448,7 +446,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
           purchaseId: purchaseId,
         });
   
-        setIsPaymentConfirmed(true); // ✅ Prevent further edits after saving
+        setIsPaymentConfirmed(true);
       } else {
         throw new Error(data.errorMessage || "Failed to save purchase invoice.");
       }

@@ -8,7 +8,7 @@ const CloseCounterModal = ({ isOpen, onClose, onCloseCounter }) => {
   useEffect(() => {
     if (isOpen) {
       setAmount("");
-      setError(""); // Reset error when modal opens
+      setError(""); 
     }
   }, [isOpen]);
 

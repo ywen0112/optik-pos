@@ -93,14 +93,13 @@ const Transaction = () => {
       console.log("Close Counter Response:", data);
 
       if (response.ok && data.success) {
-        // ✅ Clear stored session and reset state
         localStorage.removeItem("counterSessionId");
         localStorage.removeItem("openingBalance");
         setCounterSessionId(null);
         setIsCounterOpen(false);
         setOpenCounterAmount("");
         setIsCloseCounterOpen(false);
-        navigate("/main/transaction"); // ✅ Redirect to transaction page
+        navigate("/main/transaction");
       } else {
         throw new Error(data.errorMessage || "Failed to close counter.");
       }

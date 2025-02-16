@@ -67,7 +67,6 @@ const DebtorReport = () => {
   const filteredData = mockData.filter((debtor) => {
     const debtorDate = new Date(debtor.timestamp);
   
-    // Include the entire day for the "toDate" filter
     const from = fromDate ? new Date(fromDate) : null;
     const to = toDate ? new Date(new Date(toDate).setHours(23, 59, 59, 999)) : null;
   

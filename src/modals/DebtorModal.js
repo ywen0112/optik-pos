@@ -11,7 +11,6 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
 
-  // ✅ Ensure correct default values on modal open
   useEffect(() => {
     if (isOpen) {
       setSectionData({
@@ -26,7 +25,6 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
     }
   }, [isOpen, data]);
 
-  // ✅ Validate required fields
   const validateFields = (fields) => {
     const validationErrors = {};
     fields.forEach(({ label, name }) => {
@@ -38,7 +36,6 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
     return validationErrors;
   };
 
-  // ✅ Handle Save Button Click
   const handleSave = () => {
     const fieldsToValidate = [
       { label: "Debtor Code", name: "debtorCode" },
@@ -65,7 +62,6 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
     }
   };
 
-  // ✅ Handle Cancel Button Click
   const handleCancelSection = () => {
     const action = () => {
       setSectionData({ ...data });
@@ -76,7 +72,6 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
     setIsConfirmOpen(true);
   };
 
-  // ✅ Confirm Cancel Action
   const handleConfirmAction = () => {
     if (confirmAction) confirmAction();
     setIsConfirmOpen(false);

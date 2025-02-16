@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../../css/AuditLogs.css";
-import ErrorModal from "../../modals/ErrorModal"; // Assuming ErrorModal is in the components folder
+import ErrorModal from "../../modals/ErrorModal";  
 
 const AuditLogs = () => {
   const [users, setUsers] = useState([]);
@@ -14,7 +14,6 @@ const AuditLogs = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Mock data to simulate API response
         const mockData = {
           items: [
             { id: 1, dateTime: "2025-01-01 10:00:00", actionType: "Login", name: "John Doe", role: "Admin" },
@@ -28,7 +27,6 @@ const AuditLogs = () => {
           totalPages: 2,
         };
 
-        // Simulate fetching data
         setTimeout(() => {
           setUsers(
             mockData.items.slice(
@@ -53,20 +51,17 @@ const AuditLogs = () => {
     fetchData();
   }, [currentPage, itemsPerPage]);
 
-  // Handle items per page change
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(parseInt(e.target.value));
-    setCurrentPage(1); // Reset to first page
+    setCurrentPage(1);  
   };
 
-  // Handle page change
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
 
-  // Close the error modal
   const closeErrorModal = () => {
     setErrorModal({ isOpen: false, title: "", message: "" });
   };

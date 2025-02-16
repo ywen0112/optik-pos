@@ -351,7 +351,7 @@ const DebtorMaintenance = () => {
                 body: JSON.stringify({
                     customerId: Number(customerId),
                     userId: userId,
-                    id: foundEyePower.eyePowerId,  // Fetch using the existing ID
+                    id: foundEyePower.eyePowerId,  
                 }),
             });
 
@@ -364,14 +364,13 @@ const DebtorMaintenance = () => {
             }
         }
 
-        // If no record found, create a new one
         const newResponse = await fetch(newApiUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 customerId: Number(customerId),
                 userId: userId,
-                id: "",  // Create new record
+                id: "",  
             }),
         });
 

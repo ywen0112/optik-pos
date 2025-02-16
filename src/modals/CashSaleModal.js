@@ -10,7 +10,7 @@ const CashSaleModal = ({ isOpen, type, onClose, onAdd }) => {
     if (isOpen) {
       setAmount("");
       setDescription("");
-      setError(""); // Reset error when modal opens
+      setError("");
     }
   }, [isOpen]);
 

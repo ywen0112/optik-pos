@@ -8,10 +8,8 @@ const HeaderBar = () => {
   const [showMaintenance, setShowMaintenance] = useState(false);
 
   useEffect(() => {
-    // Retrieve access rights from local storage
     const accessRights = JSON.parse(localStorage.getItem("accessRights")) || [];
 
-    // List of maintenance-related modules
     const maintenanceModules = [
       "User Maintenance",
       "Access Right Maintenance",
@@ -23,7 +21,6 @@ const HeaderBar = () => {
       "PWP Maintenance"
     ];
 
-    // Check if at least one maintenance module has allow: true
     const hasMaintenanceAccess = accessRights.some(
       (right) => maintenanceModules.includes(right.module) && right.allow
     );

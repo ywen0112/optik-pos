@@ -50,7 +50,7 @@ const Transaction = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: Number("customerId"),
+          customerId: customerId,
           userId: userId,
           openingBalance: parseFloat(openCounterAmount),
         }),

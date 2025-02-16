@@ -172,26 +172,30 @@ const AccessRightMaintenance = () => {
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
+        // ✅ Use the already computed final permissions from logs
+        const finalAccessRights = updatedRole.accessRights;
+  
+        // ✅ Log before sending API to confirm correct data
+        console.log("🚀 FINAL Permissions Before API Call:", finalAccessRights);
+  
+        // ✅ Construct API Payload DIRECTLY from `finalAccessRights`
+        const payload = {
+          actionData: {
+            customerId: Number(localStorage.getItem("customerId")) || 0,
+            userId: localStorage.getItem("userId") || "string",
+            id: updatedRole.accessRightId || updatedRole.id || "string",
+          },
+          accessRightId: updatedRole.accessRightId || updatedRole.id || "string",
+          description: updatedRole.role || "string",
+          accessRightActions: finalAccessRights, // ✅ Pass this directly
+        };
+  
+        console.log("🚀 API Payload Before Sending:", JSON.stringify(payload, null, 2));
+  
         const response = await fetch("https://optikposbackend.absplt.com/AccessRight/Save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            actionData: {
-              customerId: Number(localStorage.getItem("customerId")),
-              userId: localStorage.getItem("userId"),
-              id: updatedRole.accessRightId || updatedRole.id, // ✅ Ensure correct ID
-            },
-            accessRightId: updatedRole.accessRightId || updatedRole.id, // ✅ Ensure the correct ID is passed
-            description: updatedRole.role, 
-            accessRightActions: updatedRole.accessRights.map((right) => ({
-              module: right.module, 
-              allow: right.permissions.includes("Allow"),
-              add: right.permissions.includes("Add"),
-              view: right.permissions.includes("View"),
-              edit: right.permissions.includes("Edit"),
-              delete: right.permissions.includes("Delete"),
-            })),
-          }),
+          body: JSON.stringify(payload),
         });
   
         const data = await response.json();
@@ -199,8 +203,8 @@ const AccessRightMaintenance = () => {
         if (response.ok && data.success) {
           setSuccessModal({ isOpen: true, title: "Access Right saved successfully!" });
   
-          await fetchRoles(); 
-          setIsPopupOpen(false); 
+          await fetchRoles();
+          setIsPopupOpen(false);
         } else {
           throw new Error(data.errorMessage || "Failed to save access right.");
         }
@@ -211,8 +215,8 @@ const AccessRightMaintenance = () => {
       }
     });
   
-    setIsConfirmOpen(true); 
-  };
+    setIsConfirmOpen(true);
+  };  
 
   const handleDelete = (accessRightId) => {
     const roleToDelete = roles.find((role) => role.accessRightId === accessRightId);

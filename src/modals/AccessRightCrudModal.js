@@ -112,52 +112,16 @@ const AccessRightCrudModal = ({
     });
   };
 
-  // const handleModuleCheckboxChange = (moduleName, permissions = []) => {
-  //   setFormData((prevState) => {
-  //     const updatedRights = prevState.accessRights.map((module) => {
-  //       if (module.module === moduleName) {
-  //         const isAllSelected = permissions.every((permission) =>
-  //           module.permissions?.includes(permission)
-  //         );
-
-  //         return {
-  //           ...module,
-  //           permissions: isAllSelected ? [] : permissions,
-  //         };
-  //       }
-  //       return module;
-  //     });
-
-  //     const fullAccess = defaultModules.every((module) => {
-  //       const moduleRights = updatedRights.find(
-  //         (right) => right.module === module.name
-  //       );
-  //       return module.singlePermission
-  //         ? moduleRights?.permissions.includes("Allow")
-  //         : moduleRights?.permissions.length ===
-  //             (module.permissions?.length || 0);
-  //     });
-
-  //     return { ...prevState, accessRights: updatedRights, fullAccess };
-  //   });
-  // };
-
   const handleModuleCheckboxChange = (moduleName, permissions = []) => {
     setFormData((prevState) => {
       const updatedRights = prevState.accessRights.map((module) => {
         if (module.module === moduleName) {
-          const moduleDefinition = defaultModules.find((mod) => mod.name === moduleName);
-          const isSinglePermission = moduleDefinition?.singlePermission;
-  
-          const isAllSelected = permissions.every((permission) => module.permissions?.includes(permission));
+          const isChecked = module.permissions.length === 0; // If unchecked, enable all
   
           return {
             ...module,
-            permissions: isAllSelected
-              ? []  // If already selected, uncheck all
-              : isSinglePermission
-              ? ["Allow", "Add", "View", "Edit", "Delete"]  // Auto-set all for single-permission modules
-              : permissions,
+            permissions: isChecked ? permissions : [], // If checked, set all permissions; else, clear them
+            allow: isChecked, // ✅ Ensure allow is true when selecting module
           };
         }
         return module;
@@ -171,21 +135,17 @@ const AccessRightCrudModal = ({
     setFormData((prevState) => {
       const updatedRights = prevState.accessRights.map((module) => {
         if (module.module === moduleName) {
-          const moduleDefinition = defaultModules.find((mod) => mod.name === moduleName);
-          const isSinglePermission = moduleDefinition?.singlePermission;
+          const updatedPermissions = module.permissions.includes(permission)
+            ? module.permissions.filter((perm) => perm !== permission) // Remove if unchecked
+            : [...module.permissions, permission]; // Add if checked
   
-          let permissions;
-          if (isSinglePermission) {
-            permissions = module.permissions.includes("Allow")
-              ? []  // If checked, uncheck all
-              : ["Allow", "Add", "View", "Edit", "Delete"];  // Otherwise, set all
-          } else {
-            permissions = module.permissions.includes(permission)
-              ? module.permissions.filter((perm) => perm !== permission)
-              : [...module.permissions, permission];
-          }
+          const hasAnyPermission = updatedPermissions.length > 0;
   
-          return { ...module, permissions };
+          return {
+            ...module,
+            permissions: updatedPermissions,
+            allow: hasAnyPermission, // ✅ Ensure allow is set to true if at least one permission is checked
+          };
         }
         return module;
       });
@@ -193,33 +153,6 @@ const AccessRightCrudModal = ({
       return { ...prevState, accessRights: updatedRights };
     });
   };  
-
-  // const handlePermissionChange = (moduleName, permission) => {
-  //   setFormData((prevState) => {
-  //     const updatedRights = prevState.accessRights.map((module) => {
-  //       if (module.module === moduleName) {
-  //         const permissions = module.permissions.includes(permission)
-  //           ? module.permissions.filter((perm) => perm !== permission)
-  //           : [...module.permissions, permission];
-
-  //         return { ...module, permissions };
-  //       }
-  //       return module;
-  //     });
-
-  //     const fullAccess = defaultModules.every((module) => {
-  //       const moduleRights = updatedRights.find(
-  //         (right) => right.module === module.name
-  //       );
-  //       return module.singlePermission
-  //         ? moduleRights?.permissions.includes("Allow")
-  //         : moduleRights?.permissions.length ===
-  //             (module.permissions?.length || 0);
-  //     });
-
-  //     return { ...prevState, accessRights: updatedRights, fullAccess };
-  //   });
-  // };
 
   const handleSave = () => {
     if (!validateFields()) {
@@ -231,8 +164,58 @@ const AccessRightCrudModal = ({
       return;
     }
   
-    onSave(formData); // ✅ Send form data to parent component, let parent handle API call
+    setFormData((prevState) => {
+      const updatedAccessRights = prevState.accessRights.map((module) => {
+        const isSinglePermissionModule = [
+          "Dashboard", "Audit Logs", "Inquiry Screen", "Report", "Transaction Cash In/Out"
+        ].includes(module.module);
+  
+        const hasAtLeastOnePermission = module.permissions.length > 0;
+  
+        // ✅ Fix: If single permission module and allow is selected, enable all actions
+        if (isSinglePermissionModule && hasAtLeastOnePermission) {
+          return {
+            module: module.module,
+            allow: true,
+            add: true,
+            edit: true,
+            view: true,
+            delete: true,
+          };
+        }
+  
+        // ✅ For multi-permission modules, allow is true if at least one permission is selected
+        return {
+          module: module.module,
+          allow: hasAtLeastOnePermission,
+          add: module.permissions.includes("Add"),
+          edit: module.permissions.includes("Edit"),
+          view: module.permissions.includes("View"),
+          delete: module.permissions.includes("Delete"),
+        };
+      });
+  
+      console.log("🚀 Updated Permissions Before API Call:", JSON.stringify(updatedAccessRights));
+  
+      if (prevState.fullAccess) {
+        updatedAccessRights.forEach((module) => {
+          module.allow = true;
+          module.add = true;
+          module.edit = true;
+          module.view = true;
+          module.delete = true;
+        });
+      }
+  
+      onSave({
+        ...prevState,
+        accessRights: updatedAccessRights,
+      });
+  
+      return prevState;
+    });
   };
+  
 
   const closeErrorModal = () => {
     setErrorModal({ isOpen: false, title: "", message: "" });
@@ -301,24 +284,22 @@ const AccessRightCrudModal = ({
                   </div>
                   {!module.singlePermission && (
                     <div className="permissions">
-                      {module.permissions.map((permission) => (
-                        <label key={permission}>
-                          <div className="module-checkbox">
-                            <input
-                              type="checkbox"
-                              checked={formData.accessRights.find(
-                                (right) => right.module === module.name
-                              )?.permissions.includes(permission)}
-                              onChange={() =>
-                                handlePermissionChange(module.name, permission)
-                              }
-                              disabled={isViewing}
-                            />
-                          </div>
-                          {permission}
-                        </label>
-                      ))}
-                    </div>
+                    {module.permissions.map((permission) => (
+                      <label key={permission}>
+                        <div className="module-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={!!formData.accessRights.find(
+                              (right) => right.module === module.name
+                            )?.permissions.includes(permission)}
+                            onChange={() => handlePermissionChange(module.name, permission)}
+                            disabled={isViewing}
+                          />
+                        </div>
+                        {permission}
+                      </label>
+                    ))}
+                  </div>                  
                   )}
                 </div>
               ))}

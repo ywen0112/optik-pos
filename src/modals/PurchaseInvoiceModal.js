@@ -20,9 +20,9 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       desc2: "",
       itemUOMId: "",
       unitPrice: 0,
-      qty: 0,
+      qty: "",
       discount: "",
-      discountAmount: 0,
+      discountAmount: "",
       subtotal: 0,
     }],
     payments: [],
@@ -36,7 +36,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
     desc2: "",
     itemUOMId: "",
     unitPrice: "",
-    qty: 0,
+    qty: "",
     discount: "",
     discountAmount: "",
     subtotal: 0,
@@ -65,9 +65,9 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
           desc2: "",
           itemUOMId: "",
           unitPrice: "",
-          qty: 0,
+          qty: "",
           discount: "",
-          discountAmount: 0,
+          discountAmount: "",
           subtotal: 0,
         }],
         payments: [],
@@ -80,9 +80,9 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
         desc2: "",
         itemUOMId: "",
         unitPrice: "",
-        qty: 0,
+        qty: "",
         discount: "",
-        discountAmount: 0, 
+        discountAmount: "", 
         subtotal: "",     
       });
 
@@ -244,7 +244,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
   };
   
   const handleQuantityChange = (e, rowIndex) => {
-    const newQty = parseInt(e.target.value, 10) || 0;
+    const newQty = Math.max("", parseInt(e.target.value) || "");
   
     setFormData((prev) => {
       const updatedItems = prev.items.map((item, index) => ({
@@ -282,13 +282,13 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
   };
 
   const handleDiscountAmountChange = (e, rowIndex) => {
-    const discountAmount = Math.max(0, parseFloat(e.target.value) || 0);
+    const discountAmount = Math.max("", parseFloat(e.target.value) || "");
   
     setFormData((prev) => {
       const updatedItems = prev.items.map((item, index) => {
         if (index === rowIndex) {
-          const unitPrice = parseFloat(item.unitPrice) || 0;
-          const qty = parseInt(item.qty, 10) || 0;
+          const unitPrice = parseFloat(item.unitPrice) || "";
+          const qty = parseInt(item.qty, 10) || "";
           return {
             ...item,
             discountAmount,
@@ -337,9 +337,9 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
           desc2: "",
           itemUOMId: "",
           unitPrice: "",
-          qty: 0,
+          qty: "",
           discount: "",
-          discountAmount: 0,
+          discountAmount: "",
           subtotal: 0,
         },
       ],
@@ -521,7 +521,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
                     <input type="number" value={itm.unitPrice} readOnly />
                   </td>
                   <td>
-                    <input type="number" 
+                    <input type="text" 
                        min="0"
                       value={itm.qty} 
                       onChange={(e) => handleQuantityChange(e, index)} 
@@ -536,7 +536,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
                   </td>
                   <td>
                     <input
-                      type="number"
+                      type="text"
                       value={itm.discountAmount}
                       min="0"
                       onChange={(e) => handleDiscountAmountChange(e, index)}

@@ -137,10 +137,8 @@ const Login = ({ logo }) => {
         </div>
       </div>
 
-      {/* Error Modal */}
       <ErrorModal isOpen={error.isOpen} title="Error" message={error.message} onClose={closeErrorModal} />
 
-      {/* ✅ New Company Selection Modal */}
       <CompanySelectionModal
         isOpen={isCompanyModalOpen}
         companies={companies}

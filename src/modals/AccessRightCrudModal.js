@@ -52,21 +52,21 @@ const AccessRightCrudModal = ({
           permissions: existingModule?.permissions || [],
         };
       });
-
+    
       const fullAccess = accessRights.every((module) => {
         const moduleDefinition = defaultModules.find((mod) => mod.name === module.module);
-
         return moduleDefinition?.singlePermission
           ? module.permissions.includes("Allow")
           : module.permissions.length === (moduleDefinition?.permissions?.length || 0);
       });
-
+  
       setFormData({
         id: data.id || null,
         role: data.role || "",
         accessRights,
         fullAccess,
       });
+    
     } else {
       setFormData({
         id: null,
@@ -80,6 +80,7 @@ const AccessRightCrudModal = ({
       setErrors({});
     }
   }, [isOpen, data, defaultModules]);
+  
 
   const validateFields = () => {
     const validationErrors = {};
@@ -140,7 +141,7 @@ const AccessRightCrudModal = ({
             : [...module.permissions, permission]; // Add if checked
   
           const hasAnyPermission = updatedPermissions.length > 0;
-  
+
           return {
             ...module,
             permissions: updatedPermissions,
@@ -152,7 +153,8 @@ const AccessRightCrudModal = ({
   
       return { ...prevState, accessRights: updatedRights };
     });
-  };  
+  };
+  
 
   const handleSave = () => {
     if (!validateFields()) {
@@ -194,9 +196,7 @@ const AccessRightCrudModal = ({
           delete: module.permissions.includes("Delete"),
         };
       });
-  
-      console.log("🚀 Updated Permissions Before API Call:", JSON.stringify(updatedAccessRights));
-  
+    
       if (prevState.fullAccess) {
         updatedAccessRights.forEach((module) => {
           module.allow = true;
@@ -262,23 +262,23 @@ const AccessRightCrudModal = ({
                 <div key={module.name} className="module-group">
                   <div className="module-title">
                     <div className="module-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={
-                          module.singlePermission
-                            ? formData.accessRights.find((right) => right.module === module.name)
-                                ?.permissions.includes("Allow")
-                            : formData.accessRights.find((right) => right.module === module.name)
-                                ?.permissions.length === (module.permissions || []).length
-                        }
-                        onChange={() =>
-                          handleModuleCheckboxChange(
-                            module.name,
-                            module.singlePermission ? ["Allow"] : module.permissions
-                          )
-                        }
-                        disabled={isViewing}
-                      />
+                    <input
+                      type="checkbox"
+                      checked={
+                        module.singlePermission
+                          ? formData.accessRights.find((right) => right.module === module.name)?.permissions.includes("Allow")
+                          : module.permissions.every((perm) =>
+                              formData.accessRights.find((right) => right.module === module.name)?.permissions.includes(perm)
+                            )
+                      }
+                      onChange={() =>
+                        handleModuleCheckboxChange(
+                          module.name,
+                          module.singlePermission ? ["Allow"] : module.permissions
+                        )
+                      }
+                      disabled={isViewing}
+                    />
                     </div>
                     <span>{module.name}</span>
                   </div>

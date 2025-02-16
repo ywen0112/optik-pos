@@ -70,6 +70,7 @@ const Login = ({ logo }) => {
     localStorage.setItem("userId", company.userId);
     localStorage.setItem("customerId", company.customerId);
     localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("accessRights", JSON.stringify(company.accessRight));
 
     setIsCompanyModalOpen(false);
     navigate("/dashboard");

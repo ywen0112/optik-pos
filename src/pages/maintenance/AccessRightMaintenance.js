@@ -24,6 +24,9 @@ const AccessRightMaintenance = () => {
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const accessRightsMaintenanceRights = JSON.parse(localStorage.getItem("accessRights"))?.find(
+    (item) => item.module === "Access Right Maintenance"
+  ) || {};
 
 
   useEffect(() => {
@@ -172,13 +175,8 @@ const AccessRightMaintenance = () => {
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
-        // ✅ Use the already computed final permissions from logs
         const finalAccessRights = updatedRole.accessRights;
   
-        // ✅ Log before sending API to confirm correct data
-        console.log("🚀 FINAL Permissions Before API Call:", finalAccessRights);
-  
-        // ✅ Construct API Payload DIRECTLY from `finalAccessRights`
         const payload = {
           actionData: {
             customerId: Number(localStorage.getItem("customerId")) || 0,
@@ -187,11 +185,9 @@ const AccessRightMaintenance = () => {
           },
           accessRightId: updatedRole.accessRightId || updatedRole.id || "string",
           description: updatedRole.role || "string",
-          accessRightActions: finalAccessRights, // ✅ Pass this directly
+          accessRightActions: finalAccessRights, 
         };
-  
-        console.log("🚀 API Payload Before Sending:", JSON.stringify(payload, null, 2));
-  
+    
         const response = await fetch("https://optikposbackend.absplt.com/AccessRight/Save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -205,6 +201,7 @@ const AccessRightMaintenance = () => {
   
           await fetchRoles();
           setIsPopupOpen(false);
+          localStorage.setItem("accessRights", JSON.stringify(finalAccessRights));
         } else {
           throw new Error(data.errorMessage || "Failed to save access right.");
         }
@@ -317,13 +314,12 @@ const AccessRightMaintenance = () => {
             items per page
           </label>
         </div>
-        <button
-          className="add-button"
-          onClick={() => handleOpenModal({ accessRights: [] }, "Add Role")}
-        >
-          Add Role
-        </button>
-      </div>
+        {accessRightsMaintenanceRights.add && (
+          <button className="add-button" onClick={() =>  handleOpenModal({ accessRights: [] }, "Add Role")}>
+            Add Role
+          </button>
+        )}
+        </div>
       {loading ? (
         <p>Loading...</p>
         ) : (
@@ -341,15 +337,21 @@ const AccessRightMaintenance = () => {
               <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
               <td>{role.description || "-"}</td> 
               <td>
-                <button onClick={() => handleOpenModal(role, "Edit Role")} className="action-button edit">
-                  <FaEdit />
-                </button>
-                <button onClick={() => handleDelete(role.accessRightId)} className="action-button delete">
-                  <FaTrash />
-                </button>
-                <button onClick={() => handleOpenModal(role, "View Role", true)} className="action-button view">
-                  <FaEye />
-                </button>
+                {accessRightsMaintenanceRights.edit && (
+                  <button onClick={() => handleOpenModal(role, "Edit Role")} className="action-button edit">
+                    <FaEdit />
+                  </button>
+                )}
+                {accessRightsMaintenanceRights.delete && (
+                  <button onClick={() => handleDelete(role.accessRightId)} className="action-button delete">
+                    <FaTrash />
+                  </button>
+                )}
+                {accessRightsMaintenanceRights.view && (
+                  <button onClick={() => handleOpenModal(role, "View Role", true)} className="action-button view">
+                    <FaEye />
+                  </button>
+                )}
               </td>
             </tr>
           ))}

@@ -38,7 +38,7 @@ const MainLayout = () => {
   const menuMapping = {
     "/main/dashboard": "Dashboard",
     "/main/audit-logs": "Audit Logs",
-    "/main/inquiry-screen": "Inquiry Screen",
+    "/main/transaction-inquiry": "Inquiry Screen",
     "/main/transaction": "Transaction",
     "/maintenance": "Maintenance",
     "/maintenance/user-maintenance": "User Maintenance",
@@ -84,7 +84,7 @@ const MainLayout = () => {
             <Routes>
               <Route path="/main/dashboard" element={<Dashboard />} />
               <Route path="/main/audit-logs" element={<AuditLogs />} />
-              <Route path="/main/inquiry-screen" element={<InquiryScreen />} />
+              <Route path="/main/transaction-inquiry" element={<InquiryScreen />} />
               <Route path="/main/transaction" element={<Transaction />} />
               <Route path="/maintenance" element={<Maintenance />} />
               <Route path="/profile" element={<Profile />} />

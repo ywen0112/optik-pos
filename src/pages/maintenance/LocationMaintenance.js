@@ -27,6 +27,9 @@ const LocationMaintenance = () => {
   const customerId = localStorage.getItem("customerId"); 
   const userId = localStorage.getItem("userId");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const locationMaintenanceRights = JSON.parse(localStorage.getItem("accessRights"))?.find(
+    (item) => item.module === "Location Maintenance"
+  ) || {};
 
   useEffect(() => {
     fetchLocations();
@@ -302,12 +305,11 @@ const LocationMaintenance = () => {
             items per page
           </label>
         </div>
-        <button
-          className="add-button"
-          onClick={() => handleOpenModal({}, "Add Location")}
-        >
-          Add Location
-        </button>
+        {locationMaintenanceRights.add && (
+          <button className="add-button" onClick={() => handleOpenModal({}, "Add Location")}>
+            Add Location
+          </button>
+        )}
       </div>
       {loading ? (
         <p>Loading...</p>
@@ -328,24 +330,21 @@ const LocationMaintenance = () => {
                 <td>{location.locationCode}</td>
                 <td>{location.description}</td>
                 <td>
-                  <button
-                    onClick={() => handleOpenModal(location, "Edit Location")}
-                    className="action-button edit"
-                  >
-                    <FaEdit /> 
-                  </button>
-                  <button
-                    onClick={() => handleDelete(location.locationId)}
-                    className="action-button delete"
-                  >
-                    <FaTrash />
-                  </button>
-                  <button
-                    onClick={() => handleOpenModal(location, "View Location", true)}
-                    className="action-button view"
-                  >
-                    <FaEye />
-                  </button>
+                  {locationMaintenanceRights.edit && (
+                    <button onClick={() => handleOpenModal(location, "Edit Location")} className="action-button edit">
+                      <FaEdit />
+                    </button>
+                  )}
+                  {locationMaintenanceRights.delete && (
+                    <button onClick={() => handleDelete(location.locationId)} className="action-button delete">
+                      <FaTrash />
+                    </button>
+                  )}
+                  {locationMaintenanceRights.view && (
+                    <button onClick={() => handleOpenModal(location, "View Location", true)} className="action-button view">
+                      <FaEye />
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

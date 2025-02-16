@@ -32,6 +32,10 @@ const DebtorMaintenance = () => {
   const [selectedEyePower, setSelectedEyePower] = useState({});
   const [eyePowerType, setEyePowerType] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const debtorMaintenanceRights = JSON.parse(localStorage.getItem("accessRights"))?.find(
+    (item) => item.module === "Debtor Maintenance"
+  ) || {};
+
 
   
   useEffect(() => {
@@ -463,12 +467,11 @@ const DebtorMaintenance = () => {
               items per page
             </label>
           </div>
-          <button
-            className="add-button"
-            onClick={() => handleOpenModal({}, "Add Debtor")}
-          >
+          {debtorMaintenanceRights.add && (
+          <button className="add-button" onClick={() => handleOpenModal({}, "Add Debtor")}>
             Add Debtor
           </button>
+        )}
         </div>
         {loading ? (
         <p>Loading...</p>
@@ -481,8 +484,12 @@ const DebtorMaintenance = () => {
                 <th>Debtor Code</th>
                 <th>Debtor Type Code</th>
                 <th>Mobile</th>
-                <th>Contact Lens Eye Power</th>
+                {debtorMaintenanceRights.edit && (
+                  <th>Contact Lens Eye Power</th>
+                )}
+                {debtorMaintenanceRights.edit && (
                 <th>Glasses Eye Power</th>
+                )}
                 <th>Action</th>
               </tr>
             </thead>
@@ -494,37 +501,36 @@ const DebtorMaintenance = () => {
                   <td>{debtor.debtorCode || "-"}</td>
                   <td>{debtorTypeOptions.find(type => type.value === debtor.debtorTypeId)?.label || "-"}</td>
                   <td>{debtor.mobile || "-"}</td>
+                  {debtorMaintenanceRights.edit && (
                   <td className="eye-power">
                     <button className="eye-power-button" onClick={() => handleOpenEyePowerModal(debtor, "Contact Lens")}>
                       <MdVisibility  /> 
                     </button>
                   </td>
+                  )}
+                  {debtorMaintenanceRights.edit && (
                   <td className="eye-power">
                     <button className="eye-power-button" onClick={() => handleOpenEyePowerModal(debtor, "Glass")}>
                       <FaGlasses /> 
                     </button>
                   </td>
+                  )}
                   <td>
-                    <button
-                      onClick={() => handleOpenModal(debtor, "Edit Debtor")}
-                      className="action-button edit"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(debtor.debtorId)}
-                      className="action-button delete"
-                    >
-                      <FaTrash />
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleOpenModal(debtor, "View Debtor", true)
-                      }
-                      className="action-button view"
-                    >
-                      <FaEye />
-                    </button>
+                  {debtorMaintenanceRights.edit && (
+                      <button onClick={() => handleOpenModal(debtor, "Edit Debtor")} className="action-button edit">
+                        <FaEdit />
+                      </button>
+                    )}
+                    {debtorMaintenanceRights.delete && (
+                      <button onClick={() => handleDelete(debtor.debtorId)} className="action-button delete">
+                        <FaTrash />
+                      </button>
+                    )}
+                    {debtorMaintenanceRights.view && (
+                      <button onClick={() => handleOpenModal(debtor, "View Debtor", true)} className="action-button view">
+                        <FaEye />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

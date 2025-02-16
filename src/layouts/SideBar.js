@@ -13,18 +13,25 @@ const Sidebar = ({ onMenuClick }) => {
     if (collapsed) setCollapsed(false);
   };
 
+  const accessRights = JSON.parse(localStorage.getItem("accessRights")) || [];
+
+  const isAllowed = (module) => {
+    const access = accessRights.find((item) => item.module === module);
+    return access ? access.allow : false; 
+  };
+
   const sections = [
     {
       title: "OVERVIEW",
       items: [
         { name: "Dashboard", icon: "fal fa-home", path: "/main/dashboard" },
-        { name: "Transaction", icon: "fal fa-briefcase", path: "/main/transaction" },
-        { name: "Transaction Inquiry", icon: "fal fa-search", path: "/main/inquiry-screen" },
+        { name: "Transaction Cash In/Out", icon: "fal fa-briefcase", path: "/main/transaction" },
+        { name: "Transaction Inquiry", icon: "fal fa-search", path: "/main/transaction-inquiry" },
         { name: "Audit Logs", icon: "fal fa-scroll", path: "/main/audit-logs" },
-      ],
+      ].filter((item) => isAllowed(item.name)), 
     },
   ];  
-  
+
   const handleMenuClick = (menuName, path) => {
     setActiveMenu(menuName);
     onMenuClick(menuName, path);
@@ -39,7 +46,7 @@ const Sidebar = ({ onMenuClick }) => {
       <ul className="menu-list">
         {sections.map((section, index) => (
           <React.Fragment key={index}>
-            {section.title && (
+            {section.title && section.items.length > 0 && (
               <li className="menu-section-title">
                 {!collapsed && section.title}
               </li>

@@ -29,6 +29,9 @@ const ItemMaintenance = () => {
   const customerId = localStorage.getItem("customerId"); 
   const userId = localStorage.getItem("userId");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const itemMaintenanceRights = JSON.parse(localStorage.getItem("accessRights"))?.find(
+    (item) => item.module === "Item Maintenance"
+  ) || {};
 
   useEffect(() => {
     const fetchItemGroups = async () => {
@@ -409,12 +412,11 @@ const ItemMaintenance = () => {
             items per page
           </label>
         </div>
-        <button
-          className="add-button"
-          onClick={() => handleOpenModal({}, "Add Item")}
-        >
-          Add Item
-        </button>
+        {itemMaintenanceRights.add && (
+          <button className="add-button" onClick={() => handleOpenModal({}, "Add Item")}>
+            Add Item
+          </button>
+        )}
       </div>
       {loading ? (
         <p>Loading...</p>
@@ -441,15 +443,21 @@ const ItemMaintenance = () => {
                     <td>{itemGroupMapping[item.itemGroupId] || "-"}</td>
                     <td>{itemTypeMapping[item.itemTypeId] || "-"}</td>
                     <td>
-                      <button onClick={() => handleOpenModal(item, "Edit Item")} className="action-button edit">
-                        <FaEdit />
-                      </button>
-                      <button onClick={() => handleDelete(item.itemId)} className="action-button delete">
-                        <FaTrash />
-                      </button>
-                      <button onClick={() => handleOpenModal(item, "View Item", true)} className="action-button view">
-                        <FaEye />
-                      </button>
+                      {itemMaintenanceRights.edit && (
+                        <button onClick={() => handleOpenModal(item, "Edit Item")} className="action-button edit">
+                          <FaEdit />
+                        </button>
+                      )}
+                      {itemMaintenanceRights.delete && (
+                        <button onClick={() => handleDelete(item.itemId)} className="action-button delete">
+                          <FaTrash />
+                        </button>
+                      )}
+                      {itemMaintenanceRights.view && (
+                        <button onClick={() => handleOpenModal(item, "View Item", true)} className="action-button view">
+                          <FaEye />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );

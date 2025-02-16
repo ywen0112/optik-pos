@@ -23,6 +23,10 @@ const Transaction = () => {
   const navigate = useNavigate();
   const customerId = localStorage.getItem("customerId"); 
   const userId = localStorage.getItem("userId");
+  const accessRights = JSON.parse(localStorage.getItem("accessRights")) || [];
+  const salesInvoiceRights = accessRights.find((item) => item.module === "Transaction Sales Invoice") || {};
+  const purchaseInvoiceRights = accessRights.find((item) => item.module === "Transaction Purchase Invoice") || {};
+  const creditNoteRights = accessRights.find((item) => item.module === "Transaction Credit Note") || {};
 
   useEffect(() => {
     const storedSessionId = localStorage.getItem("counterSessionId");
@@ -282,15 +286,21 @@ const Transaction = () => {
           <button className="transaction-button" onClick={() => handleOpenModal("cashout")}>
             Cash Out
           </button>
+          {salesInvoiceRights.allow && (
           <button className="transaction-button" onClick={handleOpenSalesInvoice}>
             Sales Invoice
           </button>
+          )}
+          {purchaseInvoiceRights.allow && (
           <button className="transaction-button" onClick={handleOpenPurchaseInvoice}>
             Purchase Invoice
-          </button>   
+          </button> 
+          )}
+          {creditNoteRights.allow && (  
           <button className="transaction-button" onClick={handleOpenCreditNote}>
             Credit Note
           </button>  
+          )}
           <button className="transaction-button close-counter-button" onClick={handleOpenCloseCounter}>Close Counter</button>
         </div>
       )}

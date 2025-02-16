@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../css/EyePowerModal.css";
-import ConfirmationModal from "./ConfirmationModal";
 
 const EyePowerModal = ({ isOpen, onClose, eyePowerType, data, onSave, onDelete }) => {
   const [eyePowerData, setEyePowerData] = useState({});
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {

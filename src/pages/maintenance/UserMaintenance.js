@@ -29,6 +29,9 @@ const UserMaintenance = () => {
   const navigate = useNavigate();
   const customerId = localStorage.getItem("customerId"); 
   const userId = localStorage.getItem("userId");
+  const userMaintenanceRights = JSON.parse(localStorage.getItem("accessRights"))?.find(
+    (item) => item.module === "User Maintenance"
+  ) || {};
 
   useEffect(() => {
     fetchLocations();
@@ -251,6 +254,8 @@ const UserMaintenance = () => {
   };  
 
   const handleDelete = (userId) => {
+    if (!userMaintenanceRights.delete) return;
+    
     const userToDelete = users.find((user) => user.userId === userId);
   
     if (!userToDelete) {
@@ -358,12 +363,11 @@ const UserMaintenance = () => {
             items per page
           </label>
         </div>
-        <button
-          className="add-button"
-          onClick={() => handleOpenModal({}, "Add User")}
-        >
-          Add User
-        </button>
+        {userMaintenanceRights.add && (
+          <button className="add-button" onClick={() => handleOpenModal({}, "Add User")}>
+            Add User
+          </button>
+        )}
       </div>
       {loading ? (
         <p>Loading...</p>
@@ -388,25 +392,22 @@ const UserMaintenance = () => {
                 <td>{user.userEmail}</td>
                 <td>{locationMap[user.locationId] || "-"}</td>
                 <td>
-                  <button
-                    onClick={() => handleOpenModal(user, "Edit User")}
-                    className="action-button edit"
-                  >
+                {userMaintenanceRights.edit && (
+                  <button onClick={() => handleOpenModal(user, "Edit User")} className="action-button edit">
                     <FaEdit />
                   </button>
-                  <button
-                    onClick={() => handleDelete(user.userId)}
-                    className="action-button delete"
-                  >
+                )}
+                {userMaintenanceRights.delete && (
+                  <button onClick={() => handleDelete(user.userId)} className="action-button delete">
                     <FaTrash />
                   </button>
-                  <button
-                    onClick={() => handleOpenModal(user, "View User", true)}
-                    className="action-button view"
-                  >
+                )}
+                {userMaintenanceRights.view && (
+                  <button onClick={() => handleOpenModal(user, "View User", true)} className="action-button view">
                     <FaEye />
                   </button>
-                </td>
+                )}
+              </td>
               </tr>
             ))}
           </tbody>

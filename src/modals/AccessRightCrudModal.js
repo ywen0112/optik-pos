@@ -23,7 +23,7 @@ const AccessRightCrudModal = ({
     () => [
       { name: "Dashboard", singlePermission: true },
       { name: "Audit Logs", singlePermission: true },
-      { name: "Inquiry Screen", singlePermission: true },
+      { name: "Transaction Inquiry", singlePermission: true },
       { name: "Report", singlePermission: true },
       { name: "Transaction Cash In/Out", singlePermission: true },
       { name: "Transaction Sales Invoice", permissions: ["View", "Add", "Edit", "Delete"] },
@@ -117,12 +117,12 @@ const AccessRightCrudModal = ({
     setFormData((prevState) => {
       const updatedRights = prevState.accessRights.map((module) => {
         if (module.module === moduleName) {
-          const isChecked = module.permissions.length === 0; // If unchecked, enable all
+          const isChecked = module.permissions.length === 0; 
   
           return {
             ...module,
-            permissions: isChecked ? permissions : [], // If checked, set all permissions; else, clear them
-            allow: isChecked, // ✅ Ensure allow is true when selecting module
+            permissions: isChecked ? permissions : [],
+            allow: isChecked,
           };
         }
         return module;
@@ -137,15 +137,15 @@ const AccessRightCrudModal = ({
       const updatedRights = prevState.accessRights.map((module) => {
         if (module.module === moduleName) {
           const updatedPermissions = module.permissions.includes(permission)
-            ? module.permissions.filter((perm) => perm !== permission) // Remove if unchecked
-            : [...module.permissions, permission]; // Add if checked
+            ? module.permissions.filter((perm) => perm !== permission) 
+            : [...module.permissions, permission]; 
   
           const hasAnyPermission = updatedPermissions.length > 0;
 
           return {
             ...module,
             permissions: updatedPermissions,
-            allow: hasAnyPermission, // ✅ Ensure allow is set to true if at least one permission is checked
+            allow: hasAnyPermission,
           };
         }
         return module;
@@ -174,7 +174,6 @@ const AccessRightCrudModal = ({
   
         const hasAtLeastOnePermission = module.permissions.length > 0;
   
-        // ✅ Fix: If single permission module and allow is selected, enable all actions
         if (isSinglePermissionModule && hasAtLeastOnePermission) {
           return {
             module: module.module,
@@ -186,7 +185,6 @@ const AccessRightCrudModal = ({
           };
         }
   
-        // ✅ For multi-permission modules, allow is true if at least one permission is selected
         return {
           module: module.module,
           allow: hasAtLeastOnePermission,

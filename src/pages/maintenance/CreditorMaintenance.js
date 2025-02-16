@@ -27,6 +27,9 @@ const CreditorMaintenance = () => {
   const userId = localStorage.getItem("userId");
   const [creditorTypeOptions, setCreditorTypeOptions] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState(""); 
+  const CreditorMaintenanceRights = JSON.parse(localStorage.getItem("accessRights"))?.find(
+    (item) => item.module === "Creditor Maintenance"
+  ) || {};
 
   useEffect(() => {
     fetchCreditors();
@@ -332,12 +335,11 @@ const CreditorMaintenance = () => {
             items per page
           </label>
         </div>
-        <button
-          className="add-button"
-          onClick={() => handleOpenModal({}, "Add Creditor")}
-        >
-          Add Creditor
-        </button>
+        {CreditorMaintenanceRights.add && (
+          <button className="add-button" onClick={() => handleOpenModal({}, "Add Creditor")}>
+            Add Creditor
+          </button>
+        )}
       </div>
       {loading ? (
         <p>Loading...</p>
@@ -362,26 +364,21 @@ const CreditorMaintenance = () => {
                 <td>{creditor.companyName || "-"}</td>
                 <td>{creditor.mobile || "-"}</td>
                  <td>
-                  <button
-                    onClick={() => handleOpenModal(creditor, "Edit Creditor")}
-                    className="action-button edit"
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(creditor.creditorId)}
-                    className="action-button delete"
-                  >
-                    <FaTrash />
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleOpenModal(creditor, "View Creditor", true)
-                    }
-                    className="action-button view"
-                  >
-                    <FaEye />
-                  </button>
+                  {CreditorMaintenanceRights.edit && (
+                    <button onClick={() => handleOpenModal(creditor, "Edit Creditor")} className="action-button edit">
+                      <FaEdit />
+                    </button>
+                  )}
+                  {CreditorMaintenanceRights.delete && (
+                    <button onClick={() => handleDelete(creditor.creditorId)} className="action-button delete">
+                      <FaTrash />
+                    </button>
+                  )}
+                  {CreditorMaintenanceRights.view && (
+                    <button onClick={() => handleOpenModal(creditor, "View Creditor", true)} className="action-button view">
+                      <FaEye />
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

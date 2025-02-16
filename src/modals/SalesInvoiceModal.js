@@ -20,7 +20,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       desc2: "",
       itemUOMId: "",
       unitPrice: 0,
-      qty: 0,
+      qty: "",
       discount: "",
       discountAmount: 0,
       subtotal: 0,
@@ -39,6 +39,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
     qty: 0,
     discount: "",
     discountAmount: "",
+    itemBatchId: "",
     subtotal: 0,
   });
 

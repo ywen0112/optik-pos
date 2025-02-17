@@ -8,6 +8,7 @@ const InvitePage = () => {
   const [customerId, setCustomerId] = useState("");
   const [userName, setUserName] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [isOwner, setIsOwner] = (false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -18,14 +19,16 @@ const InvitePage = () => {
       const customerIdParam = queryParams.get("CustomerId");
       const userEmailParam = queryParams.get("UserEmail");
       const companyNameParm = queryParams.get("CompanyName");
+      const isOwnerParm = queryParams.get("IsOwner")
 
-      if (!customerIdParam || !userEmailParam || !companyNameParm ) {
+      if (!customerIdParam || !userEmailParam || !companyNameParm || !isOwnerParm) {
         throw new Error("Invalid or missing invite link parameters.");
       }
 
       setCustomerId(customerIdParam);
       setEmail(userEmailParam);
       setCompanyName(companyNameParm);
+      setIsOwner(isOwnerParm);
     } catch (err) {
       setError(err.message);
     }
@@ -49,6 +52,7 @@ const InvitePage = () => {
           userEmail: email,
           userPassword: password,
           editorUserId: "",
+          isOwner: isOwner,
         }),
       });
 

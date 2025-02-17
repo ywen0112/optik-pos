@@ -198,7 +198,6 @@ const UserMaintenance = () => {
               userEmail: newUser.userEmail,
               userPassword: "", 
               accessRightId: newUser.accessRightId,
-              isOwner: false,
               editorUserId: userId,
             }),
           });

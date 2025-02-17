@@ -126,15 +126,7 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
                   className="payment-method-select"
                 />
               )}
-              <input
-                type="number"
-                value={payment.amount}
-                onChange={(e) => handleAmountChange(e, index)}
-                placeholder="Enter Amount"
-                min="0"
-                className="payment-amount-input"
-              />
-              {payment.method === "Card" && (
+              {type === "Card" && (
                 <div className="card-payment-details">
                   <input
                     type="text"
@@ -152,6 +144,16 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
                   />
                 </div>
               )}
+
+              <input
+                type="number"
+                value={payment.amount}
+                onChange={(e) => handleAmountChange(e, index)}
+                placeholder="Enter Amount"
+                min="0"
+                className="payment-amount-input"
+              />
+              
               {type === "Multi" && (
                 <button className="modal-add-payment-button" onClick={addPaymentMethod}>Add Payment Method</button>
               )}

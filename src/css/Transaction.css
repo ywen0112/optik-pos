@@ -230,8 +230,6 @@
 }
 
 .payment-row {
-  display: flex;
-  align-items: center;
   gap: 10px;
 }
 
@@ -246,9 +244,7 @@
 .card-payment-details {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px;
-  background: #f9f9f9;
+  gap: 5px;
   border-radius: 5px;
 }
 

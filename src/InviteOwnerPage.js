@@ -42,7 +42,6 @@ const InviteOwnerPage = () => {
           userName: "",
           userEmail: formData.userEmail,
           userPassword: "",
-          isOwner: true,
           editorUserId: "",
         }),
       });

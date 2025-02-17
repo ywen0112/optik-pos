@@ -140,18 +140,18 @@ const UserMaintenance = () => {
   
     const updatedFields = [
       { name: "userEmail", label: "Email", type: "email", required: true },
+      {
+        name: "accessRightId",
+        label: "User Role",
+        type: "select",
+        options: accessRights, 
+        required: true,
+      },
     ];
   
     if (user.userId) {
       updatedFields.push(
         { name: "userName", label: "Username", type: "text"},
-        {
-          name: "accessRightId",
-          label: "User Role",
-          type: "select",
-          options: accessRights, 
-          required: true,
-        },
         {
           name: "locationId",
           label: "Location Code",
@@ -160,7 +160,6 @@ const UserMaintenance = () => {
             label: locationMap[locationId],
             value: locationId,
           })),
-          required: true,
         }
       );
     }
@@ -198,6 +197,7 @@ const UserMaintenance = () => {
               userName: "",
               userEmail: newUser.userEmail,
               userPassword: "", 
+              accessRightId: newUser.accessRightId,
               editorUserId: userId,
             }),
           });

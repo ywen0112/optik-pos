@@ -587,7 +587,6 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
         <div className="sales-popup-form">
           <p><strong>Total: </strong>{formData.total.toFixed(2)}</p>
           <p><strong>Outstanding Balance: </strong>{outstandingBalance.toFixed(2)}</p>
-          {/* Display payment records */}
           {formData.payments.length > 0 && formData.payments.map((payment, index) => (
             <p key={index}>
               <strong>{payment.method}:</strong> {payment.amount.toFixed(2)}

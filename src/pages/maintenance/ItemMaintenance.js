@@ -101,7 +101,6 @@ const ItemMaintenance = () => {
           label: itemGroupMapping[itemGroupId], 
           value: itemGroupId, 
         })),
-        required: true,
       },
       {
         name: "itemTypeId",
@@ -111,7 +110,6 @@ const ItemMaintenance = () => {
           label: itemTypeMapping[itemTypeId], 
           value: itemTypeId, 
         })),
-        required: true,
       },
     ])
     }, [itemGroupMapping, itemTypeMapping]); 

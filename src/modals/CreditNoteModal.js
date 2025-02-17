@@ -18,9 +18,9 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
       description: "",
       desc2: "",
       itemUOMId: "",
-      unitPrice: "",
+      unitPrice: 0,
       qty: "",
-      discount: "",
+      discount: "percentage", 
       discountAmount: 0,
       subtotal: 0,
     }],
@@ -34,9 +34,10 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
     desc2: "",
     itemUOMId: "",
     unitPrice: "",
-    qty: "",
+    qty: 0,
     discount: "",
     discountAmount: "",
+    itemBatchId: "",
     subtotal: 0,
   });
 
@@ -62,7 +63,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
           itemUOMId: "",
           unitPrice: "",
           qty: "",
-          discount: "",
+          discount: "percentage", 
           discountAmount: "",
           subtotal: 0,
         }],
@@ -76,7 +77,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
         itemUOMId: "",
         unitPrice: "",
         qty: "",
-        discount: "",
+        discount: "percentage", 
         discountAmount: "", 
         subtotal: "",     
       });
@@ -123,7 +124,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: 0,
+          customerId: Number(localStorage.getItem("customerId")),
           keyword: "",
           offset: 0,
           limit: 9999,
@@ -168,7 +169,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: 0,
+          customerId: Number(localStorage.getItem("customerId")),
           keyword: "",
           offset: 0,
           limit: 9999,
@@ -194,173 +195,170 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
   };
 
   const handleItemChange = (selectedOption, rowIndex) => {
-    setFormData((prev) => {
-      const updatedItems = prev.items.map((item, index) => ({
-        ...item, 
-      }));
-  
-      updatedItems[rowIndex] = {
-        ...updatedItems[rowIndex], 
-        itemId: selectedOption.value,
-        itemCode: selectedOption.label,
-        description: selectedOption.description,
-        desc2: selectedOption.desc2,
-        itemUOMId: "", 
-        unitPrice: "",
-        subtotal: 0, 
-        availableUOMs: selectedOption.itemUOMs.map(uom => ({
-          value: uom.itemUOMId,
-          label: uom.uom,
-          unitPrice: uom.unitPrice,
-        })),
-      };
-  
-      return { ...prev, items: updatedItems };
-    });
-  };  
-  
-  const handleUOMChange = (selectedOption, rowIndex) => {
-    setFormData((prev) => {
-      const updatedItems = prev.items.map((item, index) => ({
-        ...item, 
-      }));
-  
-      updatedItems[rowIndex] = {
-        ...updatedItems[rowIndex],
-        itemUOMId: selectedOption.value,
-        unitPrice: selectedOption.unitPrice,
-        subtotal: (selectedOption.unitPrice * updatedItems[rowIndex].qty) - updatedItems[rowIndex].discountAmount,
-      };
-  
-      return { ...prev, items: updatedItems };
-    });
-  };
-  
-  const handleQuantityChange = (e, rowIndex) => {
-    const newQty = Math.max("", parseInt(e.target.value) || "");
-  
-    setFormData((prev) => {
-      const updatedItems = prev.items.map((item, index) => ({
-        ...item, 
-      }));
-  
-      updatedItems[rowIndex] = {
-        ...updatedItems[rowIndex],
-        qty: newQty,
-        subtotal: (updatedItems[rowIndex].unitPrice * newQty) - updatedItems[rowIndex].discountAmount,
-      };
-  
-      updateTotalAmount(updatedItems);
-      return { ...prev, items: updatedItems };
-    });
-  };
+      setFormData((prev) => {
+        const updatedItems = [...prev.items];
     
-
-  const handleDiscountChange = (e, rowIndex) => {
-    const discountValue = e.target.value; 
-  
-    setFormData((prev) => {
-      const updatedItems = [...prev.items];
-      updatedItems[rowIndex] = {
-        ...updatedItems[rowIndex],
-        discount: discountValue, 
-      };
-  
-      console.log(`Updating Discount for row ${rowIndex}:`, {
-        discount: discountValue,
-      });
-  
-      return { ...prev, items: updatedItems };
-    });
-  };
-
-  const handleDiscountAmountChange = (e, rowIndex) => {
-    const discountAmount = Math.max("", parseFloat(e.target.value) || "");
-  
-    setFormData((prev) => {
-      const updatedItems = prev.items.map((item, index) => {
-        if (index === rowIndex) {
-          const unitPrice = parseFloat(item.unitPrice) || "";
-          const qty = parseInt(item.qty, 10) || "";
-          return {
-            ...item,
-            discountAmount,
-            subtotal: (unitPrice * qty) - discountAmount,
-          };
-        }
-        return item;
-      });
-  
-      return { ...prev, items: updatedItems };
-    });
-  
-    updateTotalAmount();
-  };
-  
-
-  useEffect(() => {
-    setItem((prev) => ({
-      ...prev,
-      subtotal: (prev.unitPrice * prev.qty) - prev.discountAmount,
-    }));
-  }, [item.unitPrice, item.qty, item.discountAmount]);
-
-  const handleAddItem = () => {
-    const lastItem = formData.items[formData.items.length - 1];
-  
-    if (!lastItem.itemId || lastItem.qty <= 0 || lastItem.unitPrice <= 0) {
-      setErrorModal({
-        isOpen: true,
-        title: "Incomplete Item",
-        message: "Please fill in all required fields before adding a new item.",
-      });
-      return;
-    }
-  
-    setFormData((prev) => ({
-      ...prev,
-      items: [
-        ...prev.items, 
-        {
-          itemId: "",
-          itemCode: "",
-          description: "",
-          desc2: "",
+        updatedItems[rowIndex] = {
+          ...updatedItems[rowIndex],
+          itemId: selectedOption.value,
+          itemCode: selectedOption.label,
+          description: selectedOption.description,
+          desc2: selectedOption.desc2,
           itemUOMId: "",
           unitPrice: "",
-          qty: "",
-          discount: "",
-          discountAmount: "",
-          subtotal: 0,
-        },
-      ],
-    }));
-  };  
-
-  useEffect(() => {
-    if (isOpen) {
+          subtotal: 0, 
+          availableUOMs: selectedOption.itemUOMs.map(uom => ({ 
+            value: uom.itemUOMId,
+            label: uom.uom,
+            unitPrice: uom.unitPrice,
+          })),
+        };
+    
+        const newTotal = updatedItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+        
+        return { ...prev, items: updatedItems, total: newTotal };
+      });
+    };
+    
+    
+    const handleUOMChange = (selectedOption, rowIndex) => {
+      setFormData((prev) => {
+        const updatedItems = [...prev.items];
+    
+        updatedItems[rowIndex] = {
+          ...updatedItems[rowIndex],
+          itemUOMId: selectedOption.value,
+          unitPrice: selectedOption.unitPrice,
+          subtotal: (selectedOption.unitPrice * updatedItems[rowIndex].qty) - (updatedItems[rowIndex].discountAmount || 0),
+        };
+    
+        const newTotal = updatedItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+    
+        return { ...prev, items: updatedItems, total: newTotal };
+      });
+    };
+    
+    const handleQuantityChange = (e, rowIndex) => {
+      let newQty = parseInt(e.target.value);
+  
+      if (isNaN(newQty)) {
+        newQty = 0;
+      }
+    
+      setFormData((prev) => {
+        const updatedItems = [...prev.items];
+    
+        updatedItems[rowIndex] = {
+          ...updatedItems[rowIndex],
+          qty: newQty,
+          subtotal: (updatedItems[rowIndex].unitPrice || 0) * newQty - (updatedItems[rowIndex].discountAmount || 0),
+        };
+    
+        const newTotal = updatedItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+    
+        return { ...prev, items: updatedItems, total: newTotal };
+      });
+    };
+  
+    const handleDiscountTypeChange = (selectedOption, rowIndex) => {
+      setFormData((prev) => {
+        const updatedItems = [...prev.items];
+        updatedItems[rowIndex] = {
+          ...updatedItems[rowIndex],
+          discount: selectedOption.value, 
+          discountAmount: 0, 
+        };
+    
+        return { ...prev, items: updatedItems };
+      });
+    };
+  
+  
+    const handleDiscountAmountChange = (e, rowIndex) => {
+      let discountValue = e.target.value.trim(); // Get input value
+    
+      setFormData((prev) => {
+        const updatedItems = prev.items.map((item, index) => {
+          if (index === rowIndex) {
+            const unitPrice = parseFloat(item.unitPrice) || 0;
+            const qty = parseInt(item.qty, 10) || 0;
+            let finalDiscountAmount = 0;
+            let subtotal = unitPrice * qty; // Base subtotal before discount
+    
+            if (item.discount === "percentage") {
+              finalDiscountAmount = (subtotal * discountValue) / 100; // Calculate discount as percentage
+            } else {
+              finalDiscountAmount = discountValue; // Fixed discount amount
+            }
+    
+            return {
+              ...item,
+              discountAmount: discountValue, // Store user input as discountAmount
+              subtotal: subtotal - finalDiscountAmount, // Calculate final subtotal
+            };
+          }
+          return item;
+        });
+    
+        return { ...prev, items: updatedItems, total: updatedItems.reduce((sum, item) => sum + item.subtotal, 0) };
+      });
+    };  
+  
+    useEffect(() => {
+      setItem((prev) => ({
+        ...prev,
+        subtotal: (prev.unitPrice * prev.qty) - prev.discountAmount,
+      }));
+    }, [item.unitPrice, item.qty, item.discountAmount]);
+  
+    const handleAddItem = () => {
+      const lastItem = formData.items[formData.items.length - 1];
+    
+      if (!lastItem.itemId || lastItem.qty <= 0 || lastItem.unitPrice <= 0) {
+        setErrorModal({
+          isOpen: true,
+          title: "Incomplete Item",
+          message: "Please fill in all required fields before adding a new item.",
+        });
+        return;
+      }
+    
       setFormData((prev) => ({
         ...prev,
-        payments: [],
-        total: prev.items.reduce((sum, item) => sum + item.subtotal, 0),
+        items: [
+          ...prev.items, 
+          {
+            itemId: "",
+            itemCode: "",
+            description: "",
+            desc2: "",
+            itemUOMId: "",
+            unitPrice: "",
+            qty: "",
+            discount: "",
+            discountAmount: "",
+            subtotal: 0,
+          },
+        ],
       }));
-    }
-  }, [isOpen]);
-
-  const updateTotalAmount = () => {
-    setFormData((prev) => ({
-      ...prev,
-      total: prev.items.reduce((sum, item) => sum + item.subtotal, 0),
-    }));
-  };
-
+    };  
+  
+    useEffect(() => {
+      if (isOpen) {
+        setFormData((prev) => ({
+          ...prev,
+          payments: [],
+          total: prev.items.reduce((sum, item) => sum + item.subtotal, 0),
+        }));
+      }
+    }, [isOpen]);
 
   const handleSubmit = async () => {
-    if (!formData.debtorId || !formData.locationId || formData.items.length === 0) {
+    if (!formData.debtorId || formData.items.length === 0) {
       setErrorModal({
         isOpen: true,
         title: "Missing Information",
-        message: "Please ensure debtor, location, and at least one item are selected.",
+        message: "Please ensure debtor, and at least one item are selected.",
       });
       return;
     }
@@ -439,7 +437,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
   return (
     <div className="sales-modal-overlay">
       <div className="sales-modal-content">
-        <h2>CreditNote</h2>
+        <h2>Credit Note</h2>
         <div className="sales-popup-form">
           <div className="sales-form-row">
             <div className="sales-form-group">
@@ -448,7 +446,9 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
             </div>
             <div className="sales-form-group">
               <label>Company Name</label>
-              <input type="text" value={formData.companyName} readOnly />
+              <input type="text" value={formData.companyName} 
+              onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
+             />
             </div>
             <div className="sales-form-group">
               <label>Location Code</label>
@@ -470,7 +470,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
               </tr>
             </thead>
             <tbody>
-              {formData.items.map((itm, index) => (
+            {formData.items.map((itm, index) => (
                 <tr key={index}>
                   <td>
                     <Select options={items} value={items.find((option) => option.value === itm.itemId) || null} onChange={(selectedOption) => handleItemChange(selectedOption, index)} isSearchable placeholder="Select Item" />
@@ -478,7 +478,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
                   <td className="readonly-field"><input type="text" value={itm.description} readOnly /></td>
                   <td>
                     <Select 
-                      options={itm.availableUOMs || []} 
+                      options={itm.availableUOMs || []}
                       value={itm.availableUOMs?.find((uom) => uom.value === itm.itemUOMId) || null} 
                       onChange={(selectedOption) => handleUOMChange(selectedOption, index)}
                       isSearchable 
@@ -490,25 +490,28 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
                   </td>
                   <td>
                     <input type="text" 
-                       min="0"
-                      value={itm.qty} 
-                      onChange={(e) => handleQuantityChange(e, index)} 
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      value={itm.discount}
-                      onChange={(e) => handleDiscountChange(e, index)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      value={itm.discountAmount}
                       min="0"
-                      onChange={(e) => handleDiscountAmountChange(e, index)}
+                      value={itm.qty} 
+                      onChange={(e) => handleQuantityChange(e, index)}
                     />
+                  </td>
+                  <td>
+                    <Select
+                      options={[
+                        { value: "percentage", label: "Percentage (%)" },
+                        { value: "fixed", label: "Fixed Amount" },
+                      ]}
+                      value={{ value: itm.discount, label: itm.discount === "percentage" ? "Percentage (%)" : "Fixed Amount" }}
+                      onChange={(selectedOption) => handleDiscountTypeChange(selectedOption, index)}
+                    />
+                  </td>
+                  <td>
+                  <input
+                    type="text"
+                    value={itm.discountAmount} 
+                    onChange={(e) => handleDiscountAmountChange(e, index)}
+                    min="0"
+                  />
                   </td>
                   <td className="readonly-field">
                     <input type="number" value={itm.subtotal.toFixed(2)} readOnly />

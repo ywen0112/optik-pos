@@ -7,12 +7,14 @@ import SalesInvoice from "../../modals/SalesInvoiceModal";
 import PurchaseInvoiceModal from "../../modals/PurchaseInvoiceModal";
 import CreditNoteModal from "../../modals/CreditNoteModal";
 import CloseCounterModal from "../../modals/CloseCounterModal";
+import CloseCounterSummaryModal from "../../modals/CloseCounterSummaryModal";
 
 const Transaction = () => {
   const [isCounterOpen, setIsCounterOpen] = useState(false);
   const [openCounterAmount, setOpenCounterAmount] = useState("");
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [counterSessionId, setCounterSessionId] = useState(null);
+  const [counterSummary, setCounterSummary] = useState(null);
 
   const [modalType, setModalType] = useState(null); 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,7 +56,7 @@ const Transaction = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: customerId,
+          customerId: Number(customerId),
           userId: userId,
           openingBalance: parseFloat(openCounterAmount),
         }),
@@ -93,9 +95,7 @@ const Transaction = () => {
       console.log("Close Counter Response:", data);
 
       if (response.ok && data.success) {
-        localStorage.removeItem("counterSessionId");
-        localStorage.removeItem("openingBalance");
-        setCounterSessionId(null);
+        setCounterSummary(data.data); 
         setIsCounterOpen(false);
         setOpenCounterAmount("");
         setIsCloseCounterOpen(false);
@@ -322,6 +322,11 @@ const Transaction = () => {
     <PurchaseInvoiceModal isOpen={isPurchaseInvoiceOpen} onClose={handleClosePurchaseInvoice} />
     <CreditNoteModal isOpen={isCreditNoteOpen} onClose={handleCloseCreditNote} />
     <CloseCounterModal isOpen={isCloseCounterOpen} onClose={handleCloseCloseCounter} onCloseCounter={handleCloseCounter}/>
+    <CloseCounterSummaryModal 
+      isOpen={!!counterSummary} 
+      summary={counterSummary} 
+      onClose={() => setCounterSummary(null)} 
+    />
 
 </div>
   );

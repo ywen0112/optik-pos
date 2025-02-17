@@ -82,7 +82,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
         itemUOMId: "",
         unitPrice: "",
         qty: "",
-        discount: "",
+        discount: "percentage",
         discountAmount: "", 
         subtotal: "",     
       });
@@ -131,7 +131,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: 0,
+          customerId: Number(localStorage.getItem("customerId")),
           keyword: "",
           offset: 0,
           limit: 9999,
@@ -176,7 +176,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: 0,
+          customerId: Number(localStorage.getItem("customerId")),
           keyword: "",
           offset: 0,
           limit: 9999,
@@ -389,11 +389,11 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
 
 
   const handleSubmit = async () => {
-    if (!formData.debtorId || !formData.locationId || formData.items.length === 0) {
+    if (!formData.debtorId || formData.items.length === 0) {
       setErrorModal({
         isOpen: true,
         title: "Missing Information",
-        message: "Please ensure debtor, location, and at least one item are selected.",
+        message: "Please ensure debtor, and at least one item are selected.",
       });
       return;
     }

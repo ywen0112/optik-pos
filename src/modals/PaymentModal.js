@@ -21,9 +21,16 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
   }, [isOpen, type, total]);
 
   const handlePaymentChange = (selectedOption, index) => {
-    const updatedPayments = [...payments];
-    updatedPayments[index].method = selectedOption.value;
-    setPayments(updatedPayments);
+    setPayments((prevPayments) => {
+      const updatedPayments = [...prevPayments];
+      updatedPayments[index] = {
+        ...updatedPayments[index],
+        method: selectedOption.value,
+        ...(selectedOption.value === "card" && { cardNo: "", approvalCode: "" }), 
+        ...(selectedOption.value === "bank" && { referenceNo: "" }), 
+      };
+      return updatedPayments;
+    });
   };
 
   const handleAmountChange = (e, index) => {
@@ -43,6 +50,19 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
   const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
   const outstandingBalance = total > totalPaid ? total - totalPaid : 0;
   const changes = totalPaid > total ? totalPaid - total : 0;
+
+  const remark = payments
+    .map(payment => {
+      let details = `Method: ${payment.method.toUpperCase()}`;
+      if (payment.method === "card") {
+        details += `, Card No: ${payment.cardNo || "N/A"}, Approval Code: ${payment.approvalCode || "N/A"}`;
+      }
+      if (payment.method === "bank") {
+        details += `, Reference No: ${payment.referenceNo || "N/A"}`;
+      }
+      return details;
+    })
+    .join(" | ");
 
   const handleConfirmPayment = async () => {
     setLoading(true);
@@ -64,7 +84,7 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
           counterSessionId: counterSessionId,
           targetDocId: targetDocId,
           docDate: new Date().toISOString(),
-          remark: "",
+          remark: remark,
           reference: "", 
           amount: formattedAmount,
         }),
@@ -93,8 +113,8 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className="transaction-modal-overlay">
+      <div className="transaction-modal-content">
         <h2>{type === "Multi" ? "Multipayment" : `${type} Payment`}</h2>
         <p><strong>Total Amount:</strong> {total.toFixed(2)}</p>
         {outstandingBalance > 0 ? (
@@ -103,6 +123,13 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
           <p><strong>Changes:</strong> {changes.toFixed(2)}</p>
         )}
         <div className="payment-container">
+          {type === "Multi" && (
+            <div className="multi-add">
+            <button className="modal-add-payment-button" onClick={addPaymentMethod}>
+              Add
+            </button>
+            </div>  
+          )}
           {payments.map((payment, index) => (
             <div key={index} className="payment-row">
               {type === "Multi" && (
@@ -114,23 +141,35 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
                   className="payment-method-select"
                 />
               )}
-              {type === "Card" && (
-                <div className="card-payment-details">
+              {(type === "Card" || payment.method === "card") && (
+                <>
                   <input
                     type="text"
-                    value={payment.cardNo}
+                    value={payment.cardNo || ""}
                     onChange={(e) => handleCardDetailsChange(e, index, "cardNo")}
                     placeholder="Card Number"
-                    className="card-input"
+                    className="payment-amount-input"
                   />
                   <input
                     type="text"
-                    value={payment.approvalCode}
+                    value={payment.approvalCode || ""}
                     onChange={(e) => handleCardDetailsChange(e, index, "approvalCode")}
                     placeholder="Approval Code"
-                    className="card-input"
+                    className="payment-amount-input"
                   />
-                </div>
+                </>
+              )}
+
+              {(type === "Bank" || payment.method === "bank") && (
+                <>
+                  <input
+                    type="text"
+                    value={payment.referenceNo || ""}
+                    onChange={(e) => handleCardDetailsChange(e, index, "referenceNo")}
+                    placeholder="Reference No"
+                    className="payment-amount-input"
+                  />
+                </>
               )}
               <input
                 type="number"
@@ -141,10 +180,6 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
                 className="payment-amount-input"
               />
 
-              {type === "Multi" && (
-                <button className="modal-add-payment-button" onClick={addPaymentMethod}>Add Payment Method</button>
-              )}
-
               {type === "Multi" && payments.length > 1 && (
                 <button className="remove-btn" onClick={() => removePaymentMethod(index)}>X</button>
               )}
@@ -152,7 +187,7 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
           ))}
         </div>
 
-        <div className="transaction-modal-buttons">
+        <div className="sales-modal-buttons">
           <button className="modal-add-button" onClick={handleConfirmPayment} disabled={loading}>
             {loading ? "Processing..." : "Confirm Payment"}
           </button>

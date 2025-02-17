@@ -38,7 +38,6 @@ const CrudModal = ({
       data.itemUOMs.forEach((uom, index) => {
         if (!uom.uom) validationErrors[`itemUOMs.${index}.uom`] = "UOM is required.";
         if (!uom.unitPrice) validationErrors[`itemUOMs.${index}.unitPrice`] = "Unit Price is required.";
-        if (!uom.barCode) validationErrors[`itemUOMs.${index}.barCode`] = "Barcode is required.";
       });
     }
   

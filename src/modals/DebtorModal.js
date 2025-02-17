@@ -40,7 +40,6 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
     const fieldsToValidate = [
       { label: "Debtor Code", name: "debtorCode" },
       { label: "Company Name", name: "companyName" },
-      { label: "Debtor Type Code", name: "debtorTypeId", type: "select", options: debtorTypeOptions },
     ];
   
     const validationErrors = validateFields(fieldsToValidate);

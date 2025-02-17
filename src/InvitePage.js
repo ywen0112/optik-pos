@@ -8,7 +8,7 @@ const InvitePage = () => {
   const [customerId, setCustomerId] = useState("");
   const [userName, setUserName] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [isOwner, setIsOwner] = (false);
+  const [isOwner, setIsOwner] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);

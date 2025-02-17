@@ -21,7 +21,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       itemUOMId: "",
       unitPrice: 0,
       qty: "",
-      discount: "",
+      discount: "percentage", 
       discountAmount: 0,
       subtotal: 0,
     }],
@@ -67,8 +67,8 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
           itemUOMId: "",
           unitPrice: "",
           qty: "",
-          discount: "",
-          discountAmount: "",
+          discount: "percentage", 
+          discountAmount: 0,
           subtotal: 0,
         }],
         payments: [],
@@ -203,12 +203,10 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
 
   const handleItemChange = (selectedOption, rowIndex) => {
     setFormData((prev) => {
-      const updatedItems = prev.items.map((item, index) => ({
-        ...item, 
-      }));
+      const updatedItems = [...prev.items];
   
       updatedItems[rowIndex] = {
-        ...updatedItems[rowIndex], 
+        ...updatedItems[rowIndex],
         itemId: selectedOption.value,
         itemCode: selectedOption.label,
         description: selectedOption.description,
@@ -223,88 +221,95 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
         })),
       };
   
-      return { ...prev, items: updatedItems };
+      const newTotal = updatedItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+      
+      return { ...prev, items: updatedItems, total: newTotal };
     });
-  };  
+  };
+  
   
   const handleUOMChange = (selectedOption, rowIndex) => {
     setFormData((prev) => {
-      const updatedItems = prev.items.map((item, index) => ({
-        ...item, 
-      }));
+      const updatedItems = [...prev.items];
   
       updatedItems[rowIndex] = {
         ...updatedItems[rowIndex],
         itemUOMId: selectedOption.value,
         unitPrice: selectedOption.unitPrice,
-        subtotal: (selectedOption.unitPrice * updatedItems[rowIndex].qty) - updatedItems[rowIndex].discountAmount,
+        subtotal: (selectedOption.unitPrice * updatedItems[rowIndex].qty) - (updatedItems[rowIndex].discountAmount || 0),
       };
   
-      return { ...prev, items: updatedItems };
+      const newTotal = updatedItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+  
+      return { ...prev, items: updatedItems, total: newTotal };
     });
   };
   
   const handleQuantityChange = (e, rowIndex) => {
-    const newQty = Math.max("", parseInt(e.target.value) || "");
+    let newQty = parseInt(e.target.value);
+
+    if (isNaN(newQty)) {
+      newQty = 0;
+    }
   
     setFormData((prev) => {
-      const updatedItems = prev.items.map((item, index) => ({
-        ...item,
-      }));
+      const updatedItems = [...prev.items];
   
       updatedItems[rowIndex] = {
         ...updatedItems[rowIndex],
         qty: newQty,
-        subtotal: (updatedItems[rowIndex].unitPrice * newQty) - updatedItems[rowIndex].discountAmount,
+        subtotal: (updatedItems[rowIndex].unitPrice || 0) * newQty - (updatedItems[rowIndex].discountAmount || 0),
       };
   
-      updateTotalAmount(updatedItems);
-      return { ...prev, items: updatedItems };
+      const newTotal = updatedItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+  
+      return { ...prev, items: updatedItems, total: newTotal };
     });
   };
-    
 
-  const handleDiscountChange = (e, rowIndex) => {
-    const discountValue = e.target.value; 
-  
+  const handleDiscountTypeChange = (selectedOption, rowIndex) => {
     setFormData((prev) => {
       const updatedItems = [...prev.items];
       updatedItems[rowIndex] = {
         ...updatedItems[rowIndex],
-        discount: discountValue, 
+        discount: selectedOption.value, 
+        discountAmount: 0, 
       };
-  
-      console.log(`Updating Discount for row ${rowIndex}:`, {
-        discount: discountValue,
-      });
   
       return { ...prev, items: updatedItems };
     });
   };
 
+
   const handleDiscountAmountChange = (e, rowIndex) => {
-    const discountAmount = Math.max("", parseFloat(e.target.value) || "");
+    let discountValue = e.target.value.trim(); // Get input value
   
     setFormData((prev) => {
       const updatedItems = prev.items.map((item, index) => {
         if (index === rowIndex) {
-          const unitPrice = parseFloat(item.unitPrice) || "";
-          const qty = parseInt(item.qty, 10) || "";
+          const unitPrice = parseFloat(item.unitPrice) || 0;
+          const qty = parseInt(item.qty, 10) || 0;
+          let finalDiscountAmount = 0;
+          let subtotal = unitPrice * qty; // Base subtotal before discount
+  
+          if (item.discount === "percentage") {
+            finalDiscountAmount = (subtotal * discountValue) / 100; // Calculate discount as percentage
+          } else {
+            finalDiscountAmount = discountValue; // Fixed discount amount
+          }
+  
           return {
             ...item,
-            discountAmount,
-            subtotal: (unitPrice * qty) - discountAmount,
+            discountAmount: discountValue, // Store user input as discountAmount
+            subtotal: subtotal - finalDiscountAmount, // Calculate final subtotal
           };
         }
         return item;
       });
   
-      return { ...prev, items: updatedItems };
+      return { ...prev, items: updatedItems, total: updatedItems.reduce((sum, item) => sum + item.subtotal, 0) };
     });
-  
-    updateTotalAmount();
-  };
-  
+  };  
 
   useEffect(() => {
     setItem((prev) => ({
@@ -343,6 +348,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
         },
       ],
     }));
+    setIsPaymentConfirmed(false);
   };  
 
   useEffect(() => {
@@ -355,13 +361,6 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  const updateTotalAmount = () => {
-    setFormData((prev) => ({
-      ...prev,
-      total: prev.items.reduce((sum, item) => sum + item.subtotal, 0),
-    }));
-  };
-
   const handleOpenPaymentModal = (type) => {
     if (!isPaymentConfirmed) {
       setPaymentModal({ isOpen: true, type });
@@ -372,18 +371,22 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
     setPaymentModal({ isOpen: false, type: "" });
   };
 
-  const handleSubmitPayment = (payments) => {
+  const handleSubmitPayment = (payments, outstandingBalance, changes) => {
     setFormData((prev) => ({
       ...prev,
       payments,
+      outstandingBalance,
+      changes,
     }));
-
+  
     setIsPaymentConfirmed(true);
     setPaymentModal({ isOpen: false, type: "" });
   };
 
   const totalPaid = formData.payments.reduce((sum, p) => sum + p.amount, 0);
-  const outstandingBalance = formData.total - totalPaid;
+  const outstandingBalance = formData.total > totalPaid ? formData.total - totalPaid : 0;
+  const changes = totalPaid > formData.total ? totalPaid - formData.total : 0;
+
 
   const handleSubmit = async () => {
     if (!formData.debtorId || !formData.locationId || formData.items.length === 0) {
@@ -413,7 +416,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       debtorId: formData.debtorId,
       docDate: new Date().toISOString(),
       locationId: formData.locationId,
-      remark: `Total Paid: ${totalPaid.toFixed(2)}, Outstanding: ${outstandingBalance.toFixed(2)}`,
+      remark: "",
       total: formData.total,
       details: formData.items.map(item => ({
         itemId: item.itemId,
@@ -513,7 +516,9 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
             </div>
             <div className="sales-form-group">
               <label>Company Name</label>
-              <input type="text" value={formData.companyName} readOnly />
+              <input type="text" value={formData.companyName} 
+              onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
+              />
             </div>
             <div className="sales-form-group">
               <label>Location Code</label>
@@ -538,7 +543,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
               {formData.items.map((itm, index) => (
                 <tr key={index}>
                   <td>
-                    <Select options={items} value={items.find((option) => option.value === itm.itemId) || null} onChange={(selectedOption) => handleItemChange(selectedOption, index)} isSearchable placeholder="Select Item" />
+                    <Select options={items} value={items.find((option) => option.value === itm.itemId) || null} onChange={(selectedOption) => handleItemChange(selectedOption, index)} isSearchable placeholder="Select Item" isDisabled={isPaymentConfirmed} />
                   </td>
                   <td className="readonly-field"><input type="text" value={itm.description} readOnly /></td>
                   <td>
@@ -548,6 +553,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                       onChange={(selectedOption) => handleUOMChange(selectedOption, index)}
                       isSearchable 
                       placeholder="Select UOM" 
+                      isDisabled={isPaymentConfirmed} 
                     />
                   </td>
                   <td className="readonly-field">
@@ -555,25 +561,30 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                   </td>
                   <td>
                     <input type="text" 
-                       min="0"
-                      value={itm.qty} 
-                      onChange={(e) => handleQuantityChange(e, index)} 
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      value={itm.discount}
-                      onChange={(e) => handleDiscountChange(e, index)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      value={itm.discountAmount}
                       min="0"
-                      onChange={(e) => handleDiscountAmountChange(e, index)}
+                      value={itm.qty} 
+                      onChange={(e) => handleQuantityChange(e, index)}
+                      disabled={isPaymentConfirmed}  
                     />
+                  </td>
+                  <td>
+                    <Select
+                      options={[
+                        { value: "percentage", label: "Percentage (%)" },
+                        { value: "fixed", label: "Fixed Amount" },
+                      ]}
+                      value={{ value: itm.discount, label: itm.discount === "percentage" ? "Percentage (%)" : "Fixed Amount" }}
+                      onChange={(selectedOption) => handleDiscountTypeChange(selectedOption, index)}
+                    />
+                  </td>
+                  <td>
+                  <input
+                    type="text"
+                    value={itm.discountAmount} 
+                    onChange={(e) => handleDiscountAmountChange(e, index)}
+                    min="0"
+                    disabled={isPaymentConfirmed}
+                  />
                   </td>
                   <td className="readonly-field">
                     <input type="number" value={itm.subtotal.toFixed(2)} readOnly />
@@ -582,31 +593,39 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
               ))}
             </tbody>
            </table>
+           {!isPaymentConfirmed && (
            <button className="modal-add-item-button" onClick={handleAddItem}>Add Item</button>
+          )}
         </div>
         <div className="sales-popup-form">
           <p><strong>Total: </strong>{formData.total.toFixed(2)}</p>
-          <p><strong>Outstanding Balance: </strong>{outstandingBalance.toFixed(2)}</p>
+          {outstandingBalance > 0 ? (
+          <p><strong>Outstanding Balance:</strong> {outstandingBalance.toFixed(2)}</p>
+        ) : (
+          <p><strong>Changes:</strong> {changes.toFixed(2)}</p>
+        )}
           {formData.payments.length > 0 && formData.payments.map((payment, index) => (
             <p key={index}>
-              <strong>{payment.method}:</strong> {payment.amount.toFixed(2)}
+              <strong>{payment.method}:</strong> {payment.amount}
             </p>
           ))}
-
-        <div className="payment-options">
-            <button className="payment-button" onClick={() => handleOpenPaymentModal("Cash")} disabled={isPaymentConfirmed}>
-              Cash Payment
-            </button>
-            <button className="payment-button" onClick={() => handleOpenPaymentModal("Card")} disabled={isPaymentConfirmed}>
-              Card Payment
-            </button>
-            <button className="payment-button" onClick={() => handleOpenPaymentModal("Bank")} disabled={isPaymentConfirmed}>
-              Bank Transfer
-            </button>
-            <button className="payment-button" onClick={() => handleOpenPaymentModal("Multi")} disabled={isPaymentConfirmed}>
-              Multipayment
-            </button>
-          </div>
+            
+          {!isPaymentConfirmed && (
+            <div className="payment-options">
+              <button className="payment-button" onClick={() => handleOpenPaymentModal("Cash")}>
+                Cash Payment
+              </button>
+              <button className="payment-button" onClick={() => handleOpenPaymentModal("Card")}>
+                Card Payment
+              </button>
+              <button className="payment-button" onClick={() => handleOpenPaymentModal("Bank")}>
+                Bank Transfer
+              </button>
+              <button className="payment-button" onClick={() => handleOpenPaymentModal("Multi")}>
+                Multipayment
+              </button>
+            </div>
+          )}
         </div>
 
           <div className="transaction-modal-buttons">

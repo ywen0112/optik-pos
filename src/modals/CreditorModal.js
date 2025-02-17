@@ -40,12 +40,6 @@ const CreditorModal = ({
   const handleSave = () => {
     const fieldsToValidate = [
       { label: "Creditor Code", name: "creditorCode" },
-      {
-        label: "Creditor Type Code",
-        name: "creditorTypeId",
-        type: "select",
-        options: creditorTypeOptions,
-      },
       { label: "Company Name", name: "companyName" },
     ];
 

@@ -243,6 +243,23 @@
   flex: 1;
 }
 
+.card-payment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 5px;
+}
+
+.card-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
 .remove-btn {
   background-color: red;
   border: 0px;

@@ -198,6 +198,7 @@ const UserMaintenance = () => {
               userEmail: newUser.userEmail,
               userPassword: "", 
               accessRightId: newUser.accessRightId,
+              isOwner: false,
               editorUserId: userId,
             }),
           });
@@ -211,7 +212,6 @@ const UserMaintenance = () => {
             message: `Invitation Link: ${inviteLink}`, 
           });
   
-            setUsers((prevUsers) => [...prevUsers, newUser]);
             setIsPopupOpen(false);
           } else {
             throw new Error(inviteLink || "Failed to invite user.");

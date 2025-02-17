@@ -28,7 +28,7 @@ const InvitePage = () => {
       setCustomerId(customerIdParam);
       setEmail(userEmailParam);
       setCompanyName(companyNameParm);
-      setIsOwner(isOwnerParm);
+      setIsOwner(isOwnerParm.toLowerCase() === "true");
     } catch (err) {
       setError(err.message);
     }

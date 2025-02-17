@@ -16,19 +16,13 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
 
   useEffect(() => {
     if (isOpen) {
-      setPayments(
-        type === "Multi"
-          ? [{ method: "", amount: 0, cardNo: "", approvalCode: "" }]
-          : [{ method: type, amount: total.toFixed(2), cardNo: "", approvalCode: "" }]
-      );
+      setPayments(type === "Multi" ? [{ method: "", amount: 0 }] : [{ method: type, amount: total.toFixed(2) }]);
     }
   }, [isOpen, type, total]);
 
   const handlePaymentChange = (selectedOption, index) => {
     const updatedPayments = [...payments];
     updatedPayments[index].method = selectedOption.value;
-    updatedPayments[index].cardNo = ""; // Reset if method changes
-    updatedPayments[index].approvalCode = "";
     setPayments(updatedPayments);
   };
 
@@ -38,14 +32,8 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
     setPayments(updatedPayments);
   };
 
-  const handleCardDetailsChange = (e, index, field) => {
-    const updatedPayments = [...payments];
-    updatedPayments[index][field] = e.target.value;
-    setPayments(updatedPayments);
-  };
-
   const addPaymentMethod = () => {
-    setPayments([...payments, { method: "", amount: 0, cardNo: "", approvalCode: "" }]);
+    setPayments([...payments, { method: "", amount: 0 }]);
   };
 
   const removePaymentMethod = (index) => {
@@ -77,14 +65,8 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
           targetDocId: targetDocId,
           docDate: new Date().toISOString(),
           remark: "",
-          reference: "",
+          reference: "", 
           amount: formattedAmount,
-          payments: payments.map(p => ({
-            method: p.method,
-            amount: p.amount,
-            cardNo: p.method === "card" ? p.cardNo : null,
-            approvalCode: p.method === "card" ? p.approvalCode : null,
-          })),
         }),
       });
 
@@ -93,13 +75,19 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
         throw new Error(data.errorMessage || "Failed to save payment.");
       }
 
-      onSubmit(payments, outstandingBalance, changes);
+      onSubmit(payments, outstandingBalance, changes); 
       onClose();
     } catch (error) {
       setErrorModal({ isOpen: true, title: "Error Save Payment", message: error.message });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCardDetailsChange = (e, index, field) => {
+    const updatedPayments = [...payments];
+    updatedPayments[index][field] = e.target.value;
+    setPayments(updatedPayments);
   };
 
   if (!isOpen) return null;
@@ -144,7 +132,6 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
                   />
                 </div>
               )}
-
               <input
                 type="number"
                 value={payment.amount}
@@ -153,7 +140,7 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
                 min="0"
                 className="payment-amount-input"
               />
-              
+
               {type === "Multi" && (
                 <button className="modal-add-payment-button" onClick={addPaymentMethod}>Add Payment Method</button>
               )}

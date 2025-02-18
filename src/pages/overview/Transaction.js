@@ -95,6 +95,8 @@ const Transaction = () => {
       console.log("Close Counter Response:", data);
 
       if (response.ok && data.success) {
+        localStorage.removeItem("counterSessionId");
+        localStorage.removeItem("openingBalance");
         setCounterSummary(data.data); 
         setIsCounterOpen(false);
         setOpenCounterAmount("");

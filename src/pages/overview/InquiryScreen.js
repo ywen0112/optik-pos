@@ -8,7 +8,11 @@ const InquiryScreen = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalRecords, setTotalRecords] = useState(true);
-  const [activeTab, setActiveTab] = useState("cashTransaction");
+  const [activeTab, setActiveTab] = useState("counterSession");
+  const [counterSessions, setSessionCounters] = useState([]);
+  const [expandedCounterRow, setExpandedCounterRow] = useState(null);
+  // const [openDate, setOpenDate] = useState("");
+  // const [closeDate, setCloseDate] = useState("");
   const [docNo, setDocNo] = useState("");
   const [isVoid, setIsVoid] = useState(false);
   const [isCashOut, setIsCashOut] = useState(false);
@@ -17,17 +21,20 @@ const InquiryScreen = () => {
   const [transactions, setTransactions] = useState([]);
   const [usersCache, setUsersCache] = useState({});
   const [salesTransactions, setSalesTransactions] = useState([]);
+  const [expandedRow, setExpandedRow] = useState(null);
   const [isComplete, setIsComplete] = useState(false);
   const [isSalesVoid, setIsSalesVoid] = useState(false);
   const [showAllSales, setShowAllSales] = useState(true);
   const [isSalesVoidAndCompleted, setIsSalesVoidAndCompleted] = useState(false);
   const [debtorCode, setDebtorCode] = useState("");
   const [purchaseTransactions, setPurchaseTransactions] = useState([]);
+  const [expandedPurchaseRow, setExpandedPurchaseRow] = useState(null);
   const [isPurchaseVoid, setIsPurchaseVoid] = useState(false);
   const [isPurchaseVoidAndCompleted, setIsPurchaseVoidAndCompleted] = useState(false);
   const [showAllPurchases, setShowAllPurchases] = useState(true);
   const [creditorCode, setCreditorCode] = useState("");
   const [creditNote, setCreditNote] = useState([]);
+  const [expandedCreditNoteRow, setExpandedCreditNoteRow] = useState(null);
   const [showAllCreditNote, setShowAllCreditNote] = useState(true);
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, transactionId: null, message: "" });
   const [confirmSalesModal, setConfirmSalesModal] = useState({ isOpen: false, salesId: null, message: "" });
@@ -37,7 +44,10 @@ const InquiryScreen = () => {
   const customerId = Number(localStorage.getItem("customerId"));
 
   useEffect(() => {
-    if (activeTab === "cashTransaction") {
+    if (activeTab === "counterSession") {
+      fetchCounterSessions();
+    } 
+    else if (activeTab === "cashTransaction") {
       fetchTransactions();
     }
     else if (activeTab === "salesInvoice") {
@@ -50,6 +60,35 @@ const InquiryScreen = () => {
       fetchCreditNotes();
     }
   }, [activeTab, itemsPerPage, currentPage]);
+
+  const fetchCounterSessions = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/CashCounter/GetCounterSessionRecords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: customerId,
+          keyword: "",
+          offset: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setSessionCounters([...data.data]);
+        fetchUserNames(data.data);
+        setTotalRecords(Math.ceil(data.data.length === itemsPerPage))
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch transactions.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Fetch Error", message: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchTransactions = async () => {
     setLoading(true);
@@ -461,8 +500,10 @@ const InquiryScreen = () => {
     <div className="inquiry-container">
       <h3>Transaction Inquiry</h3>
 
-      {/* Tabs Section */}
       <div className="inquiry-tabs">
+        <button className={activeTab === "counterSession" ? "active" : ""} onClick={() => setActiveTab("counterSession")}>
+          Counter Session
+        </button>
         <button className={activeTab === "cashTransaction" ? "active" : ""} onClick={() => setActiveTab("cashTransaction")}>
           Cash Transaction
         </button>
@@ -477,7 +518,151 @@ const InquiryScreen = () => {
         </button>
       </div>
 
-      {/* Inquiry Screens */}
+      {activeTab === "counterSession" && (
+        <>
+          {/* <div className="search-inquiry-container">
+            <label>Open Date:</label>
+            <input
+              type="date"
+              value={openDate}
+              onChange={(e) => setOpenDate(e.target.value)}
+              className="date-input"
+            />
+
+            <label>Close Date:</label>
+            <input
+              type="date"
+              value={closeDate}
+              onChange={(e) => setCloseDate(e.target.value)}
+              className="date-input"
+            />
+          </div>      */}
+          <div className="pagination-controls">
+            <label>
+              Show:
+              <select
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+                className="items-per-page-select"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+              </select>
+              items per page
+            </label>
+          </div>
+
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <table className="inquiry-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Session Code</th>
+                  <th>Opening Balance</th>
+                  <th>Closing Balance</th>
+                  <th>Variance</th>
+                  <th>Opened By</th>
+                  <th>Closed By</th>
+                  <th>Open Time</th>
+                  <th>Close Time</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {counterSessions.map((txn, index) => {
+                  const isExpanded = expandedCounterRow === txn.counterSessionId;
+                  return (
+                    <React.Fragment key={txn.counterSessionId}>
+                      <tr>
+                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                        <td>{txn.sessionCode}</td>
+                        <td>{txn.openingBal}</td>
+                        <td>{txn.closingBal !== null ? txn.closingBal : "-"}</td>
+                        <td>{txn.variance !== null ? txn.variance : "-"}</td>
+                        <td>{txn.openBy}</td>
+                        <td>{txn.closeBy ? txn.closeBy : "-"}</td>
+                        <td>{formatDateTime(txn.openTime)}</td>
+                        <td>{txn.closeTime ? formatDateTime(txn.closeTime) : "-"}</td>
+                        <td>
+                          <button
+                            className="view-button"
+                            onClick={() => setExpandedCounterRow(isExpanded ? null : txn.counterSessionId)}
+                          >
+                            {isExpanded ? "Hide" : "View"}
+                          </button>
+                        </td>
+                      </tr>
+
+                      {isExpanded && (
+                        <tr className="expanded-row">
+                          <td colSpan="10">
+                            <div className="expanded-content">
+                              <h4>Additional Details</h4>
+                              <table className="details-table">
+                                <tbody>
+                                  <tr>
+                                    <td><strong>Sales Amount:</strong></td>
+                                    <td>{txn.salesAmt}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><strong>Purchase Amount:</strong></td>
+                                    <td>{txn.purchaseAmt}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><strong>Sales Payment Amount:</strong></td>
+                                    <td>{txn.salesPaymentAmt}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><strong>Purchase Payment Amount:</strong></td>
+                                    <td>{txn.purchasePaymentAmt}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><strong>Cash In Amount:</strong></td>
+                                    <td>{txn.cashInAmt}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><strong>Cash Out Amount:</strong></td>
+                                    <td>{txn.cashOutAmt}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><strong>Expected Closing Balance:</strong></td>
+                                    <td>{txn.expectedClosingBalance}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+          <div className="pagination">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage}
+            </span>
+            <button
+              disabled={!totalRecords}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              Next
+            </button>
+          </div>
+        </>
+      )}
+      
       {activeTab === "cashTransaction" && (
         <>
           <div className="search-inquiry-container">
@@ -565,7 +750,7 @@ const InquiryScreen = () => {
                     <td>{txn.remarks}</td>
                     <td>{txn.isVoid ? "Yes" : "No"}</td>
                     <td>{txn.isCashOut ? "Yes" : "No"}</td>
-                    <td>{usersCache[txn.createdBy] || "Loading..."}</td>
+                    <td>{usersCache[txn.createdBy] || "-"}</td>
                     <td>{formatDateTime(txn.createdTimeStamp)}</td>
                     <td>{usersCache[txn.lastModifiedBy] || "-"}</td>
                     <td>{formatDateTime(txn.lastModifiedTimeStamp)}</td>
@@ -639,39 +824,109 @@ const InquiryScreen = () => {
                   <th>Debtor Code</th>
                   <th>Total</th>
                   <th>Outstanding</th>
-                  <th>Change</th>
-                  <th>Location</th>
                   <th>Completed</th>
                   <th>Void</th>
                   <th>Doc Date</th>
+                  <th>Location Code</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredSalesTransactions.map((txn, index) => {
-                  const outstandingView = txn.outstandingBal < 0 ? 0 : txn.outstandingBal;
-                  const changeView = txn.outstandingBal < 0 ? Math.abs(txn.outstandingBal) : 0;
-
+                  const isExpanded = expandedRow === txn.salesId;
                   return (
-                    <tr key={txn.salesId}>
-                      <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                      <td>{txn.docNo}</td>
-                      <td>{txn.debtorCode}</td>
-                      <td>{txn.total}</td>
-                      <td>{outstandingView}</td>
-                      <td>{changeView}</td>
-                      <td>{txn.locationCode}</td>
-                      <td>{txn.isComplete ? "Yes" : "No"}</td>
-                      <td>{txn.isVoid ? "Yes" : "No"}</td>
-                      <td>{formatDateTime(txn.docDate)}</td>
-                      <td>
-                        {txn.isVoid ? (
-                          <button className="disabled-void" disabled>Voided</button>
-                        ) : (
-                          <button className="void-button" onClick={() => confirmVoidSalesTransaction(txn.salesId)}>Void</button>
-                        )}
-                      </td>
-                    </tr>
+                    <React.Fragment key={txn.salesId}>
+                      <tr>
+                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                        <td>{txn.docNo}</td>
+                        <td>{txn.debtorCode}</td>
+                        <td>{txn.total}</td>
+                        <td>{txn.outstandingBal < 0 ? 0 : txn.outstandingBal}</td>
+                        <td>{txn.isComplete ? "Yes" : "No"}</td>
+                        <td>{txn.isVoid ? "Yes" : "No"}</td>
+                        <td>{formatDateTime(txn.docDate)}</td>
+                        <td>{txn.locationCode || "-"}</td>
+                        <td>
+                          {txn.isVoid ? (
+                            <button className="disabled-void" disabled>Voided</button>
+                          ) : (
+                            <button
+                              className="void-button"
+                              onClick={() => confirmVoidSalesTransaction(txn.salesId)}
+                            >
+                              Void
+                            </button>
+                          )}
+
+                          <button
+                            className="view-button"
+                            onClick={() => setExpandedRow(isExpanded ? null : txn.salesId)}
+                          >
+                            {isExpanded ? "Hide" : "View"}
+                          </button>
+                        </td>
+                      </tr>
+
+                      {isExpanded && (
+                        <tr className="expanded-row">
+                          <td colSpan="9">
+                            <div className="expanded-content">
+                              <h4>Details</h4>
+                              <table className="details-table">
+                                <thead>
+                                  <tr>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>UOM</th>
+                                    <th>Qty</th>
+                                    <th>Unit Price</th>
+                                    <th>Discount</th>
+                                    <th>SubTotal</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {txn.details.map((detail) => (
+                                    <tr key={detail.salesDetailId}>
+                                      <td>{detail.itemCode}</td>
+                                      <td>{detail.description}</td>
+                                      <td>{detail.uom}</td>
+                                      <td>{detail.qty}</td>
+                                      <td>{detail.unitPrice}</td>
+                                      <td>{detail.discountAmount}</td>
+                                      <td>{detail.subTotal}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+
+                              <h4>Payment History</h4>
+                              {txn.paymentHistory.length > 0 ? (
+                                <table className="details-table">
+                                  <thead>
+                                    <tr>
+                                      <th>Payment Date</th>
+                                      <th>Remark</th>
+                                      <th>Amount</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {txn.paymentHistory.map((payment) => (
+                                      <tr key={payment.salesPaymentId}>
+                                        <td>{formatDateTime(payment.paymentDate)}</td>
+                                        <td>{payment.remark}</td>
+                                        <td>{payment.amount}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              ) : (
+                                <p>No payment history available.</p>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </tbody>
@@ -735,39 +990,109 @@ const InquiryScreen = () => {
                   <th>Creditor Code</th>
                   <th>Total</th>
                   <th>Outstanding</th>
-                  <th>Change</th>
-                  <th>Location</th>
                   <th>Completed</th>
                   <th>Void</th>
                   <th>Doc Date</th>
+                  <th>Location Code</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredPurchasesTransactions.map((txn, index) => {
-                  const outstandingView = txn.outstandingBal < 0 ? 0 : txn.outstandingBal;
-                  const changeView = txn.outstandingBal < 0 ? Math.abs(txn.outstandingBal) : 0;
-
+                  const isExpanded = expandedPurchaseRow === txn.purchaseId;
                   return (
-                    <tr key={txn.salesId}>
-                      <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                      <td>{txn.docNo}</td>
-                      <td>{txn.creditorCode}</td>
-                      <td>{txn.total}</td>
-                      <td>{outstandingView}</td>
-                      <td>{changeView}</td>
-                      <td>{txn.locationCode}</td>
-                      <td>{txn.isComplete ? "Yes" : "No"}</td>
-                      <td>{txn.isVoid ? "Yes" : "No"}</td>
-                      <td>{formatDateTime(txn.docDate)}</td>
-                      <td>
-                        {txn.isVoid ? (
-                          <button className="disabled-void" disabled>Voided</button>
-                        ) : (
-                          <button className="void-button" onClick={() => confirmVoidPurchasesTransaction(txn.purchaseId)}>Void</button>
-                        )}
-                      </td>
-                    </tr>
+                    <React.Fragment key={txn.purchaseId}>
+                      <tr>
+                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                        <td>{txn.docNo}</td>
+                        <td>{txn.creditorCode}</td>
+                        <td>{txn.total}</td>
+                        <td>{txn.outstandingBal < 0 ? 0 : txn.outstandingBal}</td>
+                        <td>{txn.isComplete ? "Yes" : "No"}</td>
+                        <td>{txn.isVoid ? "Yes" : "No"}</td>
+                        <td>{formatDateTime(txn.docDate)}</td>
+                        <td>{txn.locationCode || "-"}</td>
+                        <td>
+                          {txn.isVoid ? (
+                            <button className="disabled-void" disabled>Voided</button>
+                          ) : (
+                            <button
+                              className="void-button"
+                              onClick={() => confirmVoidPurchasesTransaction(txn.purchaseId)}
+                            >
+                              Void
+                            </button>
+                          )}
+
+                          <button
+                            className="view-button"
+                            onClick={() => setExpandedPurchaseRow(isExpanded ? null : txn.purchaseId)}
+                          >
+                            {isExpanded ? "Hide" : "View"}
+                          </button>
+                        </td>
+                      </tr>
+
+                      {isExpanded && (
+                        <tr className="expanded-row">
+                          <td colSpan="9">
+                            <div className="expanded-content">
+                              <h4>Details</h4>
+                              <table className="details-table">
+                                <thead>
+                                  <tr>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>UOM</th>
+                                    <th>Qty</th>
+                                    <th>Unit Price</th>
+                                    <th>Discount</th>
+                                    <th>SubTotal</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {txn.details.map((detail) => (
+                                    <tr key={detail.purchaseDetailId}>
+                                      <td>{detail.itemCode}</td>
+                                      <td>{detail.description}</td>
+                                      <td>{detail.uom}</td>
+                                      <td>{detail.qty}</td>
+                                      <td>{detail.unitPrice}</td>
+                                      <td>{detail.discountAmount}</td>
+                                      <td>{detail.subTotal}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+
+                              <h4>Payment History</h4>
+                              {txn.paymentHistory.length > 0 ? (
+                                <table className="details-table">
+                                  <thead>
+                                    <tr>
+                                      <th>Payment Date</th>
+                                      <th>Remark</th>
+                                      <th>Amount</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {txn.paymentHistory.map((payment) => (
+                                      <tr key={payment.purchasePaymentId}>
+                                        <td>{formatDateTime(payment.paymentDate)}</td>
+                                        <td>{payment.remark}</td>
+                                        <td>{payment.amount}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              ) : (
+                                <p>No payment history available.</p>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </tbody>
@@ -828,31 +1153,84 @@ const InquiryScreen = () => {
                   <th>Doc No</th>
                   <th>Debtor Code</th>
                   <th>Total</th>
-                  <th>Location</th>
                   <th>Void</th>
                   <th>Doc Date</th>
+                  <th>Location Code</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredCreditNote.map((txn, index) => (
-                  <tr key={txn.creditNoteId}>
-                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                    <td>{txn.docNo}</td>
-                    <td>{txn.debtorCode}</td>
-                    <td>{txn.total}</td>
-                    <td>{txn.locationCode}</td>
-                    <td>{txn.isVoid ? "Yes" : "No"}</td>
-                    <td>{formatDateTime(txn.docDate)}</td>
-                    <td>
-                      {txn.isVoid ? (
-                        <button className="disabled-void" disabled>Voided</button>
-                      ) : (
-                        <button className="void-button" onClick={() => confirmVoidCreditNote(txn.creditNoteId)}>Void</button>
+                {filteredCreditNote.map((txn, index) => {
+                  const isExpanded = expandedCreditNoteRow === txn.creditNoteId;
+                  return (
+                    <React.Fragment key={txn.creditNoteId}>
+                      <tr>
+                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                        <td>{txn.docNo}</td>
+                        <td>{txn.debtorCode}</td>
+                        <td>{txn.total}</td>
+                        <td>{txn.isVoid ? "Yes" : "No"}</td>
+                        <td>{formatDateTime(txn.docDate)}</td>
+                        <td>{txn.locationCode || "-" }</td>
+                        <td>
+                          {txn.isVoid ? (
+                            <button className="disabled-void" disabled>Voided</button>
+                          ) : (
+                            <button
+                              className="void-button"
+                              onClick={() => confirmVoidCreditNote(txn.creditNoteId)}
+                            >
+                              Void
+                            </button>
+                          )}
+
+                          <button
+                            className="view-button"
+                            onClick={() => setExpandedCreditNoteRow(isExpanded ? null : txn.creditNoteId)}
+                          >
+                            {isExpanded ? "Hide" : "View"}
+                          </button>
+                        </td>
+                      </tr>
+
+                      {isExpanded && (
+                        <tr className="expanded-row">
+                          <td colSpan="7">
+                            <div className="expanded-content">
+                              <h4>Details</h4>
+                              <table className="details-table">
+                                <thead>
+                                  <tr>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>UOM</th>
+                                    <th>Qty</th>
+                                    <th>Unit Price</th>
+                                    <th>Discount</th>
+                                    <th>SubTotal</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {txn.details.map((detail) => (
+                                    <tr key={detail.creditNoteDetailId}>
+                                      <td>{detail.itemCode}</td>
+                                      <td>{detail.description}</td>
+                                      <td>{detail.uom}</td>
+                                      <td>{detail.qty}</td>
+                                      <td>{detail.unitPrice}</td>
+                                      <td>{detail.discountAmount}</td>
+                                      <td>{detail.subTotal}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </td>
+                        </tr>
                       )}
-                    </td>
-                  </tr>
-                ))}
+                    </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           )}

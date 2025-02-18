@@ -297,18 +297,18 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
             const unitPrice = parseFloat(item.unitPrice) || 0;
             const qty = parseInt(item.qty, 10) || 0;
             let finalDiscountAmount = 0;
-            let subtotal = unitPrice * qty; // Base subtotal before discount
+            let subtotal = unitPrice * qty; 
     
             if (item.discount === "percentage") {
-              finalDiscountAmount = (subtotal * discountValue) / 100; // Calculate discount as percentage
+              finalDiscountAmount = (subtotal * discountValue) / 100; 
             } else {
-              finalDiscountAmount = discountValue; // Fixed discount amount
+              finalDiscountAmount = discountValue; 
             }
     
             return {
               ...item,
-              discountAmount: discountValue, // Store user input as discountAmount
-              subtotal: subtotal - finalDiscountAmount, // Calculate final subtotal
+              discountAmount: discountValue, 
+              subtotal: subtotal - finalDiscountAmount, 
             };
           }
           return item;

@@ -23,7 +23,15 @@
   .search-inquiry-container label {
     font-size: 13px;
   }
-  
+
+  .date-input {
+    padding: 3px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
   .inquiry-table {
     width: 100%;
     border-collapse: collapse;
@@ -79,5 +87,48 @@
     border-radius: 5px;
     cursor: not-allowed;
   }
+
+  .view-button {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+  
+  .view-button:hover {
+    background: #218838;
+  }
+  
+  .expanded-row {
+    background: #f9f9f9;
+  }
+  
+  .expanded-content {
+    padding: 10px;
+    background: #f1f1f1;
+    border-radius: 5px;
+  }
+  
+  .details-table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+  }
+  
+  .details-table th,
+  .details-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .details-table th {
+    background: #007bff;
+    color: white;
+  }
+  
   
   

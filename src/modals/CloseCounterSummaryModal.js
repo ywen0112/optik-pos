@@ -1,7 +1,7 @@
 import React from "react";
 import "../css/Transaction.css";
 
-const CloseCounterSummaryModal = ({ isOpen, onClose, summary }) => {
+const CloseCounterSummaryModal = ({ isOpen, onClose, summary, onExportReport }) => {
   if (!isOpen || !summary) return null;
 
   return (
@@ -54,8 +54,14 @@ const CloseCounterSummaryModal = ({ isOpen, onClose, summary }) => {
             </tr>
           </tbody>
         </table>
-
-        <button className="close-counter-summary-close-btn" onClick={onClose}>Close</button>
+        <div className="success-modal-buttons">
+          <button className="close-counter-summary-close-btn" onClick={onClose}>Close</button>
+        </div>
+        {onExportReport && (
+          <button className="close-counter-summary-close-btn" onClick={onExportReport}>
+            Export Report
+          </button>
+        )}
       </div>
     </div>
   );

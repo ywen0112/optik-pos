@@ -95,7 +95,6 @@ const Transaction = () => {
       console.log("Close Counter Response:", data);
 
       if (response.ok && data.success) {
-        localStorage.removeItem("counterSessionId");
         localStorage.removeItem("openingBalance");
         setCounterSummary(data.data); 
         setIsCounterOpen(false);
@@ -259,6 +258,39 @@ const Transaction = () => {
     setIsCloseCounterOpen(false);
   };
 
+  const handleExportReport = async() =>{
+    try{
+      const response = await fetch(`https://optikposbackend.absplt.com/CashCounter/GetCounterSummaryReport?CounterSessionId=${localStorage.getItem("counterSessionId")}`);
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        const byteCharacters = atob(data.data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+  
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `CounterSession.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } else {
+        throw new Error(data.errorMessage || "Failed to export the report.");
+      }
+    }catch (error) {
+      setErrorModal({
+        isOpen: true,
+        title: "Export Report Error",
+        message: error.message,
+      });
+    }
+  };
 
   return (
     <div className="open-counter-container">
@@ -327,7 +359,11 @@ const Transaction = () => {
     <CloseCounterSummaryModal 
       isOpen={!!counterSummary} 
       summary={counterSummary} 
-      onClose={() => setCounterSummary(null)} 
+      onClose={() => {
+        localStorage.removeItem("counterSessionId");
+        setCounterSummary(null)
+      }} 
+      onExportReport={handleExportReport}
     />
 
 </div>

@@ -219,7 +219,21 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
         return { ...prev, items: updatedItems, total: newTotal };
       });
     };
+
+    const handleDescriptionChange = (event, rowIndex) => {
+      const { value } = event.target;
     
+      setFormData((prev) => {
+        const updatedItems = [...prev.items];
+    
+        updatedItems[rowIndex] = {
+          ...updatedItems[rowIndex],
+          description: value,
+        };
+    
+        return { ...prev, items: updatedItems };
+      });
+    };
     
     const handleUOMChange = (selectedOption, rowIndex) => {
       setFormData((prev) => {
@@ -475,7 +489,12 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
                   <td>
                     <Select options={items} value={items.find((option) => option.value === itm.itemId) || null} onChange={(selectedOption) => handleItemChange(selectedOption, index)} isSearchable placeholder="Select Item" />
                   </td>
-                  <td className="readonly-field"><input type="text" value={itm.description} readOnly /></td>
+                  <td>
+                    <input type="text" 
+                      value={itm.description}
+                      onChange={(e) => handleDescriptionChange(e, index)}
+                    />
+                  </td>
                   <td>
                     <Select 
                       options={itm.availableUOMs || []}

@@ -227,7 +227,21 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       });
     };
     
+    const handleDescriptionChange = (event, rowIndex) => {
+      const { value } = event.target;
     
+      setFormData((prev) => {
+        const updatedItems = [...prev.items];
+    
+        updatedItems[rowIndex] = {
+          ...updatedItems[rowIndex],
+          description: value,
+        };
+    
+        return { ...prev, items: updatedItems };
+      });
+    };
+
     const handleUOMChange = (selectedOption, rowIndex) => {
       setFormData((prev) => {
         const updatedItems = [...prev.items];
@@ -511,7 +525,13 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
                   <td>
                     <Select options={items} value={items.find((option) => option.value === itm.itemId) || null} onChange={(selectedOption) => handleItemChange(selectedOption, index)} isSearchable placeholder="Select Item" isDisabled={isPaymentConfirmed} />
                   </td>
-                  <td className="readonly-field"><input type="text" value={itm.description} readOnly /></td>
+                  <td>
+                    <input type="text" 
+                      value={itm.description} 
+                      onChange={(e) => handleDescriptionChange(e, index)}
+                      disabled={isPaymentConfirmed}
+                    />
+                  </td>
                   <td>
                     <Select 
                       options={itm.availableUOMs || []}

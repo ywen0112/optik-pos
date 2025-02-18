@@ -39,13 +39,13 @@ const InquiryScreen = () => {
   useEffect(() => {
     if (activeTab === "cashTransaction") {
       fetchTransactions();
-    } 
+    }
     else if (activeTab === "salesInvoice") {
       fetchSalesTransactions();
-    } 
+    }
     else if (activeTab === "purchaseInvoice") {
       fetchPurchaseTransactions();
-    } 
+    }
     else if (activeTab === "creditNote") {
       fetchCreditNotes();
     }
@@ -122,9 +122,9 @@ const InquiryScreen = () => {
 
   const filteredTransactions = transactions.filter((txn) => {
     const lowerDocNo = docNo.toLowerCase();
-  
+
     const matchesDocNo = !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
-  
+
     if (isVoidAndCashOut) {
       return txn.isVoid === true && txn.isCashOut === true && matchesDocNo;
     }
@@ -211,10 +211,10 @@ const InquiryScreen = () => {
   const filteredSalesTransactions = salesTransactions.filter((txn) => {
     const lowerDocNo = docNo.toLowerCase();
     const lowerDebtorCode = debtorCode.toLowerCase();
-  
+
     const matchesDocNo = !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
     const matchesDebtorCode = !debtorCode || (txn.debtorCode && txn.debtorCode.toLowerCase().includes(lowerDebtorCode));
-  
+
     if (isSalesVoid) {
       return txn.isVoid === true && matchesDocNo && matchesDebtorCode;
     }
@@ -257,7 +257,7 @@ const InquiryScreen = () => {
       setLoading(false);
     }
   };
-  
+
   const confirmVoidPurchasesTransaction = (purchaseId) => {
     setConfirmPurchasesModal({
       isOpen: true,
@@ -301,10 +301,10 @@ const InquiryScreen = () => {
   const filteredPurchasesTransactions = purchaseTransactions.filter((txn) => {
     const lowerDocNo = docNo.toLowerCase();
     const lowerCreditorCode = creditorCode.toLowerCase();
-  
+
     const matchesDocNo = !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
     const matchesCreditorCode = !creditorCode || (txn.creditorCode && txn.creditorCode.toLowerCase().includes(lowerCreditorCode));
-  
+
     if (isPurchaseVoid) {
       return txn.isVoid === true && matchesDocNo && matchesCreditorCode;
     }
@@ -389,10 +389,10 @@ const InquiryScreen = () => {
   const filteredCreditNote = creditNote.filter((txn) => {
     const lowerDocNo = docNo.toLowerCase();
     const lowerDebtorCode = debtorCode.toLowerCase();
-  
+
     const matchesDocNo = !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
     const matchesDebtorCode = !debtorCode || (txn.debtorCode && txn.debtorCode.toLowerCase().includes(lowerDebtorCode));
-  
+
     if (isVoid) {
       return txn.isVoid === true && matchesDocNo && matchesDebtorCode;
     }
@@ -438,7 +438,7 @@ const InquiryScreen = () => {
     }
     setUsersCache(userNames);
   };
-  
+
   const formatDateTime = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
@@ -448,9 +448,9 @@ const InquiryScreen = () => {
   const handleItemsPerPageChange = (event) => {
     const newItemsPerPage = Number(event.target.value);
     setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
-  
+
   const handlePageChange = (page) => {
     if (page >= 1) {
       setCurrentPage(page);
@@ -537,51 +537,51 @@ const InquiryScreen = () => {
             </label>
           </div>
 
-        {loading ? (
-        <p>Loading...</p>
-        ) : (
-          <table className="inquiry-table">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Doc No</th>
-                <th>Amount</th>
-                <th>Remark</th>
-                <th>Is Void</th>
-                <th>Is Cash Out</th>
-                <th>Created By</th>
-                <th>Created Time</th>
-                <th>Last Modified By</th>
-                <th>Last Modified Time</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTransactions.map((txn, index) => (
-                <tr key={txn.cashTransactionId}>
-                  <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                  <td>{txn.docNo}</td>
-                  <td>{txn.effectedAmount}</td>
-                  <td>{txn.remarks}</td>
-                  <td>{txn.isVoid ? "Yes" : "No"}</td>
-                  <td>{txn.isCashOut ? "Yes" : "No"}</td>
-                  <td>{usersCache[txn.createdBy] || "Loading..."}</td>
-                  <td>{formatDateTime(txn.createdTimeStamp)}</td>
-                  <td>{usersCache[txn.lastModifiedBy] || "-"}</td>
-                  <td>{formatDateTime(txn.lastModifiedTimeStamp)}</td>
-                  <td>
-                  {txn.isVoid ? (
-                    <button className="disabled-void" disabled>Voided</button>
-                  ) : (
-                    <button className="void-button" onClick={() => confirmVoidTransaction(txn.cashTransactionId)}>Void</button>
-                  )}
-                </td>
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <table className="inquiry-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Doc No</th>
+                  <th>Amount</th>
+                  <th>Remark</th>
+                  <th>Is Void</th>
+                  <th>Is Cash Out</th>
+                  <th>Created By</th>
+                  <th>Created Time</th>
+                  <th>Last Modified By</th>
+                  <th>Last Modified Time</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        <div className="pagination">
+              </thead>
+              <tbody>
+                {filteredTransactions.map((txn, index) => (
+                  <tr key={txn.cashTransactionId}>
+                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                    <td>{txn.docNo}</td>
+                    <td>{txn.effectedAmount}</td>
+                    <td>{txn.remarks}</td>
+                    <td>{txn.isVoid ? "Yes" : "No"}</td>
+                    <td>{txn.isCashOut ? "Yes" : "No"}</td>
+                    <td>{usersCache[txn.createdBy] || "Loading..."}</td>
+                    <td>{formatDateTime(txn.createdTimeStamp)}</td>
+                    <td>{usersCache[txn.lastModifiedBy] || "-"}</td>
+                    <td>{formatDateTime(txn.lastModifiedTimeStamp)}</td>
+                    <td>
+                      {txn.isVoid ? (
+                        <button className="disabled-void" disabled>Voided</button>
+                      ) : (
+                        <button className="void-button" onClick={() => confirmVoidTransaction(txn.cashTransactionId)}>Void</button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <div className="pagination">
             <button
               disabled={currentPage === 1}
               onClick={() => handlePageChange(currentPage - 1)}
@@ -592,7 +592,7 @@ const InquiryScreen = () => {
               Page {currentPage}
             </span>
             <button
-              disabled={!totalRecords} 
+              disabled={!totalRecords}
               onClick={() => handlePageChange(currentPage + 1)}
             >
               Next
@@ -630,45 +630,52 @@ const InquiryScreen = () => {
 
           {loading ? (
             <p>Loading...</p>
-            ) : (
-          <table className="inquiry-table">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Doc No</th>
-                <th>Debtor Code</th>
-                <th>Total</th>
-                <th>Outstanding</th>
-                <th>Location</th>
-                <th>Completed</th>
-                <th>Void</th>
-                <th>Doc Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredSalesTransactions.map((txn, index) => (
-                <tr key={txn.salesId}>
-                  <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                  <td>{txn.docNo}</td>
-                  <td>{txn.debtorCode}</td>
-                  <td>{txn.total}</td>
-                  <td>{txn.outstandingBal}</td>
-                  <td>{txn.locationCode}</td>
-                  <td>{txn.isComplete ? "Yes" : "No"}</td>
-                  <td>{txn.isVoid ? "Yes" : "No"}</td>
-                  <td>{formatDateTime(txn.docDate)}</td>
-                  <td>
-                  {txn.isVoid ? (
-                    <button className="disabled-void" disabled>Voided</button>
-                  ) : (
-                    <button className="void-button" onClick={() => confirmVoidSalesTransaction(txn.salesId)}>Void</button>
-                  )}
-                  </td>
+          ) : (
+            <table className="inquiry-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Doc No</th>
+                  <th>Debtor Code</th>
+                  <th>Total</th>
+                  <th>Outstanding</th>
+                  <th>Change</th>
+                  <th>Location</th>
+                  <th>Completed</th>
+                  <th>Void</th>
+                  <th>Doc Date</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredSalesTransactions.map((txn, index) => {
+                  const outstandingView = txn.outstandingBal < 0 ? 0 : txn.outstandingBal;
+                  const changeView = txn.outstandingBal < 0 ? Math.abs(txn.outstandingBal) : 0;
+
+                  return (
+                    <tr key={txn.salesId}>
+                      <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                      <td>{txn.docNo}</td>
+                      <td>{txn.debtorCode}</td>
+                      <td>{txn.total}</td>
+                      <td>{outstandingView}</td>
+                      <td>{changeView}</td>
+                      <td>{txn.locationCode}</td>
+                      <td>{txn.isComplete ? "Yes" : "No"}</td>
+                      <td>{txn.isVoid ? "Yes" : "No"}</td>
+                      <td>{formatDateTime(txn.docDate)}</td>
+                      <td>
+                        {txn.isVoid ? (
+                          <button className="disabled-void" disabled>Voided</button>
+                        ) : (
+                          <button className="void-button" onClick={() => confirmVoidSalesTransaction(txn.salesId)}>Void</button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           )}
           <div className="pagination">
             <button
@@ -681,7 +688,7 @@ const InquiryScreen = () => {
               Page {currentPage}
             </span>
             <button
-              disabled={!totalRecords} 
+              disabled={!totalRecords}
               onClick={() => handlePageChange(currentPage + 1)}
             >
               Next
@@ -719,45 +726,52 @@ const InquiryScreen = () => {
 
           {loading ? (
             <p>Loading...</p>
-            ) : (
-          <table className="inquiry-table">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Doc No</th>
-                <th>Creditor Code</th>
-                <th>Total</th>
-                <th>Outstanding</th>
-                <th>Location</th>
-                <th>Completed</th>
-                <th>Void</th>
-                <th>Doc Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPurchasesTransactions.map((txn, index) => (
-                <tr key={txn.salesId}>
-                  <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                  <td>{txn.docNo}</td>
-                  <td>{txn.creditorCode}</td>
-                  <td>{txn.total}</td>
-                  <td>{txn.outstandingBal}</td>
-                  <td>{txn.locationCode}</td>
-                  <td>{txn.isComplete ? "Yes" : "No"}</td>
-                  <td>{txn.isVoid ? "Yes" : "No"}</td>
-                  <td>{formatDateTime(txn.docDate)}</td>
-                  <td>
-                  {txn.isVoid ? (
-                    <button className="disabled-void" disabled>Voided</button>
-                  ) : (
-                    <button className="void-button" onClick={() => confirmVoidPurchasesTransaction(txn.purchaseId)}>Void</button>
-                  )}
-                  </td>
+          ) : (
+            <table className="inquiry-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Doc No</th>
+                  <th>Creditor Code</th>
+                  <th>Total</th>
+                  <th>Outstanding</th>
+                  <th>Change</th>
+                  <th>Location</th>
+                  <th>Completed</th>
+                  <th>Void</th>
+                  <th>Doc Date</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredPurchasesTransactions.map((txn, index) => {
+                  const outstandingView = txn.outstandingBal < 0 ? 0 : txn.outstandingBal;
+                  const changeView = txn.outstandingBal < 0 ? Math.abs(txn.outstandingBal) : 0;
+
+                  return (
+                    <tr key={txn.salesId}>
+                      <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                      <td>{txn.docNo}</td>
+                      <td>{txn.creditorCode}</td>
+                      <td>{txn.total}</td>
+                      <td>{outstandingView}</td>
+                      <td>{changeView}</td>
+                      <td>{txn.locationCode}</td>
+                      <td>{txn.isComplete ? "Yes" : "No"}</td>
+                      <td>{txn.isVoid ? "Yes" : "No"}</td>
+                      <td>{formatDateTime(txn.docDate)}</td>
+                      <td>
+                        {txn.isVoid ? (
+                          <button className="disabled-void" disabled>Voided</button>
+                        ) : (
+                          <button className="void-button" onClick={() => confirmVoidPurchasesTransaction(txn.purchaseId)}>Void</button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           )}
           <div className="pagination">
             <button
@@ -770,7 +784,7 @@ const InquiryScreen = () => {
               Page {currentPage}
             </span>
             <button
-              disabled={!totalRecords} 
+              disabled={!totalRecords}
               onClick={() => handlePageChange(currentPage + 1)}
             >
               Next
@@ -779,16 +793,16 @@ const InquiryScreen = () => {
         </>
       )}
 
-        {activeTab === "creditNote" && (
-          <>
-            <div className="search-inquiry-container">
-              <input type="text" placeholder="Enter Doc No" value={docNo} onChange={(e) => setDocNo(e.target.value)} />
-              <input type="text" placeholder="Enter Debtor Code" value={debtorCode} onChange={(e) => setDebtorCode(e.target.value)} />
-              <label><input type="checkbox" checked={isVoid} onChange={() => handleCreditNoteFilterChange("isVoid")} /> Show Only Voided</label>
-              <label><input type="checkbox" checked={showAllCreditNote} onChange={() => handleCreditNoteFilterChange("showAllCreditNote")} /> Show All</label>
-            </div>
+      {activeTab === "creditNote" && (
+        <>
+          <div className="search-inquiry-container">
+            <input type="text" placeholder="Enter Doc No" value={docNo} onChange={(e) => setDocNo(e.target.value)} />
+            <input type="text" placeholder="Enter Debtor Code" value={debtorCode} onChange={(e) => setDebtorCode(e.target.value)} />
+            <label><input type="checkbox" checked={isVoid} onChange={() => handleCreditNoteFilterChange("isVoid")} /> Show Only Voided</label>
+            <label><input type="checkbox" checked={showAllCreditNote} onChange={() => handleCreditNoteFilterChange("showAllCreditNote")} /> Show All</label>
+          </div>
 
-            <div className="pagination-controls">
+          <div className="pagination-controls">
             <label>
               Show:
               <select
@@ -804,9 +818,9 @@ const InquiryScreen = () => {
             </label>
           </div>
 
-            {loading ? (
-              <p>Loading...</p>
-              ) : (
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
             <table className="inquiry-table">
               <thead>
                 <tr>
@@ -831,18 +845,18 @@ const InquiryScreen = () => {
                     <td>{txn.isVoid ? "Yes" : "No"}</td>
                     <td>{formatDateTime(txn.docDate)}</td>
                     <td>
-                    {txn.isVoid ? (
-                      <button className="disabled-void" disabled>Voided</button>
-                    ) : (
-                      <button className="void-button" onClick={() => confirmVoidCreditNote(txn.creditNoteId)}>Void</button>
-                    )}
+                      {txn.isVoid ? (
+                        <button className="disabled-void" disabled>Voided</button>
+                      ) : (
+                        <button className="void-button" onClick={() => confirmVoidCreditNote(txn.creditNoteId)}>Void</button>
+                      )}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            )}
-            <div className="pagination">
+          )}
+          <div className="pagination">
             <button
               disabled={currentPage === 1}
               onClick={() => handlePageChange(currentPage - 1)}
@@ -853,14 +867,14 @@ const InquiryScreen = () => {
               Page {currentPage}
             </span>
             <button
-              disabled={!totalRecords} 
+              disabled={!totalRecords}
               onClick={() => handlePageChange(currentPage + 1)}
             >
               Next
             </button>
           </div>
-          </>
-        )}
+        </>
+      )}
       {confirmModal.isOpen && (
         <ConfirmationModal
           isOpen={confirmModal.isOpen}

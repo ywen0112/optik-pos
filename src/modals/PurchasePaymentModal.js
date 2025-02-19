@@ -70,7 +70,7 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
     const customerId = localStorage.getItem("customerId");
     const userId = localStorage.getItem("userId");
     const counterSessionId = localStorage.getItem("counterSessionId");
-    const targetDocId = localStorage.getItem("salesId");
+    const targetDocId = localStorage.getItem("purchaseId");
 
     const formattedAmount = parseFloat(totalPaid).toFixed(2);
 

@@ -18,10 +18,11 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
       description: "",
       desc2: "",
       itemUOMId: "",
-      unitPrice: 0,
-      qty: "",
+      unitPrice: "",
+      qty: 0,
       discount: "percentage", 
       discountAmount: 0,
+      itemBatchId: "",
       subtotal: 0,
     }],
     total: 0,
@@ -35,8 +36,8 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
     itemUOMId: "",
     unitPrice: "",
     qty: 0,
-    discount: "",
-    discountAmount: "",
+    discount: "percentage",
+    discountAmount: 0,
     itemBatchId: "",
     subtotal: 0,
   });
@@ -62,9 +63,10 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
           desc2: "",
           itemUOMId: "",
           unitPrice: "",
-          qty: "",
+          qty: 0,
           discount: "percentage", 
-          discountAmount: "",
+          discountAmount: 0,
+          itemBatchId: "",
           subtotal: 0,
         }],
         total: 0,
@@ -76,10 +78,11 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
         desc2: "",
         itemUOMId: "",
         unitPrice: "",
-        qty: "",
+        qty: 0,
         discount: "percentage", 
-        discountAmount: "", 
-        subtotal: "",     
+        discountAmount: 0, 
+        itemBatchId: "",
+        subtotal: 0,     
       });
 
       fetchDebtors();
@@ -289,7 +292,11 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
   
   
     const handleDiscountAmountChange = (e, rowIndex) => {
-      let discountValue = e.target.value.trim(); // Get input value
+      let discountValue = e.target.value.trim(); 
+
+      if (isNaN(discountValue)) {
+        discountValue = 0;
+      }
     
       setFormData((prev) => {
         const updatedItems = prev.items.map((item, index) => {
@@ -328,7 +335,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
     const handleAddItem = () => {
       const lastItem = formData.items[formData.items.length - 1];
     
-      if (!lastItem.itemId || lastItem.qty <= 0 || lastItem.unitPrice <= 0) {
+      if (!lastItem.itemId || lastItem.qty < 0 || lastItem.unitPrice < 0) {
         setErrorModal({
           isOpen: true,
           title: "Incomplete Item",
@@ -348,9 +355,10 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
             desc2: "",
             itemUOMId: "",
             unitPrice: "",
-            qty: "",
-            discount: "",
-            discountAmount: "",
+            qty: 0,
+            discount: "percentage",
+            discountAmount: 0,
+            itemBatchId: "",
             subtotal: 0,
           },
         ],

@@ -19,10 +19,11 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       description: "",
       desc2: "",
       itemUOMId: "",
-      unitPrice: 0,
-      qty: "",
+      unitPrice: "",
+      qty: 0,
       discount: "percentage", 
       discountAmount: 0,
+      itemBatchId: "",
       subtotal: 0,
     }],
     payments: [],
@@ -37,8 +38,8 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
     itemUOMId: "",
     unitPrice: "",
     qty: 0,
-    discount: "",
-    discountAmount: "",
+    discount: "percentage",
+    discountAmount: 0,
     itemBatchId: "",
     subtotal: 0,
   });
@@ -66,9 +67,10 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
           desc2: "",
           itemUOMId: "",
           unitPrice: "",
-          qty: "",
+          qty: 0,
           discount: "percentage", 
           discountAmount: 0,
+          itemBatchId: "",
           subtotal: 0,
         }],
         payments: [],
@@ -81,10 +83,11 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
         desc2: "",
         itemUOMId: "",
         unitPrice: "",
-        qty: "",
+        qty: 0,
         discount: "percentage",
-        discountAmount: "", 
-        subtotal: "",   
+        discountAmount: 0, 
+        itemBatchId: "",
+        subtotal: 0,   
       });
 
       setIsPaymentConfirmed(false); 
@@ -296,7 +299,11 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
   
   
     const handleDiscountAmountChange = (e, rowIndex) => {
-      let discountValue = e.target.value.trim(); // Get input value
+      let discountValue = e.target.value.trim(); 
+
+      if (isNaN(discountValue)) {
+        discountValue = 0;
+      }
     
       setFormData((prev) => {
         const updatedItems = prev.items.map((item, index) => {
@@ -304,18 +311,18 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
             const unitPrice = parseFloat(item.unitPrice) || 0;
             const qty = parseInt(item.qty, 10) || 0;
             let finalDiscountAmount = 0;
-            let subtotal = unitPrice * qty; // Base subtotal before discount
+            let subtotal = unitPrice * qty;
     
             if (item.discount === "percentage") {
-              finalDiscountAmount = (subtotal * discountValue) / 100; // Calculate discount as percentage
+              finalDiscountAmount = (subtotal * discountValue) / 100; 
             } else {
-              finalDiscountAmount = discountValue; // Fixed discount amount
+              finalDiscountAmount = discountValue; 
             }
     
             return {
               ...item,
-              discountAmount: discountValue, // Store user input as discountAmount
-              subtotal: subtotal - finalDiscountAmount, // Calculate final subtotal
+              discountAmount: discountValue, 
+              subtotal: subtotal - finalDiscountAmount, 
             };
           }
           return item;
@@ -335,7 +342,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
     const handleAddItem = () => {
       const lastItem = formData.items[formData.items.length - 1];
     
-      if (!lastItem.itemId || lastItem.qty <= 0 || lastItem.unitPrice <= 0) {
+      if (!lastItem.itemId || lastItem.qty < 0 || lastItem.unitPrice < 0) {
         setErrorModal({
           isOpen: true,
           title: "Incomplete Item",
@@ -355,9 +362,9 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
             desc2: "",
             itemUOMId: "",
             unitPrice: "",
-            qty: "",
-            discount: "",
-            discountAmount: "",
+            qty: 0,
+            discount: "percentage",
+            discountAmount: 0,
             subtotal: 0,
           },
         ],

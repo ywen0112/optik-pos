@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../css/InquiryScreen.css";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
-import { DiTechcrunch } from "react-icons/di";
+import PaymentModal from "../../modals/PaymentModal";
 
 const InquiryScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -869,6 +869,14 @@ const InquiryScreen = () => {
                           >
                             {isExpanded ? "Hide" : "View"}
                           </button>
+
+                          {!txn.isComplete && !txn.isVoid && (
+                            <button
+                              className="pay-button"
+                            >
+                              Pay
+                            </button>
+                          )}
                         </td>
                       </tr>
 

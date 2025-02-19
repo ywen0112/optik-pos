@@ -1,134 +1,152 @@
 .inquiry-container {
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
   
-  .search-inquiry-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-  }
-  
-  .search-inquiry-container input[type="text"] {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 200px;
-  }
+.search-inquiry-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
 
-  .search-inquiry-container label {
-    font-size: 13px;
-  }
+.search-inquiry-container input[type="text"] {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 200px;
+}
 
-  .date-input {
-    padding: 3px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 12px;
-    cursor: pointer;
-  }
+.search-inquiry-container label {
+  font-size: 13px;
+}
 
-  .inquiry-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .inquiry-table th,
-  .inquiry-table td {
-    padding: 8px 8px;
-    text-align: left;
-    font-size: 13px;
-  }
-  
-  .inquiry-table th {
-    color: black;
-    border-bottom: 1px solid #ddd;
-  }
+.date-input {
+  padding: 3px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+}
 
-  .inquiry-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-  }
-  
-  .inquiry-tabs button {
-    background-color: #f0f0f0;
-    color: black;
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-weight: normal;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  
-  .inquiry-tabs button.active {
-    background-color: #1e90ff;
-    color: white;
-  }
-  
-  .void-button {
-    background-color: red;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    border: 1px red;
-  }
-  
-  .disabled-void {
-    background-color: gray;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: not-allowed;
-  }
+.inquiry-table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-  .view-button {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 5px;
-  }
+.inquiry-table th,
+.inquiry-table td {
+  padding: 8px 8px;
+  text-align: left;
+  font-size: 13px;
+}
+
+.inquiry-table th {
+  color: black;
+  border-bottom: 1px solid #ddd;
+}
+
+.inquiry-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.inquiry-tabs button {
+  background-color: #f0f0f0;
+  color: black;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: normal;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.inquiry-tabs button.active {
+  background-color: #1e90ff;
+  color: white;
+}
+
+.void-button {
+  background-color: red;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px red;
+}
+
+.void-button:hover {
+  opacity: 0.7;
+}
+
+.disabled-void {
+  background-color: gray;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: not-allowed;
+}
+
+.view-button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.view-button:hover {
+  background: #218838;
+}
   
-  .view-button:hover {
-    background: #218838;
-  }
+.expanded-row {
+  background: #f9f9f9;
+}
+
+.expanded-content {
+  padding: 10px;
+  background: #f1f1f1;
+  border-radius: 5px;
+}
   
-  .expanded-row {
-    background: #f9f9f9;
-  }
+.details-table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
   
-  .expanded-content {
-    padding: 10px;
-    background: #f1f1f1;
-    border-radius: 5px;
-  }
+.details-table th,
+.details-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
   
-  .details-table {
-    width: 100%;
-    margin-top: 10px;
-    border-collapse: collapse;
-  }
+.details-table th {
+  background: #1e90ff;
+  color: white;
+}
   
-  .details-table th,
-  .details-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
-  .details-table th {
-    background: #007bff;
-    color: white;
-  }
-  
+.pay-button {
+  background: #1e90ff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.pay-button:hover {
+  opacity: 0.6;
+}
+
   
   

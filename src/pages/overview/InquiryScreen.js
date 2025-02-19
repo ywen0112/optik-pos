@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../css/InquiryScreen.css";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
-import PaymentModal from "../../modals/PaymentModal";
+import OutstandingPaymentModal from "../../modals/OutstandingPaymentModal";
 
 const InquiryScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -43,6 +43,7 @@ const InquiryScreen = () => {
   const [confirmCreditNoteModal, setConfirmCreditNoteModal] = useState({ isOpen: false, creditNoteId: null, message: "" });
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const customerId = Number(localStorage.getItem("customerId"));
+  const [payModal, setPayModal] = useState({ isOpen: false, salesId: null, outstandingAmount: 0 });
 
   useEffect(() => {
     if (activeTab === "counterSession") {
@@ -497,6 +498,63 @@ const InquiryScreen = () => {
     }
   };
 
+  const handlePaymentConfirm = async (payments, totalPaid, type) => {
+    try {
+        const customerId = Number(localStorage.getItem("customerId"));
+        const userId = localStorage.getItem("userId");
+        const counterSessionId = localStorage.getItem("counterSessionId");
+        const now = new Date();
+        const offset = now.getTimezoneOffset() * 60000; // Convert minutes to milliseconds
+        const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
+
+        // Determine API Endpoint based on transaction type
+        const apiEndpoint = type === "sales"
+            ? "https://optikposbackend.absplt.com/Sales/SaveSalesPayment"
+            : "https://optikposbackend.absplt.com/Purchases/SavePurchasePayment";
+
+        // Consolidate payment methods into a single remark
+        const remark = payments
+            .map(payment => {
+                let details = `Method: ${payment.method.toUpperCase()}`;
+                if (payment.method === "card") {
+                    details += `, Card No: ${payment.cardNo || "N/A"}, Approval Code: ${payment.approvalCode || "N/A"}`;
+                }
+                if (payment.method === "bank") {
+                    details += `, Reference No: ${payment.referenceNo || "N/A"}`;
+                }
+                return details;
+            })
+            .join(" | ");
+
+        const response = await fetch(apiEndpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                customerId: customerId,
+                userId: userId,
+                counterSessionId: counterSessionId,
+                targetDocId: payModal.transactionId, 
+                docDate: localISOTime,
+                remark: remark,
+                reference: "", 
+                amount: parseFloat(totalPaid.toFixed(2)), 
+            }),
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.errorMessage || "Payment failed.");
+        }
+        setPayModal({ isOpen: false, transactionId: null, outstandingAmount: 0 });
+
+        type === "sales" ? fetchSalesTransactions() : fetchPurchaseTransactions();
+    } catch (error) {
+        setErrorModal({ isOpen: true, title: "Payment Error", message: error.message });
+    }
+};
+
   return (
     <div className="inquiry-container">
       <h3>Transaction Inquiry</h3>
@@ -873,6 +931,8 @@ const InquiryScreen = () => {
                           {!txn.isComplete && !txn.isVoid && (
                             <button
                               className="pay-button"
+                              onClick={() => setPayModal({ isOpen: true, transactionId: txn.salesId, outstandingAmount: txn.outstandingBal, type: "sales" })
+                            }
                             >
                               Pay
                             </button>
@@ -1049,7 +1109,18 @@ const InquiryScreen = () => {
                           >
                             {isExpanded ? "Hide" : "View"}
                           </button>
-                        </td>
+
+                          <td>
+                            {!txn.isComplete && !txn.isVoid && (
+                              <button
+                                className="pay-button"
+                                onClick={() => setPayModal({ isOpen: true, transactionId: txn.purchaseId, outstandingAmount: txn.outstandingBal, type: "purchase" })}
+                              >
+                                Pay
+                              </button>
+                            )}
+                          </td>
+                       </td>
                       </tr>
 
                       {isExpanded && (
@@ -1317,6 +1388,15 @@ const InquiryScreen = () => {
           onClose={() => setErrorModal({ isOpen: false, title: "", message: "" })}
         />
       )}
+      {payModal.isOpen && (
+        <OutstandingPaymentModal
+          isOpen={payModal.isOpen}
+          onClose={() => setPayModal({ isOpen: false, transactionId: null })}
+          onConfirm={(payments, totalPaid) => handlePaymentConfirm(payments, totalPaid, payModal.type)}
+          outstandingAmount={payModal.outstandingAmount}
+        />
+      )}
+
     </div>
   );
 };

@@ -426,6 +426,9 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
     const salesId = localStorage.getItem("salesId"); 
     const counterSessionId = localStorage.getItem("counterSessionId");
     const docNo = localStorage.getItem("docNo");
+    const now = new Date();
+    const offset = now.getTimezoneOffset() * 60000; // Convert minutes to milliseconds
+    const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
   
     const payload = {
       actionData: {
@@ -437,7 +440,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       docNo,
       counterSessionId,
       debtorId: formData.debtorId,
-      docDate: new Date().toISOString(),
+      docDate: localISOTime,
       locationId: formData.locationId,
       remark: "",
       total: formData.total,

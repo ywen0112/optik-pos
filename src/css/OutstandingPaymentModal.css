@@ -1,0 +1,56 @@
+.payment-selections {
+    padding: 5px;
+    margin: 5px;
+}
+
+.payment-actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.payment-confirm-btn {
+    background: none;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    padding: 8px 5px;
+    border-radius: 4px;
+    flex: 1 1;
+}
+
+.payment-cancel-btn {
+    background: none;
+    color: #1e90ff;
+    border: 1px solid #1e90ff;
+    padding: 8px 5px;
+    border-radius: 4px;
+    flex: 1 1;
+}
+
+.multi-payment-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.add-btn {
+    background: none;
+    color: #28a745;
+    padding: 5px 10px;
+    border: 1px solid #28a745;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+.remove-btn {
+    background: red;
+    color: white;
+    padding: 5px 10px;
+    border: 1px solid red;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 5px;
+}

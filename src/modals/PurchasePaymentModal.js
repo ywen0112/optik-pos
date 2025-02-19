@@ -74,8 +74,12 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
 
     const formattedAmount = parseFloat(totalPaid).toFixed(2);
 
+    const now = new Date();
+    const offset = now.getTimezoneOffset() * 60000; // Convert minutes to milliseconds
+    const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
+
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Purchase/SavePurchasePayment", {
+      const response = await fetch("https://optikposbackend.absplt.com/Purchases/SavePurchasePayment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -83,7 +87,7 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
           userId: userId,
           counterSessionId: counterSessionId,
           targetDocId: targetDocId,
-          docDate: new Date().toISOString(),
+          docDate: localISOTime,
           remark: remark,
           reference: "", 
           amount: formattedAmount,

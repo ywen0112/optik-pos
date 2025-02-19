@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../css/InquiryScreen.css";
 import ConfirmationModal from "../../modals/ConfirmationModal";
 import ErrorModal from "../../modals/ErrorModal";
+import { DiTechcrunch } from "react-icons/di";
 
 const InquiryScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -578,13 +579,13 @@ const InquiryScreen = () => {
                     <React.Fragment key={txn.counterSessionId}>
                       <tr>
                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                        <td>{txn.sessionCode}</td>
-                        <td>{txn.openingBal}</td>
+                        <td>{txn.sessionCode ? txn.sessionCode : "-"}</td>
+                        <td>{txn.openingBal !== null ? txn.openingBal : "-"}</td>
                         <td>{txn.closingBal !== null ? txn.closingBal : "-"}</td>
                         <td>{txn.variance !== null ? txn.variance : "-"}</td>
-                        <td>{txn.openBy}</td>
+                        <td>{txn.openBy ? txn.openBy : "-"}</td>
                         <td>{txn.closeBy ? txn.closeBy : "-"}</td>
-                        <td>{formatDateTime(txn.openTime)}</td>
+                        <td>{txn.openTime ? formatDateTime(txn.openTime) : "-'"}</td>
                         <td>{txn.closeTime ? formatDateTime(txn.closeTime) : "-"}</td>
                         <td>
                           <button
@@ -605,31 +606,31 @@ const InquiryScreen = () => {
                                 <tbody>
                                   <tr>
                                     <td><strong>Sales Amount:</strong></td>
-                                    <td>{txn.salesAmt}</td>
+                                    <td>{txn.salesAmt !== null ? txn.salesAmt : "-"}</td>
                                   </tr>
                                   <tr>
                                     <td><strong>Purchase Amount:</strong></td>
-                                    <td>{txn.purchaseAmt}</td>
+                                    <td>{txn.purchaseAmt !== null ? txn.purchaseAmt : "-"}</td>
                                   </tr>
                                   <tr>
                                     <td><strong>Sales Payment Amount:</strong></td>
-                                    <td>{txn.salesPaymentAmt}</td>
+                                    <td>{txn.salesPaymentAmt !== null ? txn.salesPaymentAmt : "-"}</td>
                                   </tr>
                                   <tr>
                                     <td><strong>Purchase Payment Amount:</strong></td>
-                                    <td>{txn.purchasePaymentAmt}</td>
+                                    <td>{txn.purchasePaymentAmt !== null ? txn.purchasePaymentAmt : "-"}</td>
                                   </tr>
                                   <tr>
                                     <td><strong>Cash In Amount:</strong></td>
-                                    <td>{txn.cashInAmt}</td>
+                                    <td>{txn.cashInAmt !== null ? txn.cashInAmt : "-"}</td>
                                   </tr>
                                   <tr>
                                     <td><strong>Cash Out Amount:</strong></td>
-                                    <td>{txn.cashOutAmt}</td>
+                                    <td>{txn.cashOutAmt !== null ? txn.cashOutAmt : "-"}</td>
                                   </tr>
                                   <tr>
                                     <td><strong>Expected Closing Balance:</strong></td>
-                                    <td>{txn.expectedClosingBalance}</td>
+                                    <td>{txn.expectedClosingBalance !== null ? txn.expectedClosingBalance : "-"}</td>
                                   </tr>
                                 </tbody>
                               </table>
@@ -745,15 +746,15 @@ const InquiryScreen = () => {
                 {filteredTransactions.map((txn, index) => (
                   <tr key={txn.cashTransactionId}>
                     <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                    <td>{txn.docNo}</td>
-                    <td>{txn.effectedAmount}</td>
-                    <td>{txn.remarks}</td>
+                    <td>{txn.docNo || "-"}</td>
+                    <td>{txn.effectedAmount !== null ? txn.effectedAmount : "-"}</td>
+                    <td>{txn.remarks || "-"}</td>
                     <td>{txn.isVoid ? "Yes" : "No"}</td>
                     <td>{txn.isCashOut ? "Yes" : "No"}</td>
                     <td>{usersCache[txn.createdBy] || "-"}</td>
-                    <td>{formatDateTime(txn.createdTimeStamp)}</td>
+                    <td>{formatDateTime(txn.createdTimeStamp) || "-"}</td>
                     <td>{usersCache[txn.lastModifiedBy] || "-"}</td>
-                    <td>{formatDateTime(txn.lastModifiedTimeStamp)}</td>
+                    <td>{formatDateTime(txn.lastModifiedTimeStamp) || "-"}</td>
                     <td>
                       {txn.isVoid ? (
                         <button className="disabled-void" disabled>Voided</button>
@@ -824,6 +825,7 @@ const InquiryScreen = () => {
                   <th>Debtor Code</th>
                   <th>Total</th>
                   <th>Outstanding</th>
+                  <th>Change</th>
                   <th>Completed</th>
                   <th>Void</th>
                   <th>Doc Date</th>
@@ -834,17 +836,20 @@ const InquiryScreen = () => {
               <tbody>
                 {filteredSalesTransactions.map((txn, index) => {
                   const isExpanded = expandedRow === txn.salesId;
+                  const outstandingView = txn.outstandingBal < 0 ? 0 : txn.outstandingBal;
+                  const changeView = txn.outstandingBal < 0 ? Math.abs(txn.outstandingBal) : 0;
                   return (
                     <React.Fragment key={txn.salesId}>
                       <tr>
                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                        <td>{txn.docNo}</td>
-                        <td>{txn.debtorCode}</td>
-                        <td>{txn.total}</td>
-                        <td>{txn.outstandingBal < 0 ? 0 : txn.outstandingBal}</td>
+                        <td>{txn.docNo || "-"}</td>
+                        <td>{txn.debtorCode || "-"}</td>
+                        <td>{txn.total !== null ? txn.total: "-" }</td>
+                        <td>{outstandingView}</td>
+                        <td>{changeView}</td>
                         <td>{txn.isComplete ? "Yes" : "No"}</td>
                         <td>{txn.isVoid ? "Yes" : "No"}</td>
-                        <td>{formatDateTime(txn.docDate)}</td>
+                        <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.locationCode || "-"}</td>
                         <td>
                           {txn.isVoid ? (
@@ -881,19 +886,21 @@ const InquiryScreen = () => {
                                     <th>Qty</th>
                                     <th>Unit Price</th>
                                     <th>Discount</th>
+                                    <th>Discount Amount</th>
                                     <th>SubTotal</th>
                                   </tr>
                                 </thead>
                                 <tbody>
                                   {txn.details.map((detail) => (
                                     <tr key={detail.salesDetailId}>
-                                      <td>{detail.itemCode}</td>
-                                      <td>{detail.description}</td>
-                                      <td>{detail.uom}</td>
-                                      <td>{detail.qty}</td>
-                                      <td>{detail.unitPrice}</td>
-                                      <td>{detail.discountAmount}</td>
-                                      <td>{detail.subTotal}</td>
+                                      <td>{detail.itemCode || "-"}</td>
+                                      <td>{detail.description || "-"}</td>
+                                      <td>{detail.uom || "-"}</td>
+                                      <td>{detail.qty !== null ? detail.qty : "-"}</td>
+                                      <td>{detail.unitPrice !== null ? detail.unitPrice : "-"}</td>
+                                      <td>{detail.discount || "-"}</td>
+                                      <td>{detail.discountAmount !== null ? detail.discountAmount : "-"}</td>
+                                      <td>{detail.subTotal !== null ? detail.subTotal : "-"}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -912,9 +919,9 @@ const InquiryScreen = () => {
                                   <tbody>
                                     {txn.paymentHistory.map((payment) => (
                                       <tr key={payment.salesPaymentId}>
-                                        <td>{formatDateTime(payment.paymentDate)}</td>
-                                        <td>{payment.remark}</td>
-                                        <td>{payment.amount}</td>
+                                        <td>{formatDateTime(payment.paymentDate) || "-"}</td>
+                                        <td>{payment.remark || "-"}</td>
+                                        <td>{payment.amount !== null ? payment.amount : "-"}</td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -990,6 +997,7 @@ const InquiryScreen = () => {
                   <th>Creditor Code</th>
                   <th>Total</th>
                   <th>Outstanding</th>
+                  <th>Change</th>
                   <th>Completed</th>
                   <th>Void</th>
                   <th>Doc Date</th>
@@ -1000,17 +1008,20 @@ const InquiryScreen = () => {
               <tbody>
                 {filteredPurchasesTransactions.map((txn, index) => {
                   const isExpanded = expandedPurchaseRow === txn.purchaseId;
+                  const outstandingView = txn.outstandingBal < 0 ? 0 : txn.outstandingBal;
+                  const changeView = txn.outstandingBal < 0 ? Math.abs(txn.outstandingBal) : 0;
                   return (
                     <React.Fragment key={txn.purchaseId}>
                       <tr>
                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                        <td>{txn.docNo}</td>
-                        <td>{txn.creditorCode}</td>
-                        <td>{txn.total}</td>
-                        <td>{txn.outstandingBal < 0 ? 0 : txn.outstandingBal}</td>
+                        <td>{txn.docNo || "-"}</td>
+                        <td>{txn.creditorCode || "-"}</td>
+                        <td>{txn.total !== null ? txn.total : "-'"}</td>
+                        <td>{outstandingView}</td>
+                        <td>{changeView}</td>
                         <td>{txn.isComplete ? "Yes" : "No"}</td>
                         <td>{txn.isVoid ? "Yes" : "No"}</td>
-                        <td>{formatDateTime(txn.docDate)}</td>
+                        <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.locationCode || "-"}</td>
                         <td>
                           {txn.isVoid ? (
@@ -1047,19 +1058,21 @@ const InquiryScreen = () => {
                                     <th>Qty</th>
                                     <th>Unit Price</th>
                                     <th>Discount</th>
+                                    <th>Discount Amount</th>
                                     <th>SubTotal</th>
                                   </tr>
                                 </thead>
                                 <tbody>
                                   {txn.details.map((detail) => (
                                     <tr key={detail.purchaseDetailId}>
-                                      <td>{detail.itemCode}</td>
-                                      <td>{detail.description}</td>
-                                      <td>{detail.uom}</td>
-                                      <td>{detail.qty}</td>
-                                      <td>{detail.unitPrice}</td>
-                                      <td>{detail.discountAmount}</td>
-                                      <td>{detail.subTotal}</td>
+                                      <td>{detail.itemCode || "-"}</td>
+                                      <td>{detail.description | "-"}</td>
+                                      <td>{detail.uom || "-"}</td>
+                                      <td>{detail.qty !== null ? detail.qty : "-"}</td>
+                                      <td>{detail.unitPrice !== null ? detail.unitPrice : "-"}</td>
+                                      <td>{detail.discount || "-"}</td>
+                                      <td>{detail.discountAmount !== null ? detail.discountAmount : "-"}</td>
+                                      <td>{detail.subTotal !== null ? detail.subTotal : "-"}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -1078,9 +1091,9 @@ const InquiryScreen = () => {
                                   <tbody>
                                     {txn.paymentHistory.map((payment) => (
                                       <tr key={payment.purchasePaymentId}>
-                                        <td>{formatDateTime(payment.paymentDate)}</td>
-                                        <td>{payment.remark}</td>
-                                        <td>{payment.amount}</td>
+                                        <td>{formatDateTime(payment.paymentDate) || "-"}</td>
+                                        <td>{payment.remark || "-"}</td>
+                                        <td>{payment.amount !== null ? payment.amount : "-"}</td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -1166,11 +1179,11 @@ const InquiryScreen = () => {
                     <React.Fragment key={txn.creditNoteId}>
                       <tr>
                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                        <td>{txn.docNo}</td>
-                        <td>{txn.debtorCode}</td>
-                        <td>{txn.total}</td>
+                        <td>{txn.docNo || "-"}</td>
+                        <td>{txn.debtorCode || "-"}</td>
+                        <td>{txn.total !== null ? txn.total : "-"}</td>
                         <td>{txn.isVoid ? "Yes" : "No"}</td>
-                        <td>{formatDateTime(txn.docDate)}</td>
+                        <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.locationCode || "-" }</td>
                         <td>
                           {txn.isVoid ? (
@@ -1213,13 +1226,13 @@ const InquiryScreen = () => {
                                 <tbody>
                                   {txn.details.map((detail) => (
                                     <tr key={detail.creditNoteDetailId}>
-                                      <td>{detail.itemCode}</td>
-                                      <td>{detail.description}</td>
-                                      <td>{detail.uom}</td>
-                                      <td>{detail.qty}</td>
-                                      <td>{detail.unitPrice}</td>
-                                      <td>{detail.discountAmount}</td>
-                                      <td>{detail.subTotal}</td>
+                                      <td>{detail.itemCode || "-"}</td>
+                                      <td>{detail.description || "-"}</td>
+                                      <td>{detail.uom || "-"}</td>
+                                      <td>{detail.qty !== null ? detail.qty : "-"}</td>
+                                      <td>{detail.unitPrice !== null ? detail.unitPrice : "-"}</td>
+                                      <td>{detail.discountAmount !== null ? detail.discountAmount : "-"}</td>
+                                      <td>{detail.subTotal !== null ? detail.subTotal : "-"}</td>
                                     </tr>
                                   ))}
                                 </tbody>

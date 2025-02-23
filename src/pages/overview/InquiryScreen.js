@@ -6,8 +6,6 @@ import OutstandingPaymentModal from "../../modals/OutstandingPaymentModal";
 
 const InquiryScreen = () => {
   const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalRecords, setTotalRecords] = useState(true);
   const [activeTab, setActiveTab] = useState("counterSession");
   const [counterSessions, setSessionCounters] = useState([]);
@@ -43,7 +41,14 @@ const InquiryScreen = () => {
   const [confirmCreditNoteModal, setConfirmCreditNoteModal] = useState({ isOpen: false, creditNoteId: null, message: "" });
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const customerId = Number(localStorage.getItem("customerId"));
-  const [payModal, setPayModal] = useState({ isOpen: false, salesId: null, outstandingAmount: 0 });
+  const [payModal, setPayModal] = useState({ isOpen: false, salesId: null, outstandingAmount: 0, type: null });
+  const [pagination, setPagination] = useState({
+    counterSession: { currentPage: 1, itemsPerPage: 5 },
+    cashTransaction: { currentPage: 1, itemsPerPage: 5 },
+    salesInvoice: { currentPage: 1, itemsPerPage: 5 },
+    purchaseInvoice: { currentPage: 1, itemsPerPage: 5 },
+    creditNote: { currentPage: 1, itemsPerPage: 5 },
+  });
 
   useEffect(() => {
     if (activeTab === "counterSession") {
@@ -61,7 +66,7 @@ const InquiryScreen = () => {
     else if (activeTab === "creditNote") {
       fetchCreditNotes();
     }
-  }, [activeTab, itemsPerPage, currentPage]);
+  }, [activeTab, pagination[activeTab].currentPage, pagination[activeTab].itemsPerPage]);
 
   const fetchCounterSessions = async () => {
     setLoading(true);
@@ -72,8 +77,8 @@ const InquiryScreen = () => {
         body: JSON.stringify({
           customerId: customerId,
           keyword: "",
-          offset: (currentPage - 1) * itemsPerPage,
-          limit: itemsPerPage,
+          offset: (pagination.counterSession.currentPage - 1) * pagination.counterSession.itemsPerPage,
+          limit: pagination.counterSession.itemsPerPage,
         }),
       });
 
@@ -81,7 +86,7 @@ const InquiryScreen = () => {
       if (response.ok && data.success) {
         setSessionCounters([...data.data]);
         fetchUserNames(data.data);
-        setTotalRecords(Math.ceil(data.data.length === itemsPerPage))
+        setTotalRecords(Math.ceil(data.data.length === pagination.counterSession.itemsPerPage));
       } else {
         throw new Error(data.errorMessage || "Failed to fetch transactions.");
       }
@@ -101,8 +106,8 @@ const InquiryScreen = () => {
         body: JSON.stringify({
           customerId: customerId,
           keyword: "",
-          offset: (currentPage - 1) * itemsPerPage,
-          limit: itemsPerPage,
+          offset: (pagination.cashTransaction.currentPage - 1) * pagination.cashTransaction.itemsPerPage,
+          limit: pagination.cashTransaction.itemsPerPage,
         }),
       });
 
@@ -110,7 +115,7 @@ const InquiryScreen = () => {
       if (response.ok && data.success) {
         setTransactions([...data.data]);
         fetchUserNames(data.data);
-        setTotalRecords(Math.ceil(data.data.length === itemsPerPage))
+        setTotalRecords(Math.ceil(data.data.length === pagination.cashTransaction.itemsPerPage));
       } else {
         throw new Error(data.errorMessage || "Failed to fetch transactions.");
       }
@@ -190,15 +195,15 @@ const InquiryScreen = () => {
         body: JSON.stringify({
           customerId: customerId,
           keyword: "",
-          offset: (currentPage - 1) * itemsPerPage,
-          limit: itemsPerPage,
+          offset: (pagination.salesInvoice.currentPage - 1) * pagination.salesInvoice.itemsPerPage,
+          limit: pagination.salesInvoice.itemsPerPage,
         }),
       });
 
       const data = await response.json();
       if (response.ok && data.success) {
         setSalesTransactions([...data.data]);
-        setTotalRecords(Math.ceil(data.data.length === itemsPerPage))
+        setTotalRecords(Math.ceil(data.data.length === pagination.salesInvoice.itemsPerPage));
       } else {
         throw new Error(data.errorMessage || "Failed to fetch sales transactions.");
       }
@@ -280,15 +285,15 @@ const InquiryScreen = () => {
         body: JSON.stringify({
           customerId: customerId,
           keyword: "",
-          offset: (currentPage - 1) * itemsPerPage,
-          limit: itemsPerPage,
+          offset: (pagination.purchaseInvoice.currentPage - 1) * pagination.purchaseInvoice.itemsPerPage,
+          limit: pagination.purchaseInvoice.itemsPerPage,
         }),
       });
 
       const data = await response.json();
       if (response.ok && data.success) {
         setPurchaseTransactions([...data.data]);
-        setTotalRecords(Math.ceil(data.data.length === itemsPerPage))
+        setTotalRecords(Math.ceil(data.data.length === pagination.purchaseInvoice.itemsPerPage));
       } else {
         throw new Error(data.errorMessage || "Failed to fetch purchase transactions.");
       }
@@ -370,15 +375,15 @@ const InquiryScreen = () => {
         body: JSON.stringify({
           customerId: customerId,
           keyword: "",
-          offset: (currentPage - 1) * itemsPerPage,
-          limit: itemsPerPage,
+          offset: (pagination.creditNote.currentPage - 1) * pagination.creditNote.itemsPerPage,
+          limit: pagination.creditNote.itemsPerPage,
         }),
       });
 
       const data = await response.json();
       if (response.ok && data.success) {
         setCreditNote([...data.data]);
-        setTotalRecords(Math.ceil(data.data.length === itemsPerPage))
+        setTotalRecords(Math.ceil(data.data.length === pagination.creditNote.itemsPerPage));
       } else {
         throw new Error(data.errorMessage || "Failed to fetch credit note.");
       }
@@ -488,31 +493,33 @@ const InquiryScreen = () => {
 
   const handleItemsPerPageChange = (event) => {
     const newItemsPerPage = Number(event.target.value);
-    setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1);
+    setPagination((prev) => ({
+      ...prev,
+      [activeTab]: { ...prev[activeTab], itemsPerPage: newItemsPerPage, currentPage: 1 },
+    }));
   };
 
   const handlePageChange = (page) => {
     if (page >= 1) {
-      setCurrentPage(page);
+      setPagination((prev) => ({
+        ...prev,
+        [activeTab]: { ...prev[activeTab], currentPage: page },
+      }));
     }
   };
-
-  const handlePaymentConfirm = async (payments, totalPaid, type) => {
+  
+  const handlePaymentConfirm = async (payments, totalPaid, type, reference) => {
     try {
-        const customerId = Number(localStorage.getItem("customerId"));
         const userId = localStorage.getItem("userId");
         const counterSessionId = localStorage.getItem("counterSessionId");
         const now = new Date();
-        const offset = now.getTimezoneOffset() * 60000; // Convert minutes to milliseconds
+        const offset = now.getTimezoneOffset() * 60000; 
         const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
 
-        // Determine API Endpoint based on transaction type
         const apiEndpoint = type === "sales"
             ? "https://optikposbackend.absplt.com/Sales/SaveSalesPayment"
             : "https://optikposbackend.absplt.com/Purchases/SavePurchasePayment";
 
-        // Consolidate payment methods into a single remark
         const remark = payments
             .map(payment => {
                 let details = `Method: ${payment.method.toUpperCase()}`;
@@ -538,7 +545,7 @@ const InquiryScreen = () => {
                 targetDocId: payModal.transactionId, 
                 docDate: localISOTime,
                 remark: remark,
-                reference: "", 
+                reference: reference, 
                 amount: parseFloat(totalPaid.toFixed(2)), 
             }),
         });
@@ -600,7 +607,7 @@ const InquiryScreen = () => {
             <label>
               Show:
               <select
-                value={itemsPerPage}
+              value={pagination[activeTab].itemsPerPage}
                 onChange={handleItemsPerPageChange}
                 className="items-per-page-select"
               >
@@ -636,8 +643,8 @@ const InquiryScreen = () => {
                   return (
                     <React.Fragment key={txn.counterSessionId}>
                       <tr>
-                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                        <td>{txn.sessionCode ? txn.sessionCode : "-"}</td>
+                      <td>{(pagination[activeTab].currentPage - 1) * pagination[activeTab].itemsPerPage + index + 1}</td>
+                      <td>{txn.sessionCode ? txn.sessionCode : "-"}</td>
                         <td>{txn.openingBal !== null ? txn.openingBal : "-"}</td>
                         <td>{txn.closingBal !== null ? txn.closingBal : "-"}</td>
                         <td>{txn.variance !== null ? txn.variance : "-"}</td>
@@ -704,18 +711,16 @@ const InquiryScreen = () => {
           )}
           <div className="pagination">
             <button
-              disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={pagination[activeTab].currentPage === 1}
+              onClick={() => handlePageChange(pagination[activeTab].currentPage - 1)}
             >
               Previous
             </button>
-            <span>
-              Page {currentPage}
-            </span>
+            <span>Page {pagination[activeTab].currentPage}</span>
             <button
               disabled={!totalRecords}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
+              onClick={() => handlePageChange(pagination[activeTab].currentPage + 1)}
+              >
               Next
             </button>
           </div>
@@ -769,7 +774,7 @@ const InquiryScreen = () => {
             <label>
               Show:
               <select
-                value={itemsPerPage}
+                value={pagination[activeTab].itemsPerPage}
                 onChange={handleItemsPerPageChange}
                 className="items-per-page-select"
               >
@@ -803,7 +808,7 @@ const InquiryScreen = () => {
               <tbody>
                 {filteredTransactions.map((txn, index) => (
                   <tr key={txn.cashTransactionId}>
-                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                    <td>{(pagination[activeTab].currentPage - 1) * pagination[activeTab].itemsPerPage + index + 1}</td>
                     <td>{txn.docNo || "-"}</td>
                     <td>{txn.effectedAmount !== null ? txn.effectedAmount : "-"}</td>
                     <td>{txn.remarks || "-"}</td>
@@ -827,17 +832,15 @@ const InquiryScreen = () => {
           )}
           <div className="pagination">
             <button
-              disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={pagination[activeTab].currentPage === 1}
+              onClick={() => handlePageChange(pagination[activeTab].currentPage - 1)}
             >
               Previous
             </button>
-            <span>
-              Page {currentPage}
-            </span>
+            <span>Page {pagination[activeTab].currentPage}</span>
             <button
               disabled={!totalRecords}
-              onClick={() => handlePageChange(currentPage + 1)}
+              onClick={() => handlePageChange(pagination[activeTab].currentPage + 1)}
             >
               Next
             </button>
@@ -860,7 +863,7 @@ const InquiryScreen = () => {
             <label>
               Show:
               <select
-                value={itemsPerPage}
+                value={pagination[activeTab].itemsPerPage}
                 onChange={handleItemsPerPageChange}
                 className="items-per-page-select"
               >
@@ -879,6 +882,7 @@ const InquiryScreen = () => {
               <thead>
                 <tr>
                   <th>No</th>
+                  <th>Doc Date</th>
                   <th>Doc No</th>
                   <th>Debtor Code</th>
                   <th>Total</th>
@@ -886,7 +890,6 @@ const InquiryScreen = () => {
                   <th>Change</th>
                   <th>Completed</th>
                   <th>Void</th>
-                  <th>Doc Date</th>
                   <th>Location Code</th>
                   <th>Actions</th>
                 </tr>
@@ -899,7 +902,8 @@ const InquiryScreen = () => {
                   return (
                     <React.Fragment key={txn.salesId}>
                       <tr>
-                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                      <td>{(pagination[activeTab].currentPage - 1) * pagination[activeTab].itemsPerPage + index + 1}</td>
+                      <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.docNo || "-"}</td>
                         <td>{txn.debtorCode || "-"}</td>
                         <td>{txn.total !== null ? txn.total: "-" }</td>
@@ -907,7 +911,6 @@ const InquiryScreen = () => {
                         <td>{changeView}</td>
                         <td>{txn.isComplete ? "Yes" : "No"}</td>
                         <td>{txn.isVoid ? "Yes" : "No"}</td>
-                        <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.locationCode || "-"}</td>
                         <td>
                           {txn.isVoid ? (
@@ -980,7 +983,9 @@ const InquiryScreen = () => {
                                   <thead>
                                     <tr>
                                       <th>Payment Date</th>
+                                      <th>Doc No</th>
                                       <th>Remark</th>
+                                      <th>Reference</th>
                                       <th>Amount</th>
                                     </tr>
                                   </thead>
@@ -988,7 +993,9 @@ const InquiryScreen = () => {
                                     {txn.paymentHistory.map((payment) => (
                                       <tr key={payment.salesPaymentId}>
                                         <td>{formatDateTime(payment.paymentDate) || "-"}</td>
+                                        <td>{payment.docNo || "-"}</td>
                                         <td>{payment.remark || "-"}</td>
+                                        <td>{payment.reference || "-"}</td>
                                         <td>{payment.amount !== null ? payment.amount : "-"}</td>
                                       </tr>
                                     ))}
@@ -1009,17 +1016,15 @@ const InquiryScreen = () => {
           )}
           <div className="pagination">
             <button
-              disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={pagination[activeTab].currentPage === 1}
+              onClick={() => handlePageChange(pagination[activeTab].currentPage - 1)}
             >
               Previous
             </button>
-            <span>
-              Page {currentPage}
-            </span>
+            <span>Page {pagination[activeTab].currentPage}</span>
             <button
               disabled={!totalRecords}
-              onClick={() => handlePageChange(currentPage + 1)}
+              onClick={() => handlePageChange(pagination[activeTab].currentPage + 1)}
             >
               Next
             </button>
@@ -1042,7 +1047,7 @@ const InquiryScreen = () => {
             <label>
               Show:
               <select
-                value={itemsPerPage}
+                value={pagination[activeTab].itemsPerPage}
                 onChange={handleItemsPerPageChange}
                 className="items-per-page-select"
               >
@@ -1061,6 +1066,7 @@ const InquiryScreen = () => {
               <thead>
                 <tr>
                   <th>No</th>
+                  <th>Doc Date</th>
                   <th>Doc No</th>
                   <th>Creditor Code</th>
                   <th>Total</th>
@@ -1068,7 +1074,6 @@ const InquiryScreen = () => {
                   <th>Change</th>
                   <th>Completed</th>
                   <th>Void</th>
-                  <th>Doc Date</th>
                   <th>Location Code</th>
                   <th>Actions</th>
                 </tr>
@@ -1081,7 +1086,8 @@ const InquiryScreen = () => {
                   return (
                     <React.Fragment key={txn.purchaseId}>
                       <tr>
-                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                        <td>{(pagination[activeTab].currentPage - 1) * pagination[activeTab].itemsPerPage + index + 1}</td>
+                        <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.docNo || "-"}</td>
                         <td>{txn.creditorCode || "-"}</td>
                         <td>{txn.total !== null ? txn.total : "-'"}</td>
@@ -1089,7 +1095,6 @@ const InquiryScreen = () => {
                         <td>{changeView}</td>
                         <td>{txn.isComplete ? "Yes" : "No"}</td>
                         <td>{txn.isVoid ? "Yes" : "No"}</td>
-                        <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.locationCode || "-"}</td>
                         <td>
                           {txn.isVoid ? (
@@ -1110,7 +1115,6 @@ const InquiryScreen = () => {
                             {isExpanded ? "Hide" : "View"}
                           </button>
 
-                          <td>
                             {!txn.isComplete && !txn.isVoid && (
                               <button
                                 className="pay-button"
@@ -1119,7 +1123,6 @@ const InquiryScreen = () => {
                                 Pay
                               </button>
                             )}
-                          </td>
                        </td>
                       </tr>
 
@@ -1164,6 +1167,7 @@ const InquiryScreen = () => {
                                     <tr>
                                       <th>Payment Date</th>
                                       <th>Remark</th>
+                                      <th>Reference</th>
                                       <th>Amount</th>
                                     </tr>
                                   </thead>
@@ -1172,6 +1176,7 @@ const InquiryScreen = () => {
                                       <tr key={payment.purchasePaymentId}>
                                         <td>{formatDateTime(payment.paymentDate) || "-"}</td>
                                         <td>{payment.remark || "-"}</td>
+                                        <td>{payment.reference || "-"}</td>
                                         <td>{payment.amount !== null ? payment.amount : "-"}</td>
                                       </tr>
                                     ))}
@@ -1192,17 +1197,15 @@ const InquiryScreen = () => {
           )}
           <div className="pagination">
             <button
-              disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={pagination[activeTab].currentPage === 1}
+              onClick={() => handlePageChange(pagination[activeTab].currentPage - 1)}
             >
               Previous
             </button>
-            <span>
-              Page {currentPage}
-            </span>
+            <span>Page {pagination[activeTab].currentPage}</span>
             <button
               disabled={!totalRecords}
-              onClick={() => handlePageChange(currentPage + 1)}
+              onClick={() => handlePageChange(pagination[activeTab].currentPage + 1)}
             >
               Next
             </button>
@@ -1223,7 +1226,7 @@ const InquiryScreen = () => {
             <label>
               Show:
               <select
-                value={itemsPerPage}
+                value={pagination[activeTab].itemsPerPage}
                 onChange={handleItemsPerPageChange}
                 className="items-per-page-select"
               >
@@ -1242,11 +1245,11 @@ const InquiryScreen = () => {
               <thead>
                 <tr>
                   <th>No</th>
+                  <th>Doc Date</th>
                   <th>Doc No</th>
                   <th>Debtor Code</th>
                   <th>Total</th>
                   <th>Void</th>
-                  <th>Doc Date</th>
                   <th>Location Code</th>
                   <th>Actions</th>
                 </tr>
@@ -1257,12 +1260,12 @@ const InquiryScreen = () => {
                   return (
                     <React.Fragment key={txn.creditNoteId}>
                       <tr>
-                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                        <td>{(pagination[activeTab].currentPage - 1) * pagination[activeTab].itemsPerPage + index + 1}</td>
+                        <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.docNo || "-"}</td>
                         <td>{txn.debtorCode || "-"}</td>
                         <td>{txn.total !== null ? txn.total : "-"}</td>
                         <td>{txn.isVoid ? "Yes" : "No"}</td>
-                        <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.locationCode || "-" }</td>
                         <td>
                           {txn.isVoid ? (
@@ -1328,17 +1331,15 @@ const InquiryScreen = () => {
           )}
           <div className="pagination">
             <button
-              disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={pagination[activeTab].currentPage === 1}
+              onClick={() => handlePageChange(pagination[activeTab].currentPage - 1)}
             >
               Previous
             </button>
-            <span>
-              Page {currentPage}
-            </span>
+            <span>Page {pagination[activeTab].currentPage}</span>
             <button
               disabled={!totalRecords}
-              onClick={() => handlePageChange(currentPage + 1)}
+              onClick={() => handlePageChange(pagination[activeTab].currentPage + 1)}
             >
               Next
             </button>
@@ -1392,8 +1393,9 @@ const InquiryScreen = () => {
         <OutstandingPaymentModal
           isOpen={payModal.isOpen}
           onClose={() => setPayModal({ isOpen: false, transactionId: null })}
-          onConfirm={(payments, totalPaid) => handlePaymentConfirm(payments, totalPaid, payModal.type)}
+          onConfirm={(payments, totalPaid, type, reference) => handlePaymentConfirm(payments, totalPaid, type, reference)}
           outstandingAmount={payModal.outstandingAmount}
+          type={payModal.type} 
         />
       )}
 

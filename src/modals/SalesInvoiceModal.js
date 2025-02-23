@@ -13,6 +13,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
     debtorCode: "",
     companyName: "",
     locationId: "",
+    agentId: "",
     items: [{
       itemId: "",
       itemCode: "",
@@ -44,6 +45,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
     subtotal: 0,
   });
 
+  const [agents, setAgents] = useState([]);
   const [debtors, setDebtors] = useState([]);
   const [locations, setLocations] = useState([]);
   const [items, setItems] = useState([]);
@@ -53,6 +55,11 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
   const [paymentModal, setPaymentModal] = useState({ isOpen: false, type: "" });
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
 
+  const customerId = Number(localStorage.getItem("customerId"));
+  const salesId = localStorage.getItem("salesId"); 
+  const counterSessionId = localStorage.getItem("counterSessionId");
+  const docNo = localStorage.getItem("docNo");
+
   useEffect(() => {
     if (isOpen) {
       setFormData({
@@ -60,6 +67,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
         debtorCode: "",
         companyName: "",
         locationId: "",
+        agentId: "",
         items: [{
           itemId: "",
           itemCode: "",
@@ -95,8 +103,43 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       fetchDebtors();
       fetchLocations();
       fetchItems();
+      fetchAgents();
     }
   }, [isOpen]);
+
+  const fetchAgents = async () => {
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Users/GetUsers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: customerId,
+          keyword: "",
+          offset: 0,
+          limit: 9999,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        const options = data.data.map((user) => ({
+          value: user.userId,
+          label: user.userName,
+        }));
+        setAgents(options);
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch agents.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error Fetching Agents", message: error.message });
+    }
+  };
+
+  const handleAgentChange = (selectedOption) => {
+    setFormData((prev) => ({
+      ...prev,
+      agentId: selectedOption.value,
+    }));
+  };
 
   const fetchDebtors = async () => {
     try {
@@ -104,7 +147,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: Number(localStorage.getItem("customerId")),
+          customerId: customerId,
           keyword: "",
           offset: 0,
           limit: 9999,
@@ -115,7 +158,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       if (response.ok && data.success) {
         const options = data.data.map((debtor) => ({
           value: debtor.debtorId,
-          label: `${debtor.debtorCode}`,
+          label: `${debtor.debtorCode} - ${debtor.companyName}`,
           debtorCode: debtor.debtorCode,
           companyName: debtor.companyName,
         }));
@@ -134,7 +177,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: Number(localStorage.getItem("customerId")),
+          customerId: customerId,
           keyword: "",
           offset: 0,
           limit: 9999,
@@ -145,7 +188,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       if (response.ok && data.success) {
         const options = data.data.map((location) => ({
           value: location.locationId,
-          label: location.locationCode,
+          label: `${location.locationCode} - ${location.description}`,
         }));
         setLocations(options);
       } else {
@@ -179,7 +222,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: Number(localStorage.getItem("customerId")),
+          customerId: customerId,
           keyword: "",
           offset: 0,
           limit: 9999,
@@ -190,7 +233,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       if (response.ok && data.success) {
         const options = data.data.map((item) => ({
           value: item.itemId,
-          label: item.itemCode,
+          label: `${item.itemCode} - ${item.description}`,
           description: item.description,
           desc2: item.desc2,
           itemUOMs: item.itemUOMs,
@@ -421,13 +464,9 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       return;
     }
   
-    const customerId = Number(localStorage.getItem("customerId"));
-    const userId = localStorage.getItem("userId");
-    const salesId = localStorage.getItem("salesId"); 
-    const counterSessionId = localStorage.getItem("counterSessionId");
-    const docNo = localStorage.getItem("docNo");
+    const userId = formData.agentId || localStorage.getItem("userId");
     const now = new Date();
-    const offset = now.getTimezoneOffset() * 60000; // Convert minutes to milliseconds
+    const offset = now.getTimezoneOffset() * 60000;
     const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
   
     const payload = {
@@ -491,7 +530,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
   
   const handleExportReport = async () => {
     try {
-      const response = await fetch(`https://optikposbackend.absplt.com/Sales/GetSalesReport?SalesId=${localStorage.getItem("salesId")}`);
+      const response = await fetch(`https://optikposbackend.absplt.com/Sales/GetSalesReport?SalesId=${salesId}`);
       const data = await response.json();
   
       if (response.ok && data.success) {
@@ -506,7 +545,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
   
         const link = document.createElement("a");
         link.href = url;
-        link.download = `SalesReport_${localStorage.getItem("docNo")}.pdf`;
+        link.download = `SalesReport_${docNo}.pdf`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -549,6 +588,16 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
             <div className="sales-form-group">
               <label>Location Code</label>
               <Select options={locations} value={locations.find((location) => location.value === formData.locationId) || ""} onChange={handleLocationChange} isSearchable placeholder="Select Location" />
+            </div>
+            <div className="sales-form-group">
+              <label>Agent</label>
+              <Select
+                options={agents}
+                value={agents.find((agent) => agent.value === formData.agentId) || ""}
+                onChange={handleAgentChange}
+                isSearchable
+                placeholder="Select Agent"
+              />
             </div>
           </div>
         

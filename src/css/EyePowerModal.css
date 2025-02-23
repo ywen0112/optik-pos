@@ -19,10 +19,16 @@
   border-radius: 8px;
 }
 
-.eye-power-fields{
+.lens-power-fields{
   display: grid;
   gap: 8px;
   grid-template-columns: repeat(6, 1fr); 
+}
+
+.glasses-power-fields{
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(7, 1fr); 
 }
 
 .eye-power-form-group {

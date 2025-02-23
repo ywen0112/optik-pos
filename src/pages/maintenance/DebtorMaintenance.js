@@ -318,74 +318,91 @@ const DebtorMaintenance = () => {
     setSuccessModal({ isOpen: false, title: ""});
   };
 
-  const handleOpenEyePowerModal = async (debtor, type) => {
+  // const handleOpenEyePowerModal = async (debtor, type) => {
+  //   try {
+  //       const getApiUrl =
+  //           type === "Glass"
+  //               ? "https://optikposbackend.absplt.com/EyePower/GetGlasss"
+  //               : "https://optikposbackend.absplt.com/EyePower/GetContactLenss";
+
+  //       const newApiUrl =
+  //           type === "Glass"
+  //               ? "https://optikposbackend.absplt.com/EyePower/NewGlass"
+  //               : "https://optikposbackend.absplt.com/EyePower/NewContactLens";
+
+  //       const searchResponse = await fetch(getApiUrl, {
+  //           method: "POST",
+  //           headers: { "Content-Type": "application/json" },
+  //           body: JSON.stringify({
+  //               customerId: Number(customerId),
+  //               keyword: debtor.eyePowerId || "",  
+  //               offset: 0,
+  //               limit: 10
+  //           }),
+  //       });
+
+  //       const searchData = await searchResponse.json();
+  //       if (searchData.success && searchData.data.length > 0) {
+  //           const foundEyePower = searchData.data[0];
+
+  //           const editResponse = await fetch("https://optikposbackend.absplt.com/EyePower/Edit", {
+  //               method: "POST",
+  //               headers: { "Content-Type": "application/json" },
+  //               body: JSON.stringify({
+  //                   customerId: Number(customerId),
+  //                   userId: userId,
+  //                   id: foundEyePower.eyePowerId,  
+  //               }),
+  //           });
+
+  //           const editData = await editResponse.json();
+  //           if (editData.success) {
+  //               setSelectedEyePower(editData.data);
+  //               setEyePowerType(type);
+  //               setIsEyePowerOpen(true);
+  //               return;
+  //           }
+  //       }
+
+  //       const newResponse = await fetch(newApiUrl, {
+  //           method: "POST",
+  //           headers: { "Content-Type": "application/json" },
+  //           body: JSON.stringify({
+  //               customerId: Number(customerId),
+  //               userId: userId,
+  //               id: "",  
+  //           }),
+  //       });
+
+  //       const newData = await newResponse.json();
+  //       if (newData.success) {
+  //           setSelectedEyePower({ ...newData.data, debtorId: debtor.debtorId });
+  //           setEyePowerType(type);
+  //           setIsEyePowerOpen(true);
+  //       } else {
+  //           throw new Error(newData.errorMessage || "Failed to create new Eye Power record.");
+  //       }
+  //   } catch (error) {
+  //       setErrorModal({ isOpen: true, title: "Error Fetching Eye Power", message: error.message });
+  //   } finally {
+  //       setLoading(false);
+  //   }
+  // };
+
+  const handleOpenEyePowerModal = async (debtor) => {
     try {
-        const getApiUrl =
-            type === "Glass"
-                ? "https://optikposbackend.absplt.com/EyePower/GetGlasss"
-                : "https://optikposbackend.absplt.com/EyePower/GetContactLenss";
-
-        const newApiUrl =
-            type === "Glass"
-                ? "https://optikposbackend.absplt.com/EyePower/NewGlass"
-                : "https://optikposbackend.absplt.com/EyePower/NewContactLens";
-
-        const searchResponse = await fetch(getApiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                customerId: Number(customerId),
-                keyword: debtor.eyePowerId || "",  
-                offset: 0,
-                limit: 10
-            }),
-        });
-
-        const searchData = await searchResponse.json();
-        if (searchData.success && searchData.data.length > 0) {
-            const foundEyePower = searchData.data[0];
-
-            const editResponse = await fetch("https://optikposbackend.absplt.com/EyePower/Edit", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    customerId: Number(customerId),
-                    userId: userId,
-                    id: foundEyePower.eyePowerId,  
-                }),
-            });
-
-            const editData = await editResponse.json();
-            if (editData.success) {
-                setSelectedEyePower(editData.data);
-                setEyePowerType(type);
-                setIsEyePowerOpen(true);
-                return;
-            }
-        }
-
-        const newResponse = await fetch(newApiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                customerId: Number(customerId),
-                userId: userId,
-                id: "",  
-            }),
-        });
-
-        const newData = await newResponse.json();
-        if (newData.success) {
-            setSelectedEyePower({ ...newData.data, debtorId: debtor.debtorId });
-            setEyePowerType(type);
-            setIsEyePowerOpen(true);
-        } else {
-            throw new Error(newData.errorMessage || "Failed to create new Eye Power record.");
-        }
+      const response = await fetch("https://optikposbackend.absplt.com/EyePower/New", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerId: Number(customerId), userId: userId, id: "" }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setSelectedEyePower({ ...data.data, debtorId: debtor.debtorId });
+        setIsEyePowerOpen(true);
+      }
     } catch (error) {
-        setErrorModal({ isOpen: true, title: "Error Fetching Eye Power", message: error.message });
-    } finally {
-        setLoading(false);
+      console.error("Error fetching eye power data:", error);
     }
   };
 
@@ -484,10 +501,7 @@ const DebtorMaintenance = () => {
                 <th>Debtor Type Code</th>
                 <th>Mobile</th>
                 {debtorMaintenanceRights.edit && (
-                  <th>Contact Lens Eye Power</th>
-                )}
-                {debtorMaintenanceRights.edit && (
-                <th>Glasses Eye Power</th>
+                  <th>Eye Power</th>
                 )}
                 <th>Action</th>
               </tr>
@@ -502,15 +516,8 @@ const DebtorMaintenance = () => {
                   <td>{debtor.mobile || "-"}</td>
                   {debtorMaintenanceRights.edit && (
                   <td className="eye-power">
-                    <button className="eye-power-button" onClick={() => handleOpenEyePowerModal(debtor, "Contact Lens")}>
+                    <button className="eye-power-button" onClick={() => handleOpenEyePowerModal(debtor, "Eye Power")}>
                       <MdVisibility  /> 
-                    </button>
-                  </td>
-                  )}
-                  {debtorMaintenanceRights.edit && (
-                  <td className="eye-power">
-                    <button className="eye-power-button" onClick={() => handleOpenEyePowerModal(debtor, "Glass")}>
-                      <FaGlasses /> 
                     </button>
                   </td>
                   )}

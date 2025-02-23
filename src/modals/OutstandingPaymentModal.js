@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import "../css/OutstandingPaymentModal.css";
 
-const OutstandingPaymentModal = ({ isOpen, onClose, onConfirm, outstandingAmount }) => {
+const OutstandingPaymentModal = ({ isOpen, onClose, onConfirm, outstandingAmount, type }) => {
     const [paymentMethod, setPaymentMethod] = useState("cash");
     const [amount, setAmount] = useState(outstandingAmount);
     const [multiPayment, setMultiPayment] = useState([{ method: "cash", amount: "", referenceNo: "", cardNo: "", approvalCode: "" }]);
-  
+    const [reference, setReference] = useState("");
+
     const handlePaymentMethodChange = (e) => {
       setPaymentMethod(e.target.value);
       if (e.target.value !== "multi") {
@@ -31,7 +32,7 @@ const OutstandingPaymentModal = ({ isOpen, onClose, onConfirm, outstandingAmount
     const handleSubmit = () => {
         if (paymentMethod === "multi") {
             const totalPaid = multiPayment.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
-            onConfirm(multiPayment, totalPaid);
+            onConfirm(multiPayment, totalPaid, type, reference);
         } else {
             const singlePayment = [{
                 method: paymentMethod,
@@ -40,7 +41,7 @@ const OutstandingPaymentModal = ({ isOpen, onClose, onConfirm, outstandingAmount
                 cardNo: paymentMethod === "card" ? multiPayment[0].cardNo : "",
                 approvalCode: paymentMethod === "card" ? multiPayment[0].approvalCode : "",
             }];
-            onConfirm(singlePayment, parseFloat(amount || 0));
+            onConfirm(singlePayment, parseFloat(amount || 0), type, reference);
         }
         onClose();
     };
@@ -60,6 +61,15 @@ const OutstandingPaymentModal = ({ isOpen, onClose, onConfirm, outstandingAmount
             <option value="bank">Bank Transfer</option>
             <option value="multi">Multi-Payment</option>
         </select>
+
+        {type === "purchase" && (
+            <input
+                type="text"
+                value={reference}
+                onChange={(e) => setReference(e.target.value)}
+                placeholder="Enter Receipt Reference"
+            />
+        )}
 
         {paymentMethod === "multi" ? (
             <>
@@ -81,7 +91,6 @@ const OutstandingPaymentModal = ({ isOpen, onClose, onConfirm, outstandingAmount
                             placeholder="Enter Amount"
                         />
                         
-                        {/* Additional Fields for Bank Transfer */}
                         {payment.method === "bank" && (
                             <input
                                 type="text"
@@ -91,7 +100,6 @@ const OutstandingPaymentModal = ({ isOpen, onClose, onConfirm, outstandingAmount
                             />
                         )}
 
-                        {/* Additional Fields for Card Payment */}
                         {payment.method === "card" && (
                             <>
                                 <input
@@ -125,7 +133,6 @@ const OutstandingPaymentModal = ({ isOpen, onClose, onConfirm, outstandingAmount
                     placeholder="Enter Amount"
                 />
 
-                {/* Additional Fields for Bank Transfer */}
                 {paymentMethod === "bank" && (
                     <input
                         type="text"
@@ -135,7 +142,6 @@ const OutstandingPaymentModal = ({ isOpen, onClose, onConfirm, outstandingAmount
                     />
                 )}
 
-                {/* Additional Fields for Card Payment */}
                 {paymentMethod === "card" && (
                     <>
                         <input

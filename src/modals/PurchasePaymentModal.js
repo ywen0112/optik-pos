@@ -13,10 +13,16 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [reference, setReference] = useState("");
+  const customerId = Number(localStorage.getItem("customerId"));
+  const userId = localStorage.getItem("userId");
+  const counterSessionId = localStorage.getItem("counterSessionId");
+  const targetDocId = localStorage.getItem("purchaseId");
 
    useEffect(() => {
      if (isOpen) {
-       setPayments(type === "Multi" ? [{ method: "", amount: 0 }] : [{ method: type, amount: total.toFixed(2) }]);
+       setPayments(type === "Multi" ? [{ method: "", amount: 0 }] : [{ method: type, amount: total.toFixed(2)}]);
+       setReference("");
      }
    }, [isOpen, type, total]);
 
@@ -37,6 +43,10 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
     const updatedPayments = [...payments];
     updatedPayments[index].amount = parseFloat(e.target.value) || "";
     setPayments(updatedPayments);
+  };
+
+  const handleReferenceChange = (e) => {
+    setReference(e.target.value);
   };
 
   const addPaymentMethod = () => {
@@ -67,15 +77,9 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
   const handleConfirmPayment = async () => {
     setLoading(true);
 
-    const customerId = localStorage.getItem("customerId");
-    const userId = localStorage.getItem("userId");
-    const counterSessionId = localStorage.getItem("counterSessionId");
-    const targetDocId = localStorage.getItem("purchaseId");
-
     const formattedAmount = parseFloat(totalPaid).toFixed(2);
-
     const now = new Date();
-    const offset = now.getTimezoneOffset() * 60000; // Convert minutes to milliseconds
+    const offset = now.getTimezoneOffset() * 60000; 
     const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
 
     try {
@@ -83,13 +87,13 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: Number(customerId),
+          customerId: customerId,
           userId: userId,
           counterSessionId: counterSessionId,
           targetDocId: targetDocId,
           docDate: localISOTime,
           remark: remark,
-          reference: "", 
+          reference: reference, 
           amount: formattedAmount,
         }),
       });
@@ -126,6 +130,13 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
         ) : (
           <p><strong>Changes:</strong> {changes.toFixed(2)}</p>
         )}
+        <input
+          type="text"
+          value={reference}
+          onChange={handleReferenceChange}
+          placeholder="Enter Receipt Reference"
+          className="payment-amount-input"
+        />
         <div className="payment-container">
           {type === "Multi" && (
             <div className="multi-add">
@@ -170,7 +181,7 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
                     type="text"
                     value={payment.referenceNo || ""}
                     onChange={(e) => handleCardDetailsChange(e, index, "referenceNo")}
-                    placeholder="Reference No"
+                    placeholder="Bank Reference No"
                     className="payment-amount-input"
                   />
                 </>

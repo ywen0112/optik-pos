@@ -13,6 +13,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
     creditorCode: "",
     companyName: "",
     locationId: "",
+    agentId: "",
     items: [{
       itemId: "",
       itemCode: "",
@@ -44,6 +45,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
     subtotal: 0,
   });
 
+  const [agents, setAgents] = useState([]);
   const [creditors, setCreditors] = useState([]);
   const [locations, setLocations] = useState([]);
   const [items, setItems] = useState([]);
@@ -52,6 +54,10 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [paymentModal, setPaymentModal] = useState({ isOpen: false, type: "" });
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
+  const customerId = Number(localStorage.getItem("customerId"));
+  const purchaseId = localStorage.getItem("purchaseId"); 
+  const counterSessionId = localStorage.getItem("counterSessionId");
+  const docNo = localStorage.getItem("docNo");
 
   useEffect(() => {
     if (isOpen) {
@@ -60,6 +66,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
         creditorCode: "",
         companyName: "",
         locationId: "",
+        agentId: "",
         items: [{
           itemId: "",
           itemCode: "",
@@ -95,8 +102,43 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       fetchCreditors();
       fetchLocations();
       fetchItems();
+      fetchAgents();
     }
   }, [isOpen]);
+
+  const fetchAgents = async () => {
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Users/GetUsers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: customerId,
+          keyword: "",
+          offset: 0,
+          limit: 9999,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        const options = data.data.map((user) => ({
+          value: user.userId,
+          label: user.userName,
+        }));
+        setAgents(options);
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch agents.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error Fetching Agents", message: error.message });
+    }
+  };
+
+  const handleAgentChange = (selectedOption) => {
+    setFormData((prev) => ({
+      ...prev,
+      agentId: selectedOption.value,
+    }));
+  };
 
   const fetchCreditors = async () => {
     try {
@@ -115,7 +157,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       if (response.ok && data.success) {
         const options = data.data.map((creditor) => ({
           value: creditor.creditorId,
-          label: `${creditor.creditorCode}`,
+          label: `${creditor.creditorCode} - ${creditor.companyName}`,
           creditorCode: creditor.creditorCode,
           companyName: creditor.companyName,
         }));
@@ -145,7 +187,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       if (response.ok && data.success) {
         const options = data.data.map((location) => ({
           value: location.locationId,
-          label: location.locationCode,
+          label: `${location.locationCode} - ${location.description}`,
         }));
         setLocations(options);
       } else {
@@ -190,7 +232,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       if (response.ok && data.success) {
         const options = data.data.map((item) => ({
           value: item.itemId,
-          label: item.itemCode,
+          label: `${item.itemCode} - ${item.description}`,
           description: item.description,
           desc2: item.desc2,
           itemUOMs: item.itemUOMs,
@@ -419,16 +461,11 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       return;
     }
   
-    const customerId = Number(localStorage.getItem("customerId"));
-    const userId = localStorage.getItem("userId");
-    const purchaseId = localStorage.getItem("purchaseId");
-    const counterSessionId = localStorage.getItem("counterSessionId");
-    const docNo = localStorage.getItem("docNo");
+    const userId = formData.agentId || localStorage.getItem("userId");
     const now = new Date();
-    const offset = now.getTimezoneOffset() * 60000; // Convert minutes to milliseconds
+    const offset = now.getTimezoneOffset() * 60000;
     const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
 
-  
     const payload = {
       actionData: {
         customerId,
@@ -514,6 +551,16 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
             <div className="sales-form-group">
               <label>Location Code</label>
               <Select options={locations} value={locations.find((location) => location.value === formData.locationId) || ""} onChange={handleLocationChange} isSearchable placeholder="Select Location" />
+            </div>
+            <div className="sales-form-group">
+              <label>Agent</label>
+              <Select
+                options={agents}
+                value={agents.find((agent) => agent.value === formData.agentId) || ""}
+                onChange={handleAgentChange}
+                isSearchable
+                placeholder="Select Agent"
+              />
             </div>
           </div>
         

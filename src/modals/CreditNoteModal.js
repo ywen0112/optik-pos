@@ -12,6 +12,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
     debtorCode: "",
     companyName: "",
     locationId: "",
+    agentId: "",
     items: [{
       itemId: "",
       itemCode: "",
@@ -42,12 +43,17 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
     subtotal: 0,
   });
 
+  const [agents, setAgents] = useState([]);
   const [debtors, setDebtors] = useState([]);
   const [locations, setLocations] = useState([]);
   const [items, setItems] = useState([]);
   const [confirmationModal, setConfirmationModal] = useState(false);
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: "", message: "" });
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const customerId = Number(localStorage.getItem("customerId"));
+  const creditNoteId = localStorage.getItem("creditNoteId"); 
+  const counterSessionId = localStorage.getItem("counterSessionId");
+  const docNo = localStorage.getItem("docNo");
 
   useEffect(() => {
     if (isOpen) {
@@ -56,6 +62,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
         debtorCode: "",
         companyName: "",
         locationId: "",
+        agentId: "",
         items: [{
           itemId: "",
           itemCode: "",
@@ -88,8 +95,43 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
       fetchDebtors();
       fetchLocations();
       fetchItems();
+      fetchAgents();
     }
   }, [isOpen]);
+
+  const fetchAgents = async () => {
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/Users/GetUsers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: customerId,
+          keyword: "",
+          offset: 0,
+          limit: 9999,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        const options = data.data.map((user) => ({
+          value: user.userId,
+          label: user.userName,
+        }));
+        setAgents(options);
+      } else {
+        throw new Error(data.errorMessage || "Failed to fetch agents.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error Fetching Agents", message: error.message });
+    }
+  };
+
+  const handleAgentChange = (selectedOption) => {
+    setFormData((prev) => ({
+      ...prev,
+      agentId: selectedOption.value,
+    }));
+  };
 
   const fetchDebtors = async () => {
     try {
@@ -385,11 +427,10 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
       return;
     }
   
-    const customerId = Number(localStorage.getItem("customerId"));
-    const userId = localStorage.getItem("userId");
-    const creditNoteId = localStorage.getItem("creditNoteId");
-    const counterSessionId = localStorage.getItem("counterSessionId");
-    const docNo = localStorage.getItem("docNo");
+    const userId = formData.agentId || localStorage.getItem("userId");
+    const now = new Date();
+    const offset = now.getTimezoneOffset() * 60000;
+    const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
   
     const payload = {
       actionData: {
@@ -401,7 +442,7 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
       docNo,
       counterSessionId,
       debtorId: formData.debtorId,
-      docDate: new Date().toISOString(),
+      docDate: localISOTime,
       locationId: formData.locationId,
       remark: "",
       total: formData.total,
@@ -475,6 +516,16 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
             <div className="sales-form-group">
               <label>Location Code</label>
               <Select options={locations} value={locations.find((location) => location.value === formData.locationId) || ""} onChange={handleLocationChange} isSearchable placeholder="Select Location" />
+            </div>
+            <div className="sales-form-group">
+              <label>Agent</label>
+              <Select
+                options={agents}
+                value={agents.find((agent) => agent.value === formData.agentId) || ""}
+                onChange={handleAgentChange}
+                isSearchable
+                placeholder="Select Agent"
+              />
             </div>
           </div>
         

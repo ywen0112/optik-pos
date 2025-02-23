@@ -23,7 +23,7 @@ const EyePowerModal = ({ isOpen, onClose, data, onSave }) => {
   return (
     <div className="eye-power-modal-overlay">
       <div className="eye-power-modal-content">
-        <h3>Eye Power Details</h3>
+        <h3>Eye Power</h3>
         <div className="lens-power-fields">
             {["opticalHeight", "segmentHeight"].map(
               (field, index) => (

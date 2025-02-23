@@ -28,18 +28,16 @@
     display: flex;
     justify-content: space-between;
     cursor: pointer;
-    background: #f0f0f0;
     padding: 10px;
     border-radius: 4px;
 }
 
 .creditor-section-content {
     padding: 10px;
-    background: #f9f9f9;
     border-radius: 4px;
     display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(4, 1fr); 
+    gap: 8px;
+    grid-template-columns: repeat(6, 1fr); 
 }
 
 .creditor-form-group {
@@ -74,7 +72,7 @@
     font-size: 14px;
     resize: vertical; 
     min-height: 50px; 
-  }
+}
 
 .error-message {
     color: red;
@@ -107,5 +105,4 @@
     margin-top: 20px;
     font-size: 13px;
 }
-
 

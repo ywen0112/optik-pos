@@ -171,12 +171,17 @@
   padding: 10px;
 }
 
+.service-record-details table {
+  margin-top: 5px;
+}
+
 .service-record-details h4{
   margin-bottom: 5px;
 }
 
 .service-record-details td{
   font-size: 12px;
+
 }
 
 .service-record-details p{
@@ -186,4 +191,21 @@
   
 .service-record-details h5{
   margin-bottom: 0px;
-  }
+}
+
+.add-eye-button {
+  background-color: #1e90ff;
+  color: white;
+  border: none;
+  padding: 0px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  height: 30px;
+  align-self: center;
+  margin-right: 5px;
+}
+  
+.add-eye-button:hover {
+  background-color: #002299;
+}

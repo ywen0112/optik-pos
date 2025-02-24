@@ -5,6 +5,7 @@ import ConfirmationModal from "./ConfirmationModal";
 import Select from "react-select";
 import GlassesEyePowerTable from "../layouts/GlassesEyePowerTable";
 import LensEyePowerTable from "../layouts/LensEyePowerTable";
+import NewEyePowerModal from "./NewEyePowerModal";
 
 const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTypeOptions }) => {
   const [sectionData, setSectionData] = useState({});
@@ -15,6 +16,13 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
 
   const [serviceRecords, setServiceRecords] = useState([]);
   const [selectedRecord, setSelectedRecord] = useState(null);
+
+  const [activeTab, setActiveTab] = useState("serviceRecord");
+  const [eyePowerRecords, setEyePowerRecords] = useState([]);
+  const [selectedEyeRecordIndex, setSelectedEyeRecordIndex] = useState(0);
+
+  const [showNewEyeModal, setShowNewEyeModal] = useState(false);
+  const [newEyeData, setNewEyeData] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -59,9 +67,79 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
       });
       const result = await res.json();
       if (res.ok && result.success) {
-        setServiceRecords(result.data);
+        const sortedRecords = result.data.sort((a, b) => new Date(b.docDate) - new Date(a.docDate));
+        setServiceRecords(sortedRecords);
       } else {
         throw new Error(result.errorMessage || "Failed to fetch service records.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error", message: error.message });
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "eyePowerRecords" && isViewing && data.debtorId) {
+      fetchEyePowerRecords(data.debtorId);
+    }
+  }, [activeTab, isViewing, data.debtorId]);
+
+  useEffect(() => {
+    if (eyePowerRecords.length > 0) {
+      setSelectedEyeRecordIndex(0);
+    }
+  }, [eyePowerRecords]);
+  
+
+  const fetchUserName = async (userId) => {
+    try {
+      const res = await fetch("https://optikposbackend.absplt.com/Users/GetSpecificUser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "text/plain",
+        },
+        body: JSON.stringify({
+          customerId: Number(localStorage.getItem("customerId")),
+          userId: localStorage.getItem("userId"),
+          id: userId,
+        }),
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        return result.data.userName;
+      } else {
+        return userId; // fallback
+      }
+    } catch (error) {
+      return userId;
+    }
+  };
+  
+  const fetchEyePowerRecords = async (debtorId) => {
+    try {
+      const res = await fetch("https://optikposbackend.absplt.com/EyePower/GetDebtorEyePowerRecords", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "text/plain",
+        },
+        body: JSON.stringify({
+          customerId: Number(localStorage.getItem("customerId")),
+          userId: localStorage.getItem("userId"),
+          id: debtorId,
+        }),
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const recordsWithUserNames = await Promise.all(
+          result.data.map(async (record) => {
+            const userName = await fetchUserName(record.recordedBy);
+            return { ...record, recordedBy: userName };
+          })
+        );
+        setEyePowerRecords(recordsWithUserNames);
+      } else {
+        throw new Error(result.errorMessage || "Failed to fetch eye power records.");
       }
     } catch (error) {
       setErrorModal({ isOpen: true, title: "Error", message: error.message });
@@ -118,6 +196,70 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
     if (confirmAction) confirmAction();
     setIsConfirmOpen(false);
   };
+
+  const handleAddEyePowerRecord = async () => {
+    try {
+      const res = await fetch("https://optikposbackend.absplt.com/EyePower/New", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "text/plain",
+        },
+        body: JSON.stringify({
+          customerId: Number(localStorage.getItem("customerId")),
+          userId: localStorage.getItem("userId"),
+          id: data.debtorId  // or use another appropriate id value
+        }),
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        // Set new eye power data and open the modal for input form
+        setNewEyeData(result.data);
+        setShowNewEyeModal(true);
+      } else {
+        throw new Error(result.errorMessage || "Failed to add new eye power record.");
+      }
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Error", message: error.message });
+    }
+  };
+
+  const handleNewEyeSave = (newData) => {
+    setShowNewEyeModal(false);
+    if (data.debtorId) {
+      fetchEyePowerRecords(data.debtorId);
+    }
+  };
+
+  const handleExportTemplate = async () => {
+    try {
+      const response = await fetch("https://optikposbackend.absplt.com/EyePower/GetExcelImportTemplate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "*/*",
+        },
+        body: JSON.stringify({
+          customerId: Number(localStorage.getItem("customerId")),
+          userId: localStorage.getItem("userId"),
+          id: data.debtorId, // debtor id
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to export template");
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "EyePowerExcelTemplate.xlsx";
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      setErrorModal({ isOpen: true, title: "Export Error", message: error.message });
+    }
+  };
+
 
   if (!isOpen) return null;
 
@@ -189,8 +331,25 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
         </div>
 
         {isViewing && (
+          <>
+          {/* Tab Navigation */}
+          <div className="inquiry-tabs">
+            <button 
+              className={`tab-button ${activeTab === "serviceRecord" ? "active" : ""}`}
+              onClick={() => setActiveTab("serviceRecord")}
+            >
+              Service Record
+            </button>
+            <button 
+              className={`tab-button ${activeTab === "eyePowerRecords" ? "active" : ""}`}
+              onClick={() => setActiveTab("eyePowerRecords")}
+            >
+              Eye Power Records
+            </button>
+          </div>
+
+          {activeTab === "serviceRecord" && (
           <div className="service-records-wrapper">
-            {/* Left side: List of service records as a table-like layout */}
             <div className="service-records-list">
               <h4>Service Records</h4>
               <div className="record-header">
@@ -274,13 +433,13 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
                       <tbody>
                         {selectedRecord.details.map((detail) => (
                           <tr key={detail.salesDetailId}>
-                            <td>{detail.itemCode || "="}</td>
-                            <td>{detail.description || "="}</td>
-                            <td>{detail.desc2 || "="}</td>
-                            <td>{detail.uom || "="}</td>
+                            <td>{detail.itemCode != null ? detail.itemCode : "-"}</td>
+                            <td>{detail.description != null ? detail.description : "-"}</td>
+                            <td>{detail.desc2 != null ? detail.decs2 : "-"}</td>
+                            <td>{detail.uom != null ? detail.uom : "-"}</td>
                             <td>{detail.qty !== null ? detail.qty : "-"}</td>
                             <td>{detail.unitPrice !== null ? detail.unitPrice : "-"}</td>
-                            <td>{detail.discount || "-"}</td>
+                            <td>{detail.discount != null ? detail.discount : "-"}</td>
                             <td>{detail.discountAmount !== null ? detail.discountAmount : "-"}</td>
                             <td>{detail.subTotal !== null ? detail.subTotal : "-"}</td>
                           </tr>
@@ -305,9 +464,9 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
                       <tbody>
                         {selectedRecord.paymentHistory.map((payment) => (
                           <tr key={payment.salesPaymentId}>
-                            <td>{payment.docNo || "="}</td>
-                            <td>{new Date(payment.paymentDate).toLocaleDateString() || "="}</td>
-                            <td>{payment.remark || "="}</td>
+                            <td>{payment.docNo != null ? payment.docNo : "-"}</td>
+                            <td>{new Date(payment.paymentDate).toLocaleDateString() != null ? new Date(payment.paymentDate).toLocaleDateString() : "-"}</td>
+                            <td>{payment.remark != null ? payment.remark : "-"}</td>
                             <td>{payment.amount !== null ? payment.amount : "-"}</td>
                           </tr>
                         ))}
@@ -322,6 +481,84 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
               )}
             </div>
           </div>
+        )}
+
+            {activeTab === "eyePowerRecords" && (
+              <div className="service-records-wrapper">
+                <div className="service-records-list">
+                  <h4>Eye Power Records</h4>
+                  <div className="record-header">
+                    <span className="record-col date-col">Recorded Date</span>
+                    <span className="record-col time-col">Time</span>
+                    <span className="record-col amount-col">Recorded By</span>
+                  </div>
+                  {eyePowerRecords.length > 0 ? (
+                    eyePowerRecords.map((record, index) => (
+                      <div 
+                        key={index}
+                        className={`record-row ${selectedEyeRecordIndex === index ? "active" : ""}`}
+                        onClick={() => setSelectedEyeRecordIndex(index)}
+                      >
+                        <span className="record-col date-col">
+                          {new Date(record.recordedDate).toLocaleDateString()}
+                        </span>
+                        <span className="record-col time-col">
+                          {new Date(record.recordedDate).toLocaleTimeString()}
+                        </span>
+                        <span className="record-col amount-col">
+                          {record.recordedBy}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No eye power records available.</p>
+                  )}
+                </div>
+                <div className="service-record-details">
+                  {eyePowerRecords.length > 0 && (
+                    <>
+                      <h4>Record Details</h4>
+                      <div className="button-row">
+                        <button className="add-eye-button" onClick={handleAddEyePowerRecord}>
+                          Add New Eye Power
+                        </button>
+                        
+                        <button className="add-eye-button" onClick={handleExportTemplate}>
+                          Export Eye Power Excel Template
+                        </button>
+                      </div>
+
+                      <table className="record-details-table">
+                        <tbody>
+                          <tr>
+                            <td>Optical Height:  </td>
+                            <td>{eyePowerRecords[selectedEyeRecordIndex].opticalHeight ?? "-"}</td>
+                          </tr>
+                          <tr>
+                            <td>Segment Height:  </td>
+                            <td>{eyePowerRecords[selectedEyeRecordIndex].segmentHeight ?? "-"}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <GlassesEyePowerTable
+                        title="Latest Glass Eye Power"
+                        eyeRecord={eyePowerRecords[selectedEyeRecordIndex].latestRecords}
+                      />
+                      <GlassesEyePowerTable
+                        title="Actual Glass Eye Power"
+                        eyeRecord={eyePowerRecords[selectedEyeRecordIndex].actualRecords}
+                      />
+                      <LensEyePowerTable
+                        title="Lens Eye Power"
+                        eyeRecord={eyePowerRecords[selectedEyeRecordIndex].lensRecords}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         <div className="section-buttons">
@@ -356,6 +593,16 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
           onConfirm={handleConfirmAction}
           onCancel={() => setIsConfirmOpen(false)}
         />
+
+        {showNewEyeModal && (
+          <NewEyePowerModal 
+            isOpen={showNewEyeModal} 
+            data={newEyeData} 
+            onClose={() => setShowNewEyeModal(false)} 
+            onSave={handleNewEyeSave} 
+            debtorId={data.debtorId}
+          />
+        )}
       </div>
     </div>
   );

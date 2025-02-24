@@ -521,58 +521,58 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       eyePowerId: eyePowerData.eyePowerId, 
       debtorId: formData.debtorId,
       salesId: salesId,
-      opticalHeight: Number(eyePowerData.opticalHeight) || 0,
-      segmentHeight: Number(eyePowerData.segmentHeight) || 0,
+      opticalHeight: eyePowerData.opticalHeight,
+      segmentHeight: eyePowerData.segmentHeight,
       lensProfile: {
         lensEyePowerProfileId: eyePowerData.lensProfile.lensEyePowerProfileId,
-        r_SPH: Number(eyePowerData.lensProfile.r_SPH) || 0,
-        r_CYL: Number(eyePowerData.lensProfile.r_CYL) || 0,
-        r_AXIS: Number(eyePowerData.lensProfile.r_AXIS) || 0,
-        r_BC: Number(eyePowerData.lensProfile.r_BC) || 0,
-        r_DIA: Number(eyePowerData.lensProfile.r_DIA) || 0,
-        r_K_READING: Number(eyePowerData.lensProfile.r_K_READING) || 0,
-        l_SPH: Number(eyePowerData.lensProfile.l_SPH) || 0,
-        l_CYL: Number(eyePowerData.lensProfile.l_CYL) || 0,
-        l_AXIS: Number(eyePowerData.lensProfile.l_AXIS) || 0,
-        l_BC: Number(eyePowerData.lensProfile.l_BC) || 0,
-        l_DIA: Number(eyePowerData.lensProfile.l_DIA) || 0,
-        l_K_READING: Number(eyePowerData.lensProfile.l_K_READING) || 0,
+        r_SPH: eyePowerData.lensProfile.r_SPH,
+        r_CYL: eyePowerData.lensProfile.r_CYL,
+        r_AXIS: eyePowerData.lensProfile.r_AXIS,
+        r_BC: eyePowerData.lensProfile.r_BC,
+        r_DIA: eyePowerData.lensProfile.r_DIA ,
+        r_K_READING: eyePowerData.lensProfile.r_K_READING ,
+        l_SPH: eyePowerData.lensProfile.l_SPH  ,
+        l_CYL: eyePowerData.lensProfile.l_CYL  ,
+        l_AXIS: eyePowerData.lensProfile.l_AXIS  ,
+        l_BC: eyePowerData.lensProfile.l_BC  ,
+        l_DIA: eyePowerData.lensProfile.l_DIA  ,
+        l_K_READING: eyePowerData.lensProfile.l_K_READING  ,
       },
       latestGlassProfie: {
         glassEyePowerProfileId: eyePowerData.latestGlassProfie.glassEyePowerProfileId,
         isActual: false,
-        r_SPH: Number(eyePowerData.latestGlassProfie.r_SPH) || 0,
-        r_CYL: Number(eyePowerData.latestGlassProfie.r_CYL) || 0,
-        r_AXIS: Number(eyePowerData.latestGlassProfie.r_AXIS) || 0,
-        r_PRISM: Number(eyePowerData.latestGlassProfie.r_PRISM) || 0,
-        r_VA: Number(eyePowerData.latestGlassProfie.r_VA) || 0,
-        r_ADD: Number(eyePowerData.latestGlassProfie.r_ADD) || 0,
-        r_PD: Number(eyePowerData.latestGlassProfie.r_PD) || 0,
-        l_SPH: Number(eyePowerData.latestGlassProfie.l_SPH) || 0,
-        l_CYL: Number(eyePowerData.latestGlassProfie.l_CYL) || 0,
-        l_AXIS: Number(eyePowerData.latestGlassProfie.l_AXIS) || 0,
-        l_PRISM: Number(eyePowerData.latestGlassProfie.l_PRISM) || 0,
-        l_VA: Number(eyePowerData.latestGlassProfie.l_VA) || 0,
-        l_ADD: Number(eyePowerData.latestGlassProfie.l_ADD) || 0,
-        l_PD: Number(eyePowerData.latestGlassProfie.l_PD) || 0,
+        r_SPH: eyePowerData.latestGlassProfie.r_SPH  ,
+        r_CYL: eyePowerData.latestGlassProfie.r_CYL  ,
+        r_AXIS: eyePowerData.latestGlassProfie.r_AXIS  ,
+        r_PRISM: eyePowerData.latestGlassProfie.r_PRISM  ,
+        r_VA: eyePowerData.latestGlassProfie.r_VA  ,
+        r_ADD: eyePowerData.latestGlassProfie.r_ADD  ,
+        r_PD: eyePowerData.latestGlassProfie.r_PD  ,
+        l_SPH: eyePowerData.latestGlassProfie.l_SPH  ,
+        l_CYL: eyePowerData.latestGlassProfie.l_CYL  ,
+        l_AXIS: eyePowerData.latestGlassProfie.l_AXIS  ,
+        l_PRISM: eyePowerData.latestGlassProfie.l_PRISM  ,
+        l_VA: eyePowerData.latestGlassProfie.l_VA  ,
+        l_ADD: eyePowerData.latestGlassProfie.l_ADD  ,
+        l_PD: eyePowerData.latestGlassProfie.l_PD  ,
       },
       actualGlassProfile: {
         glassEyePowerProfileId: eyePowerData.actualGlassProfile.glassEyePowerProfileId,
         isActual: true,
-        r_SPH: Number(eyePowerData.actualGlassProfile.r_SPH) || 0,
-        r_CYL: Number(eyePowerData.actualGlassProfile.r_CYL) || 0,
-        r_AXIS: Number(eyePowerData.actualGlassProfile.r_AXIS) || 0,
-        r_PRISM: Number(eyePowerData.actualGlassProfile.r_PRISM) || 0,
-        r_VA: Number(eyePowerData.actualGlassProfile.r_VA) || 0,
-        r_ADD: Number(eyePowerData.actualGlassProfile.r_ADD) || 0,
-        r_PD: Number(eyePowerData.actualGlassProfile.r_PD) || 0,
-        l_SPH: Number(eyePowerData.actualGlassProfile.l_SPH) || 0,
-        l_CYL: Number(eyePowerData.actualGlassProfile.l_CYL) || 0,
-        l_AXIS: Number(eyePowerData.actualGlassProfile.l_AXIS) || 0,
-        l_PRISM: Number(eyePowerData.actualGlassProfile.l_PRISM) || 0,
-        l_VA: Number(eyePowerData.actualGlassProfile.l_VA) || 0,
-        l_ADD: Number(eyePowerData.actualGlassProfile.l_ADD) || 0,
-        l_PD: Number(eyePowerData.actualGlassProfile.l_PD) || 0,
+        r_SPH: eyePowerData.actualGlassProfile.r_SPH  ,
+        r_CYL: eyePowerData.actualGlassProfile.r_CYL  ,
+        r_AXIS: eyePowerData.actualGlassProfile.r_AXIS  ,
+        r_PRISM: eyePowerData.actualGlassProfile.r_PRISM  ,
+        r_VA: eyePowerData.actualGlassProfile.r_VA  ,
+        r_ADD: eyePowerData.actualGlassProfile.r_ADD  ,
+        r_PD: eyePowerData.actualGlassProfile.r_PD  ,
+        l_SPH: eyePowerData.actualGlassProfile.l_SPH  ,
+        l_CYL: eyePowerData.actualGlassProfile.l_CYL  ,
+        l_AXIS: eyePowerData.actualGlassProfile.l_AXIS  ,
+        l_PRISM: eyePowerData.actualGlassProfile.l_PRISM  ,
+        l_VA: eyePowerData.actualGlassProfile.l_VA  ,
+        l_ADD: eyePowerData.actualGlassProfile.l_ADD  ,
+        l_PD: eyePowerData.actualGlassProfile.l_PD  ,
       }
     };
   
@@ -869,7 +869,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
             <td className="height-label">Optical Height</td>
             <td>
               <input
-                type="text"
+                type="number"
                 value={eyePowerData?.opticalHeight || ""}
                 onChange={(e) =>
                   setEyePowerData({ ...eyePowerData, opticalHeight: e.target.value })
@@ -879,7 +879,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
             <td className="height-label">Segment Height</td>
             <td>
               <input
-                type="text"
+                type="number"
                 value={eyePowerData?.segmentHeight || ""}
                 onChange={(e) =>
                   setEyePowerData({ ...eyePowerData, segmentHeight: e.target.value })
@@ -911,7 +911,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 <td>Right</td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.r_SPH || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -926,7 +926,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.r_CYL || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -941,7 +941,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.r_AXIS || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -956,7 +956,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.r_BC || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -971,7 +971,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.r_DIA || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -986,7 +986,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.r_K_READING || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1004,7 +1004,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 <td>Left</td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.l_SPH || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1019,7 +1019,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.l_CYL || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1034,7 +1034,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.l_AXIS || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1049,7 +1049,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.l_BC || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1064,7 +1064,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.l_DIA || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1079,7 +1079,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.lensProfile.l_K_READING || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1115,7 +1115,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 <td>Right</td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.r_SPH || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1130,7 +1130,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.r_CYL || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1145,7 +1145,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.r_AXIS || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1160,7 +1160,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.r_PRISM || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1175,7 +1175,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.r_VA || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1190,7 +1190,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.r_ADD || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1205,7 +1205,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.r_PD || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1223,7 +1223,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 <td>Left</td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.l_SPH || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1238,7 +1238,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.l_CYL || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1253,7 +1253,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.l_AXIS || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1268,7 +1268,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.l_PRISM || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1283,7 +1283,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.l_VA || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1298,7 +1298,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.l_ADD || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1313,7 +1313,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.latestGlassProfie.l_PD || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1349,7 +1349,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 <td>Right</td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.r_SPH || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1364,7 +1364,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.r_CYL || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1379,7 +1379,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.r_AXIS || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1394,7 +1394,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.r_PRISM || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1409,7 +1409,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.r_VA || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1424,7 +1424,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.r_ADD || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1439,7 +1439,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.r_PD || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1457,7 +1457,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 <td>Left</td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.l_SPH || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1472,7 +1472,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.l_CYL || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1487,7 +1487,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.l_AXIS || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1502,7 +1502,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.l_PRISM || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1517,7 +1517,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.l_VA || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1532,7 +1532,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.l_ADD || ""}
                     onChange={(e) =>
                       setEyePowerData({
@@ -1547,7 +1547,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
                 </td>
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={eyePowerData.actualGlassProfile.l_PD || ""}
                     onChange={(e) =>
                       setEyePowerData({

@@ -89,31 +89,6 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
     }
   }, [eyePowerRecords]);
   
-
-  const fetchUserName = async (userId) => {
-    try {
-      const res = await fetch("https://optikposbackend.absplt.com/Users/GetSpecificUser", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "text/plain",
-        },
-        body: JSON.stringify({
-          customerId: Number(localStorage.getItem("customerId")),
-          userId: localStorage.getItem("userId"),
-          id: userId,
-        }),
-      });
-      const result = await res.json();
-      if (res.ok && result.success) {
-        return result.data.userName;
-      } else {
-        return userId; // fallback
-      }
-    } catch (error) {
-      return userId;
-    }
-  };
   
   const fetchEyePowerRecords = async (debtorId) => {
     try {
@@ -131,13 +106,7 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
       });
       const result = await res.json();
       if (res.ok && result.success) {
-        const recordsWithUserNames = await Promise.all(
-          result.data.map(async (record) => {
-            const userName = await fetchUserName(record.recordedBy);
-            return { ...record, recordedBy: userName };
-          })
-        );
-        setEyePowerRecords(recordsWithUserNames);
+        setEyePowerRecords(result.data);
       } else {
         throw new Error(result.errorMessage || "Failed to fetch eye power records.");
       }

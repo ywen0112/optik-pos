@@ -45,7 +45,7 @@ const NewEyePowerModal = ({ isOpen, data, onClose, onSave, debtorId }) => {
       salesId: formData.salesId || "",
       opticalHeight: formData.opticalHeight,
       segmentHeight: formData.segmentHeight,
-      recordedDate: formData.recordedDate || now,
+      userDefinedTime: formData.recordedDate || now,
       lensProfile: {
         lensEyePowerProfileId: formData.lensProfile.lensEyePowerProfileId,
         r_SPH: formData.lensProfile.r_SPH,
@@ -142,7 +142,7 @@ const NewEyePowerModal = ({ isOpen, data, onClose, onSave, debtorId }) => {
           <input
             type="datetime-local"
             className="creditor-form-input"
-            value={formData.recordedDate || getDefaultDateTimeLocal()}
+            value={formData.recordedDate || ""}
             onChange={(e) => handleInputChange("recordedDate", e.target.value)}
           />
         </div>

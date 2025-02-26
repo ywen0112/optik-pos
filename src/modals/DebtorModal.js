@@ -7,10 +7,22 @@ import GlassesEyePowerTable from "../layouts/GlassesEyePowerTable";
 import LensEyePowerTable from "../layouts/LensEyePowerTable";
 import NewEyePowerModal from "./NewEyePowerModal";
 
-const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTypeOptions }) => {
+const DebtorModal = ({
+  isOpen,
+  title,
+  data,
+  onClose,
+  onSave,
+  isViewing,
+  debtorTypeOptions,
+}) => {
   const [sectionData, setSectionData] = useState({});
   const [errors, setErrors] = useState({});
-  const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
+  const [errorModal, setErrorModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+  });
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
 
@@ -27,7 +39,7 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
   useEffect(() => {
     if (isOpen) {
       setSectionData({
-        ...data,  
+        ...data,
         medicalIsDiabetes: data.medicalIsDiabetes ?? false,
         medicalIsHypertension: data.medicalIsHypertension ?? false,
         ocularIsSquint: data.ocularIsSquint ?? false,
@@ -53,24 +65,31 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
   // Function to fetch service records from the API
   const fetchServiceRecords = async (debtorId) => {
     try {
-      const res = await fetch("https://optikposbackend.absplt.com/Sales/GetDebtorServiceRecords", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "text/plain",
-        },
-        body: JSON.stringify({
-          customerId: Number(localStorage.getItem("customerId")),
-          userId: localStorage.getItem("userId"),
-          id: debtorId,
-        }),
-      });
+      const res = await fetch(
+        "https://optikposbackend.absplt.com/Sales/GetDebtorServiceRecords",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "text/plain",
+          },
+          body: JSON.stringify({
+            customerId: Number(localStorage.getItem("customerId")),
+            userId: localStorage.getItem("userId"),
+            id: debtorId,
+          }),
+        }
+      );
       const result = await res.json();
       if (res.ok && result.success) {
-        const sortedRecords = result.data.sort((a, b) => new Date(b.docDate) - new Date(a.docDate));
+        const sortedRecords = result.data.sort(
+          (a, b) => new Date(b.docDate) - new Date(a.docDate)
+        );
         setServiceRecords(sortedRecords);
       } else {
-        throw new Error(result.errorMessage || "Failed to fetch service records.");
+        throw new Error(
+          result.errorMessage || "Failed to fetch service records."
+        );
       }
     } catch (error) {
       setErrorModal({ isOpen: true, title: "Error", message: error.message });
@@ -88,27 +107,31 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
       setSelectedEyeRecordIndex(0);
     }
   }, [eyePowerRecords]);
-  
-  
+
   const fetchEyePowerRecords = async (debtorId) => {
     try {
-      const res = await fetch("https://optikposbackend.absplt.com/EyePower/GetDebtorEyePowerRecords", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "text/plain",
-        },
-        body: JSON.stringify({
-          customerId: Number(localStorage.getItem("customerId")),
-          userId: localStorage.getItem("userId"),
-          id: debtorId,
-        }),
-      });
+      const res = await fetch(
+        "https://optikposbackend.absplt.com/EyePower/GetDebtorEyePowerRecords",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "text/plain",
+          },
+          body: JSON.stringify({
+            customerId: Number(localStorage.getItem("customerId")),
+            userId: localStorage.getItem("userId"),
+            id: debtorId,
+          }),
+        }
+      );
       const result = await res.json();
       if (res.ok && result.success) {
         setEyePowerRecords(result.data);
       } else {
-        throw new Error(result.errorMessage || "Failed to fetch eye power records.");
+        throw new Error(
+          result.errorMessage || "Failed to fetch eye power records."
+        );
       }
     } catch (error) {
       setErrorModal({ isOpen: true, title: "Error", message: error.message });
@@ -131,7 +154,7 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
       { label: "Debtor Code", name: "debtorCode" },
       { label: "Company Name", name: "companyName" },
     ];
-  
+
     const validationErrors = validateFields(fieldsToValidate);
     if (Object.keys(validationErrors).length === 0) {
       onSave({
@@ -168,25 +191,30 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
 
   const handleAddEyePowerRecord = async () => {
     try {
-      const res = await fetch("https://optikposbackend.absplt.com/EyePower/New", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "text/plain",
-        },
-        body: JSON.stringify({
-          customerId: Number(localStorage.getItem("customerId")),
-          userId: localStorage.getItem("userId"),
-          id: data.debtorId  // or use another appropriate id value
-        }),
-      });
+      const res = await fetch(
+        "https://optikposbackend.absplt.com/EyePower/New",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "text/plain",
+          },
+          body: JSON.stringify({
+            customerId: Number(localStorage.getItem("customerId")),
+            userId: localStorage.getItem("userId"),
+            id: data.debtorId, // or use another appropriate id value
+          }),
+        }
+      );
       const result = await res.json();
       if (res.ok && result.success) {
         // Set new eye power data and open the modal for input form
         setNewEyeData(result.data);
         setShowNewEyeModal(true);
       } else {
-        throw new Error(result.errorMessage || "Failed to add new eye power record.");
+        throw new Error(
+          result.errorMessage || "Failed to add new eye power record."
+        );
       }
     } catch (error) {
       setErrorModal({ isOpen: true, title: "Error", message: error.message });
@@ -202,18 +230,21 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
 
   const handleExportTemplate = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/EyePower/GetExcelImportTemplate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "*/*",
-        },
-        body: JSON.stringify({
-          customerId: Number(localStorage.getItem("customerId")),
-          userId: localStorage.getItem("userId"),
-          id: data.debtorId, // debtor id
-        }),
-      });
+      const response = await fetch(
+        "https://optikposbackend.absplt.com/EyePower/GetExcelImportTemplate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "*/*",
+          },
+          body: JSON.stringify({
+            customerId: Number(localStorage.getItem("customerId")),
+            userId: localStorage.getItem("userId"),
+            id: data.debtorId, // debtor id
+          }),
+        }
+      );
       if (!response.ok) {
         throw new Error("Failed to export template");
       }
@@ -225,10 +256,13 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
       a.click();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      setErrorModal({ isOpen: true, title: "Export Error", message: error.message });
+      setErrorModal({
+        isOpen: true,
+        title: "Export Error",
+        message: error.message,
+      });
     }
   };
-
 
   if (!isOpen) return null;
 
@@ -240,7 +274,12 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
           {[
             { label: "Debtor Code", name: "debtorCode" },
             { label: "Company Name", name: "companyName" },
-            { label: "Debtor Type Code", name: "debtorTypeId", type: "select", options: debtorTypeOptions },
+            {
+              label: "Debtor Type Code",
+              name: "debtorTypeId",
+              type: "select",
+              options: debtorTypeOptions,
+            },
             { label: "Address 1", name: "address1" },
             { label: "Address 2", name: "address2" },
             { label: "Address 3", name: "address3" },
@@ -251,20 +290,47 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
             { label: "Mobile", name: "mobile" },
             { label: "Medical Others", name: "medicalOthers" },
             { label: "Ocular Others", name: "ocularOthers" },
-            { label: "Medical Is Diabetes", name: "medicalIsDiabetes", type: "checkbox" },
-            { label: "Medical Is Hypertension", name: "medicalIsHypertension", type: "checkbox" },
-            { label: "Ocular Is Squint", name: "ocularIsSquint", type: "checkbox" },
-            { label: "Ocular Is Lazy Eye", name: "ocularIsLazyEye", type: "checkbox" },
-            { label: "Ocular Has Surgery", name: "ocularHasSurgery", type: "checkbox" },
+            {
+              label: "Medical Is Diabetes",
+              name: "medicalIsDiabetes",
+              type: "checkbox",
+            },
+            {
+              label: "Medical Is Hypertension",
+              name: "medicalIsHypertension",
+              type: "checkbox",
+            },
+            {
+              label: "Ocular Is Squint",
+              name: "ocularIsSquint",
+              type: "checkbox",
+            },
+            {
+              label: "Ocular Is Lazy Eye",
+              name: "ocularIsLazyEye",
+              type: "checkbox",
+            },
+            {
+              label: "Ocular Has Surgery",
+              name: "ocularHasSurgery",
+              type: "checkbox",
+            },
           ].map(({ label, name, type = "text", options }) => (
             <div key={name} className="creditor-form-group">
               <label className="creditor-form-label">{label}</label>
               {type === "select" ? (
                 <Select
                   name={name}
-                  value={options.find((option) => option.value === sectionData[name]) || ""}
+                  value={
+                    options.find(
+                      (option) => option.value === sectionData[name]
+                    ) || ""
+                  }
                   onChange={(selectedOption) =>
-                    setSectionData({ ...sectionData, [name]: selectedOption.value })
+                    setSectionData({
+                      ...sectionData,
+                      [name]: selectedOption.value,
+                    })
                   }
                   options={options}
                   isDisabled={isViewing}
@@ -301,156 +367,217 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
 
         {isViewing && (
           <>
-          {/* Tab Navigation */}
-          <div className="inquiry-tabs">
-            <button 
-              className={`tab-button ${activeTab === "serviceRecord" ? "active" : ""}`}
-              onClick={() => setActiveTab("serviceRecord")}
-            >
-              Service Record
-            </button>
-            <button 
-              className={`tab-button ${activeTab === "eyePowerRecords" ? "active" : ""}`}
-              onClick={() => setActiveTab("eyePowerRecords")}
-            >
-              Eye Power Records
-            </button>
-          </div>
+            {/* Tab Navigation */}
+            <div className="inquiry-tabs">
+              <button
+                className={`tab-button ${
+                  activeTab === "serviceRecord" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("serviceRecord")}
+              >
+                Service Record
+              </button>
+              <button
+                className={`tab-button ${
+                  activeTab === "eyePowerRecords" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("eyePowerRecords")}
+              >
+                Eye Power Records
+              </button>
+            </div>
 
-          {activeTab === "serviceRecord" && (
-          <div className="service-records-wrapper">
-            <div className="service-records-list">
-              <h4>Service Records</h4>
-              <div className="record-header">
-                <span className="record-col date-col">DocDate</span>
-                <span className="record-col docno-col">Doc No</span>
-                <span className="record-col amount-col">Amount</span>
-              </div>
-              {serviceRecords.length > 0 ? (
-                serviceRecords.map((record) => (
-                  <div
-                    key={record.salesId}
-                    className={`record-row ${selectedRecord && selectedRecord.salesId === record.salesId ? "active" : ""}`}
-                    onClick={() => setSelectedRecord(record)}
-                  >
-                    <span className="record-col date-col">
-                      {new Date(record.docDate).toLocaleDateString()}
-                    </span>
-                    <span className="record-col docno-col">{record.docNo}</span>
-                    <span className="record-col amount-col">{record.total}</span>
+            {activeTab === "serviceRecord" && (
+              <div className="service-records-wrapper">
+                <div className="service-records-list">
+                  <h4>Service Records</h4>
+                  <div className="record-header">
+                    <span className="record-col date-col">DocDate</span>
+                    <span className="record-col docno-col">Doc No</span>
+                    <span className="record-col amount-col">Amount</span>
                   </div>
-                ))
-              ) : (
-                <p>No records found.</p>
-              )}
-            </div>
-
-            {/* Right side: Selected record details */}
-            <div className="service-record-details">
-              {selectedRecord ? (
-                <>
-                  <h4>Record Details</h4>
-                  <table className="record-details-table">
-                    <tbody>
-                      <tr>
-                        <td>Optical Height:  </td>
-                        <td>{selectedRecord.opticalHeight ?? "-"}</td>
-                      </tr>
-                      <tr>
-                        <td>Segment Height:  </td>
-                        <td>{selectedRecord.segmentHeight ?? "-"}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <GlassesEyePowerTable
-                    title="Previous Glass Eye Power"
-                    eyeRecord={selectedRecord.previousGlassEyePower}
-                  />
-
-                  <GlassesEyePowerTable
-                    title="Latest Glass Eye Power"
-                    eyeRecord={selectedRecord.latestGlassEyePower}
-                  />
-
-                  <GlassesEyePowerTable
-                    title="Actual Glass Eye Power"
-                    eyeRecord={selectedRecord.actualGlassEyePower}
-                  />
-
-                  <LensEyePowerTable
-                    title="Lens Eye Power"
-                    eyeRecord={selectedRecord.lensEyePower}
-                  />
-
-                  <h5>Item Details</h5>
-                  {selectedRecord.details && selectedRecord.details.length > 0 ? (
-                    <table className="eye-record-table">
-                      <thead>
-                        <tr>
-                          <th>Item Code</th>
-                          <th>Description</th>
-                          <th>Desc 2</th>
-                          <th>UOM</th>
-                          <th>Qty</th>
-                          <th>Unit Price</th>
-                          <th>Discount</th>
-                          <th>Discount Amount</th>
-                          <th>Subtotal</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedRecord.details.map((detail) => (
-                          <tr key={detail.salesDetailId}>
-                            <td>{detail.itemCode != null ? detail.itemCode : "-"}</td>
-                            <td>{detail.description != null ? detail.description : "-"}</td>
-                            <td>{detail.desc2 != null ? detail.decs2 : "-"}</td>
-                            <td>{detail.uom != null ? detail.uom : "-"}</td>
-                            <td>{detail.qty !== null ? detail.qty : "-"}</td>
-                            <td>{detail.unitPrice !== null ? detail.unitPrice : "-"}</td>
-                            <td>{detail.discount != null ? detail.discount : "-"}</td>
-                            <td>{detail.discountAmount !== null ? detail.discountAmount : "-"}</td>
-                            <td>{detail.subTotal !== null ? detail.subTotal : "-"}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  {serviceRecords.length > 0 ? (
+                    serviceRecords.map((record) => (
+                      <div
+                        key={record.salesId}
+                        className={`record-row ${
+                          selectedRecord &&
+                          selectedRecord.salesId === record.salesId
+                            ? "active"
+                            : ""
+                        }`}
+                        onClick={() => setSelectedRecord(record)}
+                      >
+                        <span className="record-col date-col">
+                          {new Date(record.docDate).toLocaleDateString()}
+                        </span>
+                        <span className="record-col docno-col">
+                          {record.docNo}
+                        </span>
+                        <span className="record-col amount-col">
+                          {record.total}
+                        </span>
+                      </div>
+                    ))
                   ) : (
-                    <p>No detail records available.</p>
+                    <p>No records found.</p>
                   )}
+                </div>
 
-                  <h5>Payment History</h5>
-                  {selectedRecord.paymentHistory && selectedRecord.paymentHistory.length > 0 ? (
-                    <table className="eye-record-table">
-                      <thead>
-                        <tr>
-                          <th>Doc No</th>
-                          <th>Payment Date</th>
-                          <th>Remark</th>
-                          <th>Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedRecord.paymentHistory.map((payment) => (
-                          <tr key={payment.salesPaymentId}>
-                            <td>{payment.docNo != null ? payment.docNo : "-"}</td>
-                            <td>{new Date(payment.paymentDate).toLocaleDateString() != null ? new Date(payment.paymentDate).toLocaleDateString() : "-"}</td>
-                            <td>{payment.remark != null ? payment.remark : "-"}</td>
-                            <td>{payment.amount !== null ? payment.amount : "-"}</td>
+                {/* Right side: Selected record details */}
+                <div className="service-record-details">
+                  {selectedRecord ? (
+                    <>
+                      <h4>Record Details</h4>
+                      <table className="record-details-table">
+                        <tbody>
+                          <tr>
+                            <td>Optical Height: </td>
+                            <td>{selectedRecord.opticalHeight ?? "-"}</td>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                          <tr>
+                            <td>Segment Height: </td>
+                            <td>{selectedRecord.segmentHeight ?? "-"}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <GlassesEyePowerTable
+                        title="Previous Glass Eye Power"
+                        eyeRecord={selectedRecord.previousGlassEyePower}
+                      />
+
+                      <GlassesEyePowerTable
+                        title="Latest Glass Eye Power"
+                        eyeRecord={selectedRecord.latestGlassEyePower}
+                      />
+
+                      <GlassesEyePowerTable
+                        title="Actual Glass Eye Power"
+                        eyeRecord={selectedRecord.actualGlassEyePower}
+                      />
+
+                      <LensEyePowerTable
+                        title="Lens Eye Power"
+                        eyeRecord={selectedRecord.lensEyePower}
+                      />
+
+                      <h5>Item Details</h5>
+                      {selectedRecord.details &&
+                      selectedRecord.details.length > 0 ? (
+                        <table className="eye-record-table">
+                          <thead>
+                            <tr>
+                              <th>Item Code</th>
+                              <th>Description</th>
+                              <th>Desc 2</th>
+                              <th>UOM</th>
+                              <th>Qty</th>
+                              <th>Unit Price</th>
+                              <th>Discount</th>
+                              <th>Discount Amount</th>
+                              <th>Subtotal</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedRecord.details.map((detail) => (
+                              <tr key={detail.salesDetailId}>
+                                <td>
+                                  {detail.itemCode != null
+                                    ? detail.itemCode
+                                    : "-"}
+                                </td>
+                                <td>
+                                  {detail.description != null
+                                    ? detail.description
+                                    : "-"}
+                                </td>
+                                <td>
+                                  {detail.desc2 != null ? detail.decs2 : "-"}
+                                </td>
+                                <td>{detail.uom != null ? detail.uom : "-"}</td>
+                                <td>
+                                  {detail.qty !== null ? detail.qty : "-"}
+                                </td>
+                                <td>
+                                  {detail.unitPrice !== null
+                                    ? detail.unitPrice
+                                    : "-"}
+                                </td>
+                                <td>
+                                  {detail.discount != null
+                                    ? detail.discount
+                                    : "-"}
+                                </td>
+                                <td>
+                                  {detail.discountAmount !== null
+                                    ? detail.discountAmount
+                                    : "-"}
+                                </td>
+                                <td>
+                                  {detail.subTotal !== null
+                                    ? detail.subTotal
+                                    : "-"}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <p>No detail records available.</p>
+                      )}
+
+                      <h5>Payment History</h5>
+                      {selectedRecord.paymentHistory &&
+                      selectedRecord.paymentHistory.length > 0 ? (
+                        <table className="eye-record-table">
+                          <thead>
+                            <tr>
+                              <th>Doc No</th>
+                              <th>Payment Date</th>
+                              <th>Remark</th>
+                              <th>Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedRecord.paymentHistory.map((payment) => (
+                              <tr key={payment.salesPaymentId}>
+                                <td>
+                                  {payment.docNo != null ? payment.docNo : "-"}
+                                </td>
+                                <td>
+                                  {new Date(
+                                    payment.paymentDate
+                                  ).toLocaleDateString() != null
+                                    ? new Date(
+                                        payment.paymentDate
+                                      ).toLocaleDateString()
+                                    : "-"}
+                                </td>
+                                <td>
+                                  {payment.remark != null
+                                    ? payment.remark
+                                    : "-"}
+                                </td>
+                                <td>
+                                  {payment.amount !== null
+                                    ? payment.amount
+                                    : "-"}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <p>No payment history available.</p>
+                      )}
+                    </>
                   ) : (
-                    <p>No payment history available.</p>
+                    <p>Select a service record to view its details.</p>
                   )}
-                </>
-              ) : (
-                <p>Select a service record to view its details.</p>
-              )}
-            </div>
-          </div>
-        )}
+                </div>
+              </div>
+            )}
 
             {activeTab === "eyePowerRecords" && (
               <div className="service-records-wrapper">
@@ -463,9 +590,11 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
                   </div>
                   {eyePowerRecords.length > 0 ? (
                     eyePowerRecords.map((record, index) => (
-                      <div 
+                      <div
                         key={index}
-                        className={`record-row ${selectedEyeRecordIndex === index ? "active" : ""}`}
+                        className={`record-row ${
+                          selectedEyeRecordIndex === index ? "active" : ""
+                        }`}
                         onClick={() => setSelectedEyeRecordIndex(index)}
                       >
                         <span className="record-col date-col">
@@ -484,43 +613,60 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
                   )}
                 </div>
                 <div className="service-record-details">
+                  <h4>Record Details</h4>
+                  <div className="button-row">
+                    <button
+                      className="add-eye-button"
+                      onClick={handleAddEyePowerRecord}
+                    >
+                      Add New Eye Power
+                    </button>
+
+                    <button
+                      className="add-eye-button"
+                      onClick={handleExportTemplate}
+                    >
+                      Export Eye Power Excel Template
+                    </button>
+                  </div>
                   {eyePowerRecords.length > 0 && (
                     <>
-                      <h4>Record Details</h4>
-                      <div className="button-row">
-                        <button className="add-eye-button" onClick={handleAddEyePowerRecord}>
-                          Add New Eye Power
-                        </button>
-                        
-                        <button className="add-eye-button" onClick={handleExportTemplate}>
-                          Export Eye Power Excel Template
-                        </button>
-                      </div>
-
                       <table className="record-details-table">
                         <tbody>
                           <tr>
-                            <td>Optical Height:  </td>
-                            <td>{eyePowerRecords[selectedEyeRecordIndex].opticalHeight ?? "-"}</td>
+                            <td>Optical Height: </td>
+                            <td>
+                              {eyePowerRecords[selectedEyeRecordIndex]
+                                .opticalHeight ?? "-"}
+                            </td>
                           </tr>
                           <tr>
-                            <td>Segment Height:  </td>
-                            <td>{eyePowerRecords[selectedEyeRecordIndex].segmentHeight ?? "-"}</td>
+                            <td>Segment Height: </td>
+                            <td>
+                              {eyePowerRecords[selectedEyeRecordIndex]
+                                .segmentHeight ?? "-"}
+                            </td>
                           </tr>
                         </tbody>
                       </table>
 
                       <GlassesEyePowerTable
                         title="Latest Glass Eye Power"
-                        eyeRecord={eyePowerRecords[selectedEyeRecordIndex].latestRecords}
+                        eyeRecord={
+                          eyePowerRecords[selectedEyeRecordIndex].latestRecords
+                        }
                       />
                       <GlassesEyePowerTable
                         title="Actual Glass Eye Power"
-                        eyeRecord={eyePowerRecords[selectedEyeRecordIndex].actualRecords}
+                        eyeRecord={
+                          eyePowerRecords[selectedEyeRecordIndex].actualRecords
+                        }
                       />
                       <LensEyePowerTable
                         title="Lens Eye Power"
-                        eyeRecord={eyePowerRecords[selectedEyeRecordIndex].lensRecords}
+                        eyeRecord={
+                          eyePowerRecords[selectedEyeRecordIndex].lensRecords
+                        }
                       />
                     </>
                   )}
@@ -552,7 +698,9 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
           isOpen={errorModal.isOpen}
           title={errorModal.title}
           message={errorModal.message}
-          onClose={() => setErrorModal({ isOpen: false, title: "", message: "" })}
+          onClose={() =>
+            setErrorModal({ isOpen: false, title: "", message: "" })
+          }
         />
 
         <ConfirmationModal
@@ -564,11 +712,11 @@ const DebtorModal = ({ isOpen, title, data, onClose, onSave, isViewing, debtorTy
         />
 
         {showNewEyeModal && (
-          <NewEyePowerModal 
-            isOpen={showNewEyeModal} 
-            data={newEyeData} 
-            onClose={() => setShowNewEyeModal(false)} 
-            onSave={handleNewEyeSave} 
+          <NewEyePowerModal
+            isOpen={showNewEyeModal}
+            data={newEyeData}
+            onClose={() => setShowNewEyeModal(false)}
+            onSave={handleNewEyeSave}
             debtorId={data.debtorId}
           />
         )}

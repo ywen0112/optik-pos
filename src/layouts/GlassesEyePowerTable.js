@@ -1,7 +1,7 @@
 import React from "react";
 import "../css/EyeRecordTable.css";
 
-const GlassesEyePowerTable = ({ title, eyeRecord }) => {
+const GlassesEyePowerTable = ({ title, eyeRecord, editable, onChange }) => {
   if (!eyeRecord) {
     return (
       <div className="eye-power-container">
@@ -10,6 +10,12 @@ const GlassesEyePowerTable = ({ title, eyeRecord }) => {
       </div>
     );
   }
+
+  const handleInputChange = (field, value) => {
+    if (onChange) {
+      onChange({ ...eyeRecord, [field]: value });
+    }
+  };
 
   return (
     <div className="eye-power-container">
@@ -28,26 +34,27 @@ const GlassesEyePowerTable = ({ title, eyeRecord }) => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Right</td>
-            <td>{eyeRecord.r_SPH !== null ? eyeRecord.r_SPH : "-"}</td>
-            <td>{eyeRecord.r_CYL !== null ? eyeRecord.r_CYL : "-"}</td>
-            <td>{eyeRecord.r_AXIS !== null ? eyeRecord.r_AXIS : "-"}</td>
-            <td>{eyeRecord.r_PRISM !== null ? eyeRecord.r_PRISM : "-"}</td>
-            <td>{eyeRecord.r_VA !== null ? eyeRecord.r_VA : "-"}</td>
-            <td>{eyeRecord.r_ADD !== null ? eyeRecord.r_ADD : "-"}</td>
-            <td>{eyeRecord.r_PD !== null ? eyeRecord.r_PD : "-"}</td>
-          </tr>
-          <tr>
-            <td>Left</td>
-            <td>{eyeRecord.l_SPH !== null ? eyeRecord.l_SPH : "-"}</td>
-            <td>{eyeRecord.l_CYL !== null ? eyeRecord.l_CYL : "-"}</td>
-            <td>{eyeRecord.l_AXIS !== null ? eyeRecord.l_AXIS : "-"}</td>
-            <td>{eyeRecord.l_PRISM !== null ? eyeRecord.l_PRISM : "-"}</td>
-            <td>{eyeRecord.l_VA !== null ? eyeRecord.l_VA : "-"}</td>
-            <td>{eyeRecord.l_ADD !== null ? eyeRecord.l_ADD : "-"}</td>
-            <td>{eyeRecord.l_PD !== null ? eyeRecord.l_PD : "-"}</td>
-          </tr>
+          {["r", "l"].map((side) => (
+            <tr key={side}>
+              <td>{side === "r" ? "Right" : "Left"}</td>
+              {["SPH", "CYL", "AXIS", "PRISM", "VA", "ADD", "PD"].map((param) => {
+                const field = `${side}_${param}`;
+                return (
+                  <td key={field}>
+                    {editable ? (
+                      <input
+                        type="number"
+                        value={eyeRecord[field] ?? ""}
+                        onChange={(e) => handleInputChange(field, e.target.value)}
+                      />
+                    ) : (
+                      eyeRecord[field] ?? "-"
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

@@ -5,7 +5,7 @@ const OutstandingPaymentModal = ({ isOpen, onClose, onConfirm, outstandingAmount
     const [paymentMethod, setPaymentMethod] = useState("cash");
     const [amount, setAmount] = useState(outstandingAmount);
     const [multiPayment, setMultiPayment] = useState([{ method: "cash", amount: "", referenceNo: "", cardNo: "", approvalCode: "" }]);
-    const [reference, setReference] = useState("");
+    const [reference, setReference] = useState(null);
 
     const handlePaymentMethodChange = (e) => {
       setPaymentMethod(e.target.value);

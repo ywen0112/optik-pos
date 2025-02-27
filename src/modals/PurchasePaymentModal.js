@@ -13,7 +13,7 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
-  const [reference, setReference] = useState("");
+  const [reference, setReference] = useState(null);
   const customerId = Number(localStorage.getItem("customerId"));
   const userId = localStorage.getItem("userId");
   const counterSessionId = localStorage.getItem("counterSessionId");

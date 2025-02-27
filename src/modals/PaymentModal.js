@@ -89,7 +89,7 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
           targetDocId: targetDocId,
           docDate: localISOTime,
           remark: remark,
-          reference: "", 
+          reference: null, 
           amount: formattedAmount,
         }),
       });

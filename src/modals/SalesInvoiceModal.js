@@ -112,7 +112,6 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      // Call the API to get new eye power data when modal opens
       const fetchNewEyePower = async () => {
         try {
           const userId = localStorage.getItem("userId");
@@ -524,56 +523,53 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       opticalHeight: eyePowerData.opticalHeight,
       segmentHeight: eyePowerData.segmentHeight,
       lensProfile: {
-        lensEyePowerProfileId: eyePowerData.lensProfile.lensEyePowerProfileId,
-        r_SPH: eyePowerData.lensProfile.r_SPH,
-        r_CYL: eyePowerData.lensProfile.r_CYL,
-        r_AXIS: eyePowerData.lensProfile.r_AXIS,
-        r_BC: eyePowerData.lensProfile.r_BC,
-        r_DIA: eyePowerData.lensProfile.r_DIA ,
-        r_K_READING: eyePowerData.lensProfile.r_K_READING ,
-        l_SPH: eyePowerData.lensProfile.l_SPH  ,
-        l_CYL: eyePowerData.lensProfile.l_CYL  ,
-        l_AXIS: eyePowerData.lensProfile.l_AXIS  ,
-        l_BC: eyePowerData.lensProfile.l_BC  ,
-        l_DIA: eyePowerData.lensProfile.l_DIA  ,
-        l_K_READING: eyePowerData.lensProfile.l_K_READING  ,
+        lens_R_SPH: eyePowerData.lensProfile?.lens_R_SPH ,
+        lens_R_CYL: eyePowerData.lensProfile?.lens_R_CYL ,
+        lens_R_AXIS: eyePowerData.lensProfile?.lens_R_AXIS ,
+        lens_R_BC: eyePowerData.lensProfile?.lens_R_BC ,
+        lens_R_DIA: eyePowerData.lensProfile?.lens_R_DIA ,
+        lens_R_K_READING: eyePowerData.lensProfile?.lens_R_K_READING ,
+        lens_L_SPH: eyePowerData.lensProfile?.lens_L_SPH ,
+        lens_L_CYL: eyePowerData.lensProfile?.lens_L_CYL ,
+        lens_L_AXIS: eyePowerData.lensProfile?.lens_L_AXIS ,
+        lens_L_BC: eyePowerData.lensProfile?.lens_L_BC ,
+        lens_L_DIA: eyePowerData.lensProfile?.lens_L_DIA ,
+        lens_L_K_READING: eyePowerData.lensProfile?.lens_L_K_READING ,
       },
-      latestGlassProfie: {
-        glassEyePowerProfileId: eyePowerData.latestGlassProfie.glassEyePowerProfileId,
-        isActual: false,
-        r_SPH: eyePowerData.latestGlassProfie.r_SPH  ,
-        r_CYL: eyePowerData.latestGlassProfie.r_CYL  ,
-        r_AXIS: eyePowerData.latestGlassProfie.r_AXIS  ,
-        r_PRISM: eyePowerData.latestGlassProfie.r_PRISM  ,
-        r_VA: eyePowerData.latestGlassProfie.r_VA  ,
-        r_ADD: eyePowerData.latestGlassProfie.r_ADD  ,
-        r_PD: eyePowerData.latestGlassProfie.r_PD  ,
-        l_SPH: eyePowerData.latestGlassProfie.l_SPH  ,
-        l_CYL: eyePowerData.latestGlassProfie.l_CYL  ,
-        l_AXIS: eyePowerData.latestGlassProfie.l_AXIS  ,
-        l_PRISM: eyePowerData.latestGlassProfie.l_PRISM  ,
-        l_VA: eyePowerData.latestGlassProfie.l_VA  ,
-        l_ADD: eyePowerData.latestGlassProfie.l_ADD  ,
-        l_PD: eyePowerData.latestGlassProfie.l_PD  ,
+
+      latestGlassProfile: {
+        latest_Glass_R_SPH: eyePowerData.latestGlassProfile?.latest_Glass_R_SPH ,
+        latest_Glass_R_CYL: eyePowerData.latestGlassProfile?.latest_Glass_R_CYL ,
+        latest_Glass_R_AXIS: eyePowerData.latestGlassProfile?.latest_Glass_R_AXIS ,
+        latest_Glass_R_PRISM: eyePowerData.latestGlassProfile?.latest_Glass_R_PRISM ,
+        latest_Glass_R_VA: eyePowerData.latestGlassProfile?.latest_Glass_R_VA ,
+        latest_Glass_R_ADD: eyePowerData.latestGlassProfile?.latest_Glass_R_ADD ,
+        latest_Glass_R_PD: eyePowerData.latestGlassProfile?.latest_Glass_R_PD ,
+        latest_Glass_L_SPH: eyePowerData.latestGlassProfile?.latest_Glass_L_SPH ,
+        latest_Glass_L_CYL: eyePowerData.latestGlassProfile?.latest_Glass_L_CYL ,
+        latest_Glass_L_AXIS: eyePowerData.latestGlassProfile?.latest_Glass_L_AXIS ,
+        latest_Glass_L_PRISM: eyePowerData.latestGlassProfile?.latest_Glass_L_PRISM ,
+        latest_Glass_L_VA: eyePowerData.latestGlassProfile?.latest_Glass_L_VA ,
+        latest_Glass_L_ADD: eyePowerData.latestGlassProfile?.latest_Glass_L_ADD ,
+        latest_Glass_L_PD: eyePowerData.latestGlassProfile?.latest_Glass_L_PD ,
       },
+
       actualGlassProfile: {
-        glassEyePowerProfileId: eyePowerData.actualGlassProfile.glassEyePowerProfileId,
-        isActual: true,
-        r_SPH: eyePowerData.actualGlassProfile.r_SPH  ,
-        r_CYL: eyePowerData.actualGlassProfile.r_CYL  ,
-        r_AXIS: eyePowerData.actualGlassProfile.r_AXIS  ,
-        r_PRISM: eyePowerData.actualGlassProfile.r_PRISM  ,
-        r_VA: eyePowerData.actualGlassProfile.r_VA  ,
-        r_ADD: eyePowerData.actualGlassProfile.r_ADD  ,
-        r_PD: eyePowerData.actualGlassProfile.r_PD  ,
-        l_SPH: eyePowerData.actualGlassProfile.l_SPH  ,
-        l_CYL: eyePowerData.actualGlassProfile.l_CYL  ,
-        l_AXIS: eyePowerData.actualGlassProfile.l_AXIS  ,
-        l_PRISM: eyePowerData.actualGlassProfile.l_PRISM  ,
-        l_VA: eyePowerData.actualGlassProfile.l_VA  ,
-        l_ADD: eyePowerData.actualGlassProfile.l_ADD  ,
-        l_PD: eyePowerData.actualGlassProfile.l_PD  ,
-      }
+        actual_Glass_R_SPH: eyePowerData.actualGlassProfile?.actual_Glass_R_SPH ,
+        actual_Glass_R_CYL: eyePowerData.actualGlassProfile?.actual_Glass_R_CYL ,
+        actual_Glass_R_AXIS: eyePowerData.actualGlassProfile?.actual_Glass_R_AXIS ,
+        actual_Glass_R_PRISM: eyePowerData.actualGlassProfile?.actual_Glass_R_PRISM ,
+        actual_Glass_R_VA: eyePowerData.actualGlassProfile?.actual_Glass_R_VA ,
+        actual_Glass_R_ADD: eyePowerData.actualGlassProfile?.actual_Glass_R_ADD ,
+        actual_Glass_R_PD: eyePowerData.actualGlassProfile?.actual_Glass_R_PD ,
+        actual_Glass_L_SPH: eyePowerData.actualGlassProfile?.actual_Glass_L_SPH ,
+        actual_Glass_L_CYL: eyePowerData.actualGlassProfile?.actual_Glass_L_CYL ,
+        actual_Glass_L_AXIS: eyePowerData.actualGlassProfile?.actual_Glass_L_AXIS ,
+        actual_Glass_L_PRISM: eyePowerData.actualGlassProfile?.actual_Glass_L_PRISM ,
+        actual_Glass_L_VA: eyePowerData.actualGlassProfile?.actual_Glass_L_VA ,
+        actual_Glass_L_ADD: eyePowerData.actualGlassProfile?.actual_Glass_L_ADD ,
+        actual_Glass_L_PD: eyePowerData.actualGlassProfile?.actual_Glass_L_PD ,
+      },
     };
   
     try {
@@ -653,8 +649,8 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
           salesId: salesId,
         });
   
-        setIsPaymentConfirmed(true); 
         await handleSaveEyePower();
+        setIsPaymentConfirmed(true); 
       } else {
         throw new Error(data.errorMessage || "Failed to save sales invoice.");
       }
@@ -907,192 +903,31 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Right</td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.r_SPH || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          r_SPH: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.r_CYL || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          r_CYL: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.r_AXIS || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          r_AXIS: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.r_BC || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          r_BC: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.r_DIA || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          r_DIA: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.r_K_READING || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          r_K_READING: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td>Left</td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.l_SPH || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          l_SPH: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.l_CYL || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          l_CYL: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.l_AXIS || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          l_AXIS: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.l_BC || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          l_BC: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.l_DIA || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          l_DIA: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.lensProfile.l_K_READING || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        lensProfile: {
-                          ...eyePowerData.lensProfile,
-                          l_K_READING: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-              </tr>
+              {["R", "L"].map((side) => (
+                <tr key={side}>
+                  <td>{side === "R" ? "Right" : "Left"}</td>
+                  {["SPH", "CYL", "AXIS", "BC", "DIA", "K_READING"].map((param) => {
+                    const fieldName = `lens_${side}_${param}`; 
+                    return (
+                      <td key={fieldName}>
+                        <input
+                          type="number"
+                          value={eyePowerData.lensProfile[fieldName]}
+                          onChange={(e) =>
+                            setEyePowerData({
+                              ...eyePowerData,
+                              lensProfile: {
+                                ...eyePowerData.lensProfile,
+                                [fieldName]: e.target.value,
+                              },
+                            })
+                          }
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
             </tbody>
           </table>
 
@@ -1111,222 +946,31 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Right</td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.r_SPH || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          r_SPH: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.r_CYL || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          r_CYL: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.r_AXIS || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          r_AXIS: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.r_PRISM || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          r_PRISM: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.r_VA || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          r_VA: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.r_ADD || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          r_ADD: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.r_PD || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          r_PD: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td>Left</td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.l_SPH || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          l_SPH: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.l_CYL || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          l_CYL: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.l_AXIS || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          l_AXIS: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.l_PRISM || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          l_PRISM: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.l_VA || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          l_VA: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.l_ADD || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          l_ADD: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.latestGlassProfie.l_PD || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        latestGlassProfie: {
-                          ...eyePowerData.latestGlassProfie,
-                          l_PD: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-              </tr>
+              {["R", "L"].map((side) => (
+                <tr key={side}>
+                  <td>{side === "R" ? "Right" : "Left"}</td>
+                  {["SPH", "CYL", "AXIS", "PRISM", "VA", "ADD", "PD"].map((param) => {
+                    const fieldName = `latest_Glass_${side}_${param}`;
+                    return (
+                      <td key={fieldName}>
+                        <input
+                          type="number"
+                          value={eyePowerData.latestGlassProfile[fieldName]}
+                          onChange={(e) =>
+                            setEyePowerData({
+                              ...eyePowerData,
+                              latestGlassProfile: {
+                                ...eyePowerData.latestGlassProfile,
+                                [fieldName]: e.target.value,
+                              },
+                            })
+                          }
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
             </tbody>
           </table>
 
@@ -1345,222 +989,31 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Right</td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.r_SPH || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          r_SPH: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.r_CYL || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          r_CYL: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.r_AXIS || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          r_AXIS: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.r_PRISM || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          r_PRISM: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.r_VA || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          r_VA: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.r_ADD || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          r_ADD: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.r_PD || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          r_PD: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td>Left</td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.l_SPH || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          l_SPH: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.l_CYL || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          l_CYL: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.l_AXIS || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          l_AXIS: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.l_PRISM || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          l_PRISM: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.l_VA || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          l_VA: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.l_ADD || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          l_ADD: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={eyePowerData.actualGlassProfile.l_PD || ""}
-                    onChange={(e) =>
-                      setEyePowerData({
-                        ...eyePowerData,
-                        actualGlassProfile: {
-                          ...eyePowerData.actualGlassProfile,
-                          l_PD: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                </td>
-              </tr>
+              {["R", "L"].map((side) => (
+                <tr key={side}>
+                  <td>{side === "R" ? "Right" : "Left"}</td>
+                  {["SPH", "CYL", "AXIS", "PRISM", "VA", "ADD", "PD"].map((param) => {
+                    const fieldName = `actual_Glass_${side}_${param}`;
+                    return (
+                      <td key={fieldName}>
+                        <input
+                          type="number"
+                          value={eyePowerData.actualGlassProfile[fieldName]}
+                          onChange={(e) =>
+                            setEyePowerData({
+                              ...eyePowerData,
+                              actualGlassProfile: {
+                                ...eyePowerData.actualGlassProfile,
+                                [fieldName]: e.target.value,
+                              },
+                            })
+                          }
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
             </tbody>
           </table>
         </>

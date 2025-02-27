@@ -3,8 +3,8 @@ import SuccessModal from "./SuccessModal";
 import ErrorModal from "./ErrorModal";
 
 const NewEyePowerModal = ({ isOpen, data, onClose, onSave, debtorId }) => {
-  const [formData, setFormData] = useState(data);
-  const [successModal, setSuccessModal] = useState({ isOpen: false, title: "", message: "" });
+    const [formData, setFormData] = useState(data);
+    const [successModal, setSuccessModal] = useState({ isOpen: false, title: "", message: "" });
     const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
 
   useEffect(() => {
@@ -17,13 +17,6 @@ const NewEyePowerModal = ({ isOpen, data, onClose, onSave, debtorId }) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleGroupChange = (group, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [group]: { ...prev[group], [field]: value },
-    }));
-  };
-
   const getDefaultDateTimeLocal = () => {
     const date = new Date();
     const tzOffset = date.getTimezoneOffset() * 60000;
@@ -33,70 +26,66 @@ const NewEyePowerModal = ({ isOpen, data, onClose, onSave, debtorId }) => {
   const now = getDefaultDateTimeLocal();
 
   const handleSave = async () => {
-    // Construct the payload for the API request
     const requestData = {
       actionData: {
         customerId: Number(localStorage.getItem("customerId")),
         userId: localStorage.getItem("userId"),
-        id: debtorId || "",
+        id: debtorId,
       },
-      eyePowerId: formData.eyePowerId || "",
-      debtorId: debtorId || "",
-      salesId: formData.salesId || "",
+      eyePowerId: formData.eyePowerId,
+      debtorId: debtorId,
+      salesId: formData.salesId,
       opticalHeight: formData.opticalHeight,
       segmentHeight: formData.segmentHeight,
       userDefinedTime: formData.recordedDate || now,
       lensProfile: {
-        lensEyePowerProfileId: formData.lensProfile.lensEyePowerProfileId,
-        r_SPH: formData.lensProfile.r_SPH,
-        r_CYL: formData.lensProfile.r_CYL,
-        r_AXIS: formData.lensProfile.r_AXIS,
-        r_BC: formData.lensProfile.r_BC,
-        r_DIA: formData.lensProfile.r_DIA ,
-        r_K_READING: formData.lensProfile.r_K_READING ,
-        l_SPH: formData.lensProfile.l_SPH  ,
-        l_CYL: formData.lensProfile.l_CYL  ,
-        l_AXIS: formData.lensProfile.l_AXIS  ,
-        l_BC: formData.lensProfile.l_BC  ,
-        l_DIA: formData.lensProfile.l_DIA  ,
-        l_K_READING: formData.lensProfile.l_K_READING  ,
+        lens_R_SPH: formData.lensProfile?.lens_R_SPH ,
+        lens_R_CYL: formData.lensProfile?.lens_R_CYL ,
+        lens_R_AXIS: formData.lensProfile?.lens_R_AXIS ,
+        lens_R_BC: formData.lensProfile?.lens_R_BC ,
+        lens_R_DIA: formData.lensProfile?.lens_R_DIA ,
+        lens_R_K_READING: formData.lensProfile?.lens_R_K_READING ,
+        lens_L_SPH: formData.lensProfile?.lens_L_SPH ,
+        lens_L_CYL: formData.lensProfile?.lens_L_CYL ,
+        lens_L_AXIS: formData.lensProfile?.lens_L_AXIS ,
+        lens_L_BC: formData.lensProfile?.lens_L_BC ,
+        lens_L_DIA: formData.lensProfile?.lens_L_DIA ,
+        lens_L_K_READING: formData.lensProfile?.lens_L_K_READING ,
       },
-      latestGlassProfie: {
-        glassEyePowerProfileId: formData.latestGlassProfie.glassEyePowerProfileId,
-        isActual: false,
-        r_SPH: formData.latestGlassProfie.r_SPH  ,
-        r_CYL: formData.latestGlassProfie.r_CYL  ,
-        r_AXIS: formData.latestGlassProfie.r_AXIS  ,
-        r_PRISM: formData.latestGlassProfie.r_PRISM  ,
-        r_VA: formData.latestGlassProfie.r_VA  ,
-        r_ADD: formData.latestGlassProfie.r_ADD  ,
-        r_PD: formData.latestGlassProfie.r_PD  ,
-        l_SPH: formData.latestGlassProfie.l_SPH  ,
-        l_CYL: formData.latestGlassProfie.l_CYL  ,
-        l_AXIS: formData.latestGlassProfie.l_AXIS  ,
-        l_PRISM: formData.latestGlassProfie.l_PRISM  ,
-        l_VA: formData.latestGlassProfie.l_VA  ,
-        l_ADD: formData.latestGlassProfie.l_ADD  ,
-        l_PD: formData.latestGlassProfie.l_PD  ,
+
+      latestGlassProfile: {
+        latest_Glass_R_SPH: formData.latestGlassProfile?.latest_Glass_R_SPH ,
+        latest_Glass_R_CYL: formData.latestGlassProfile?.latest_Glass_R_CYL ,
+        latest_Glass_R_AXIS: formData.latestGlassProfile?.latest_Glass_R_AXIS ,
+        latest_Glass_R_PRISM: formData.latestGlassProfile?.latest_Glass_R_PRISM ,
+        latest_Glass_R_VA: formData.latestGlassProfile?.latest_Glass_R_VA ,
+        latest_Glass_R_ADD: formData.latestGlassProfile?.latest_Glass_R_ADD ,
+        latest_Glass_R_PD: formData.latestGlassProfile?.latest_Glass_R_PD ,
+        latest_Glass_L_SPH: formData.latestGlassProfile?.latest_Glass_L_SPH ,
+        latest_Glass_L_CYL: formData.latestGlassProfile?.latest_Glass_L_CYL ,
+        latest_Glass_L_AXIS: formData.latestGlassProfile?.latest_Glass_L_AXIS ,
+        latest_Glass_L_PRISM: formData.latestGlassProfile?.latest_Glass_L_PRISM ,
+        latest_Glass_L_VA: formData.latestGlassProfile?.latest_Glass_L_VA ,
+        latest_Glass_L_ADD: formData.latestGlassProfile?.latest_Glass_L_ADD ,
+        latest_Glass_L_PD: formData.latestGlassProfile?.latest_Glass_L_PD ,
       },
+
       actualGlassProfile: {
-        glassEyePowerProfileId: formData.actualGlassProfile.glassEyePowerProfileId,
-        isActual: true,
-        r_SPH: formData.actualGlassProfile.r_SPH  ,
-        r_CYL: formData.actualGlassProfile.r_CYL  ,
-        r_AXIS: formData.actualGlassProfile.r_AXIS  ,
-        r_PRISM: formData.actualGlassProfile.r_PRISM  ,
-        r_VA: formData.actualGlassProfile.r_VA  ,
-        r_ADD: formData.actualGlassProfile.r_ADD  ,
-        r_PD: formData.actualGlassProfile.r_PD  ,
-        l_SPH: formData.actualGlassProfile.l_SPH  ,
-        l_CYL: formData.actualGlassProfile.l_CYL  ,
-        l_AXIS: formData.actualGlassProfile.l_AXIS  ,
-        l_PRISM: formData.actualGlassProfile.l_PRISM  ,
-        l_VA: formData.actualGlassProfile.l_VA  ,
-        l_ADD: formData.actualGlassProfile.l_ADD  ,
-        l_PD: formData.actualGlassProfile.l_PD  ,
-      }
+        actual_Glass_R_SPH: formData.actualGlassProfile?.actual_Glass_R_SPH ,
+        actual_Glass_R_CYL: formData.actualGlassProfile?.actual_Glass_R_CYL ,
+        actual_Glass_R_AXIS: formData.actualGlassProfile?.actual_Glass_R_AXIS ,
+        actual_Glass_R_PRISM: formData.actualGlassProfile?.actual_Glass_R_PRISM ,
+        actual_Glass_R_VA: formData.actualGlassProfile?.actual_Glass_R_VA ,
+        actual_Glass_R_ADD: formData.actualGlassProfile?.actual_Glass_R_ADD ,
+        actual_Glass_R_PD: formData.actualGlassProfile?.actual_Glass_R_PD ,
+        actual_Glass_L_SPH: formData.actualGlassProfile?.actual_Glass_L_SPH ,
+        actual_Glass_L_CYL: formData.actualGlassProfile?.actual_Glass_L_CYL ,
+        actual_Glass_L_AXIS: formData.actualGlassProfile?.actual_Glass_L_AXIS ,
+        actual_Glass_L_PRISM: formData.actualGlassProfile?.actual_Glass_L_PRISM ,
+        actual_Glass_L_VA: formData.actualGlassProfile?.actual_Glass_L_VA ,
+        actual_Glass_L_ADD: formData.actualGlassProfile?.actual_Glass_L_ADD ,
+        actual_Glass_L_PD: formData.actualGlassProfile?.actual_Glass_L_PD ,
+      },
     };
 
     try {
@@ -167,479 +156,133 @@ const NewEyePowerModal = ({ isOpen, data, onClose, onSave, debtorId }) => {
         </div>
         </div>
 
-        {/* Lens Profile */}
         <h5 className="creditor-modal-title">Lens Profile</h5>
         <table className="eye-record-table">
-          <thead>
-            <tr>
-              <th>Parameter</th>
-              <th>SPH</th>
-              <th>CYL</th>
-              <th>AXIS</th>
-              <th>BC</th>
-              <th>DIA</th>
-              <th>K_READING</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Right</td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.r_SPH || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "r_SPH", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.r_CYL || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "r_CYL", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.r_AXIS || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "r_AXIS", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.r_BC || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "r_BC", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.r_DIA || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "r_DIA", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.r_K_READING || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "r_K_READING", e.target.value)
-                  }
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>Left</td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.l_SPH || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "l_SPH", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.l_CYL || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "l_CYL", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.l_AXIS || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "l_AXIS", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.l_BC || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "l_BC", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.l_DIA || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "l_DIA", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.lensProfile?.l_K_READING || ""}
-                  onChange={(e) =>
-                    handleGroupChange("lensProfile", "l_K_READING", e.target.value)
-                  }
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>SPH</th>
+                <th>CYL</th>
+                <th>AXIS</th>
+                <th>BC</th>
+                <th>DIA</th>
+                <th>K_READING</th>
+              </tr>
+            </thead>
+            <tbody>
+              {["R", "L"].map((side) => (
+                <tr key={side}>
+                  <td>{side === "R" ? "Right" : "Left"}</td>
+                  {["SPH", "CYL", "AXIS", "BC", "DIA", "K_READING"].map((param) => {
+                    const fieldName = `lens_${side}_${param}`; 
+                    return (
+                      <td key={fieldName}>
+                        <input
+                          type="number"
+                          value={formData.lensProfile[fieldName]}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              lensProfile: {
+                                ...formData.lensProfile,
+                                [fieldName]: e.target.value,
+                              },
+                            })
+                          }
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-        {/* Latest Glass Profile */}
         <h5 className="creditor-modal-title">Latest Glass Profile</h5>
         <table className="eye-record-table">
-          <thead>
-            <tr>
-              <th>Parameter</th>
-              <th>SPH</th>
-              <th>CYL</th>
-              <th>AXIS</th>
-              <th>PRISM</th>
-              <th>VA</th>
-              <th>ADD</th>
-              <th>PD</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Right</td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.r_SPH || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "r_SPH", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.r_CYL || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "r_CYL", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.r_AXIS || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "r_AXIS", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.r_PRISM || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "r_PRISM", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.r_VA || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "r_VA", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.r_ADD || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "r_ADD", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.r_PD || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "r_PD", e.target.value)
-                  }
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>Left</td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.l_SPH || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "l_SPH", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.l_CYL || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "l_CYL", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.l_AXIS || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "l_AXIS", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.l_PRISM || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "l_PRISM", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.l_VA || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "l_VA", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.l_ADD || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "l_ADD", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.latestGlassProfie?.l_PD || ""}
-                  onChange={(e) =>
-                    handleGroupChange("latestGlassProfie", "l_PD", e.target.value)
-                  }
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>SPH</th>
+                <th>CYL</th>
+                <th>AXIS</th>
+                <th>PRISM</th>
+                <th>VA</th>
+                <th>ADD</th>
+                <th>PD</th>
+              </tr>
+            </thead>
+            <tbody>
+              {["R", "L"].map((side) => (
+                <tr key={side}>
+                  <td>{side === "R" ? "Right" : "Left"}</td>
+                  {["SPH", "CYL", "AXIS", "PRISM", "VA", "ADD", "PD"].map((param) => {
+                    const fieldName = `latest_Glass_${side}_${param}`;
+                    return (
+                      <td key={fieldName}>
+                        <input
+                          type="number"
+                          value={formData.latestGlassProfile[fieldName]}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              latestGlassProfile: {
+                                ...formData.latestGlassProfile,
+                                [fieldName]: e.target.value,
+                              },
+                            })
+                          }
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-        {/* Actual Glass Profile */}
         <h5 className="creditor-modal-title">Actual Glass Profile</h5>
         <table className="eye-record-table">
-          <thead>
-            <tr>
-              <th>Parameter</th>
-              <th>SPH</th>
-              <th>CYL</th>
-              <th>AXIS</th>
-              <th>PRISM</th>
-              <th>VA</th>
-              <th>ADD</th>
-              <th>PD</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Right</td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.r_SPH || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "r_SPH", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.r_CYL || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "r_CYL", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.r_AXIS || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "r_AXIS", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.r_PRISM || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "r_PRISM", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.r_VA || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "r_VA", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.r_ADD || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "r_ADD", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.r_PD || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "r_PD", e.target.value)
-                  }
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>Left</td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.l_SPH || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "l_SPH", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.l_CYL || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "l_CYL", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.l_AXIS || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "l_AXIS", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.l_PRISM || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "l_PRISM", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.l_VA || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "l_VA", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.l_ADD || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "l_ADD", e.target.value)
-                  }
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  className="creditor-form-input"
-                  value={formData.actualGlassProfile?.l_PD || ""}
-                  onChange={(e) =>
-                    handleGroupChange("actualGlassProfile", "l_PD", e.target.value)
-                  }
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>SPH</th>
+                <th>CYL</th>
+                <th>AXIS</th>
+                <th>PRISM</th>
+                <th>VA</th>
+                <th>ADD</th>
+                <th>PD</th>
+              </tr>
+            </thead>
+            <tbody>
+              {["R", "L"].map((side) => (
+                <tr key={side}>
+                  <td>{side === "R" ? "Right" : "Left"}</td>
+                  {["SPH", "CYL", "AXIS", "PRISM", "VA", "ADD", "PD"].map((param) => {
+                    const fieldName = `actual_Glass_${side}_${param}`;
+                    return (
+                      <td key={fieldName}>
+                        <input
+                          type="number"
+                          value={formData.actualGlassProfile[fieldName]}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              actualGlassProfile: {
+                                ...formData.actualGlassProfile,
+                                [fieldName]: e.target.value,
+                              },
+                            })
+                          }
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
         <div className="section-buttons">
           <button className="save-button" onClick={handleSave}>

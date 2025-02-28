@@ -31,7 +31,10 @@ const DebtorModal = ({
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [showNewEyeModal, setShowNewEyeModal] = useState(false);
   const [newEyeData, setNewEyeData] = useState(null);
-  const [successModal, setSuccessModal] = useState({ isOpen: false, title: ""});
+  const [successModal, setSuccessModal] = useState({
+    isOpen: false,
+    title: "",
+  });
 
   const getDefaultDateTimeLocal = () => {
     const date = new Date();
@@ -162,7 +165,7 @@ const DebtorModal = ({
           body: JSON.stringify({
             customerId: Number(localStorage.getItem("customerId")),
             userId: localStorage.getItem("userId"),
-            id: data.debtorId, 
+            id: data.debtorId,
           }),
         }
       );
@@ -199,15 +202,15 @@ const DebtorModal = ({
       actionData: {
         customerId: Number(localStorage.getItem("customerId")),
         userId: localStorage.getItem("userId"),
-        id: record.eyeProfileId, 
+        id: record.eyeProfileId,
       },
       eyePowerId: record.eyeProfileId,
-      debtorId: data.debtorId || "", 
-      salesId: record.salesId || "", 
+      debtorId: data.debtorId || "",
+      salesId: record.salesId || "",
       opticalHeight: record.opticalHeight ?? null,
       segmentHeight: record.segmentHeight ?? null,
       userDefinedTime: getDefaultDateTimeLocal,
-  
+
       // Map Lens Profile
       lensProfile: {
         lens_R_SPH: record.lensRecords.r_SPH ?? null,
@@ -223,7 +226,7 @@ const DebtorModal = ({
         lens_L_DIA: record.lensRecords.l_DIA ?? null,
         lens_L_K_READING: record.lensRecords.l_K_READING ?? null,
       },
-  
+
       // Map Latest Glass Profile
       latestGlassProfile: {
         latest_Glass_R_SPH: record.latestRecords.r_SPH ?? null,
@@ -241,7 +244,7 @@ const DebtorModal = ({
         latest_Glass_L_ADD: record.latestRecords.l_ADD ?? null,
         latest_Glass_L_PD: record.latestRecords.l_PD ?? null,
       },
-  
+
       // Map Actual Glass Profile
       actualGlassProfile: {
         actual_Glass_R_SPH: record.actualRecords.r_SPH ?? null,
@@ -261,7 +264,6 @@ const DebtorModal = ({
       },
     };
   };
-  
 
   const handleSaveRecord = async () => {
     if (!selectedRecord) {
@@ -272,21 +274,24 @@ const DebtorModal = ({
       });
       return;
     }
-  
+
     const requestData = mapRecordToSaveFormat(selectedRecord);
-  
+
     try {
-      const res = await fetch("https://optikposbackend.absplt.com/EyePower/Save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "text/plain",
-        },
-        body: JSON.stringify(requestData),
-      });
-  
+      const res = await fetch(
+        "https://optikposbackend.absplt.com/EyePower/Save",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "text/plain",
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
+
       const result = await res.json();
-  
+
       if (res.ok && result.success) {
         setServiceRecords(result.data);
         setSuccessModal({
@@ -311,25 +316,28 @@ const DebtorModal = ({
       });
       return;
     }
-  
+
     const requestData = {
       customerId: Number(localStorage.getItem("customerId")),
-      id: eyePowerId, 
+      id: eyePowerId,
       userId: localStorage.getItem("userId"),
     };
-  
+
     try {
-      const res = await fetch("https://optikposbackend.absplt.com/EyePower/Delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "text/plain",
-        },
-        body: JSON.stringify(requestData),
-      });
-  
+      const res = await fetch(
+        "https://optikposbackend.absplt.com/EyePower/Delete",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "text/plain",
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
+
       const result = await res.json();
-  
+
       if (res.ok && result.success) {
         fetchEyePowerRecords(data.debtorId);
         setSuccessModal({
@@ -345,9 +353,8 @@ const DebtorModal = ({
   };
 
   const closeSuccessModal = () => {
-    setSuccessModal({ isOpen: false, title: ""});
+    setSuccessModal({ isOpen: false, title: "" });
   };
-
 
   if (!isOpen) return null;
 
@@ -467,20 +474,22 @@ const DebtorModal = ({
           <div className="service-records-wrapper">
             <div className="service-records-list">
               <h3>Service Records</h3>
-            { !isViewing && (
-              <button
+              {!isViewing && (
+                <button
                   className="add-eye-button"
                   onClick={handleAddEyePowerRecord}
                 >
                   Add New Eye Power
                 </button>
-            )}
+              )}
               <div className="record-header">
                 <span className="record-col date-col">DocDate</span>
                 <span className="record-col docno-col">Doc No</span>
                 <span className="record-col recordedby-col">Recorded By</span>
                 <span className="record-col amount-col">Amount</span>
-                {!isViewing && <span className="record-col action-col">Actions</span>} 
+                {!isViewing && (
+                  <span className="record-col action-col">Actions</span>
+                )}
               </div>
               {serviceRecords?.length > 0 ? (
                 serviceRecords.map((record) => (
@@ -495,10 +504,12 @@ const DebtorModal = ({
                     onClick={() => setSelectedRecord(record)}
                   >
                     <span className="record-col date-col">
-                      {record.recordedDate ? new Date(record.recordedDate).toLocaleDateString() : "-"}
+                      {record.recordedDate
+                        ? new Date(record.recordedDate).toLocaleDateString()
+                        : "-"}
                     </span>
                     <span className="record-col docno-col">
-                      {record.docNo != null ? record.docNo : "-"} 
+                      {record.docNo != null ? record.docNo : "-"}
                     </span>
                     <span className="record-col recordedby-col">
                       {record.recordedBy != null ? record.recordedBy : "-"}
@@ -508,6 +519,9 @@ const DebtorModal = ({
                     </span>
                     {!isViewing && (
                       <span className="record-col action-col">
+                    
+                    
+                      {!isViewing && record.docNo !== null && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -517,7 +531,8 @@ const DebtorModal = ({
                         >
                           <FaTrash />
                         </button>
-                      </span>
+                      )}
+                    </span>
                     )}
                   </div>
                 ))
@@ -529,63 +544,86 @@ const DebtorModal = ({
             <div className="service-record-details">
               {selectedRecord ? (
                 <>
-                <h4>Record Details</h4>
-                <table className="record-details-table">
-                <tbody>
-                  <tr>
-                    <td>Optical Height:</td>
-                      <td>
-                        {isViewing ? (
-                          selectedRecord.opticalHeight ?? "-"
-                        ) : (
-                          <input
-                            type="number"
-                            value={selectedRecord.opticalHeight}
-                            onChange={(e) => handleRecordChange("opticalHeight", e.target.value)}
-                          />
-                        )}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Segment Height:</td>
-                      <td>
-                        {isViewing ? (
-                          selectedRecord.segmentHeight ?? "-"
-                        ) : (
-                          <input
-                            type="number"
-                            value={selectedRecord.segmentHeight}
-                            onChange={(e) => handleRecordChange("segmentHeight", e.target.value)}
-                          />
-                        )}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                  <h4>Record Details</h4>
+                  <table className="record-details-table">
+                    <tbody>
+                      <tr>
+                        <td>Optical Height:</td>
+                        <td>
+                          {isViewing ? (
+                            selectedRecord.opticalHeight ?? "-"
+                          ) : (
+                            <input
+                              type="number"
+                              value={selectedRecord.opticalHeight}
+                              onChange={(e) =>
+                                handleRecordChange(
+                                  "opticalHeight",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          )}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Segment Height:</td>
+                        <td>
+                          {isViewing ? (
+                            selectedRecord.segmentHeight ?? "-"
+                          ) : (
+                            <input
+                              type="number"
+                              value={selectedRecord.segmentHeight}
+                              onChange={(e) =>
+                                handleRecordChange(
+                                  "segmentHeight",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          )}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
 
-                <GlassesEyePowerTable
-                  title="Latest Glass Eye Power"
-                  eyeRecord={selectedRecord.latestRecords}
-                  editable={!isViewing}
-                  onChange={(updatedRecords) => handleRecordChange("latestRecords", updatedRecords)}
-                />
-                <GlassesEyePowerTable
-                  title="Actual Glass Eye Power"
-                  eyeRecord={selectedRecord.actualRecords}
-                  editable={!isViewing}
-                  onChange={(updatedRecords) => handleRecordChange("actualRecords", updatedRecords)}
-                />
-                <LensEyePowerTable
-                  title="Lens Eye Power"
-                  eyeRecord={selectedRecord.lensRecords}
-                  editable={!isViewing}
-                  onChange={(updatedRecords) => handleRecordChange("lensRecords", updatedRecords)}
-                />
+                  <GlassesEyePowerTable
+                    title="Latest Glass Eye Power"
+                    eyeRecord={selectedRecord.latestRecords}
+                    editable={!isViewing}
+                    onChange={(updatedRecords) =>
+                      handleRecordChange("latestRecords", updatedRecords)
+                    }
+                  />
+                  <GlassesEyePowerTable
+                    title="Actual Glass Eye Power"
+                    eyeRecord={selectedRecord.actualRecords}
+                    editable={!isViewing}
+                    onChange={(updatedRecords) =>
+                      handleRecordChange("actualRecords", updatedRecords)
+                    }
+                  />
+                  <LensEyePowerTable
+                    title="Lens Eye Power"
+                    eyeRecord={selectedRecord.lensRecords}
+                    editable={!isViewing}
+                    onChange={(updatedRecords) =>
+                      handleRecordChange("lensRecords", updatedRecords)
+                    }
+                  />
 
-                {!isViewing && <button className="add-eye-button" onClick={handleSaveRecord}>Save Changes</button>}
+                  {!isViewing && (
+                    <button
+                      className="add-eye-button"
+                      onClick={handleSaveRecord}
+                    >
+                      Save Changes
+                    </button>
+                  )}
 
                   <h5>Item Details</h5>
-                  { selectedRecord?.details?.length > 0 ? (
+                  {selectedRecord?.details?.length > 0 ? (
                     <table className="eye-record-table">
                       <thead>
                         <tr>
@@ -604,31 +642,23 @@ const DebtorModal = ({
                         {selectedRecord.details.map((detail) => (
                           <tr key={detail.salesDetailId}>
                             <td>
-                              {detail.itemCode != null
-                                ? detail.itemCode
-                                : "-"}
+                              {detail.itemCode != null ? detail.itemCode : "-"}
                             </td>
                             <td>
                               {detail.description != null
                                 ? detail.description
                                 : "-"}
                             </td>
-                            <td>
-                              {detail.desc2 || "-"}
-                            </td>
+                            <td>{detail.desc2 || "-"}</td>
                             <td>{detail.uom != null ? detail.uom : "-"}</td>
-                            <td>
-                              {detail.qty !== null ? detail.qty : "-"}
-                            </td>
+                            <td>{detail.qty !== null ? detail.qty : "-"}</td>
                             <td>
                               {detail.unitPrice !== null
                                 ? detail.unitPrice
                                 : "-"}
                             </td>
                             <td>
-                              {detail.discount != null
-                                ? detail.discount
-                                : "-"}
+                              {detail.discount != null ? detail.discount : "-"}
                             </td>
                             <td>
                               {detail.discountAmount !== null
@@ -636,9 +666,7 @@ const DebtorModal = ({
                                 : "-"}
                             </td>
                             <td>
-                              {detail.subTotal !== null
-                                ? detail.subTotal
-                                : "-"}
+                              {detail.subTotal !== null ? detail.subTotal : "-"}
                             </td>
                           </tr>
                         ))}
@@ -676,17 +704,11 @@ const DebtorModal = ({
                                 : "-"}
                             </td>
                             <td>
-                              {payment.remark != null
-                                ? payment.remark
-                                : "-"}
+                              {payment.remark != null ? payment.remark : "-"}
                             </td>
+                            <td>{payment.reference || "-"}</td>
                             <td>
-                              {payment.reference || "-"}
-                            </td>
-                            <td>
-                              {payment.amount !== null
-                                ? payment.amount
-                                : "-"}
+                              {payment.amount !== null ? payment.amount : "-"}
                             </td>
                           </tr>
                         ))}
@@ -701,7 +723,7 @@ const DebtorModal = ({
               )}
             </div>
           </div>
-          </>
+        </>
 
         <div className="section-buttons">
           {isViewing && (
@@ -728,11 +750,11 @@ const DebtorModal = ({
           onCancel={() => setIsConfirmOpen(false)}
         />
 
-      <SuccessModal
-        isOpen={successModal.isOpen}
-        title={successModal.title}
-        onClose={closeSuccessModal}
-      />
+        <SuccessModal
+          isOpen={successModal.isOpen}
+          title={successModal.title}
+          onClose={closeSuccessModal}
+        />
 
         {showNewEyeModal && (
           <NewEyePowerModal

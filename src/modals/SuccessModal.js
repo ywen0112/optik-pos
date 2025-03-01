@@ -7,9 +7,6 @@ const SuccessModal = ({ isOpen, title, message, onClose, onExportReport }) => {
   return (
     <div className="success-modal-overlay">
       <div className="success-modal">
-        <div className="success-icon">
-          <span>✔</span>
-        </div>
         <h3 className="success-modal-title">{title}</h3>
         <p className="success-modal-message">{message}</p>
         <div className="success-modal-buttons">

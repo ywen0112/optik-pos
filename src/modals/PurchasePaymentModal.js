@@ -16,7 +16,6 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
   const [reference, setReference] = useState(null);
   const customerId = Number(localStorage.getItem("customerId"));
   const userId = localStorage.getItem("userId");
-  const counterSessionId = localStorage.getItem("counterSessionId");
   const targetDocId = localStorage.getItem("purchaseId");
 
    useEffect(() => {
@@ -89,7 +88,6 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
         body: JSON.stringify({
           customerId: customerId,
           userId: userId,
-          counterSessionId: counterSessionId,
           targetDocId: targetDocId,
           docDate: localISOTime,
           remark: remark,

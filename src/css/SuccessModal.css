@@ -18,30 +18,17 @@
     padding: 20px;
     width: 550px;
     text-align: center;
-    animation: slide-in 0.3s ease-out;
   }
-  
-  @keyframes slide-in {
-    from {
-      transform: translateY(-50px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  
-  .success-icon {
-    font-size: 48px;
-    color: #4caf50;
-    margin-bottom: 15px;
-  }
-  
+
   .success-modal-title {
     font-size: 20px;
     color: #333;
     margin-bottom: 10px;
+  }
+
+  .success-modal-message {
+    font-size: 14px;
+    margin-bottom: 20px;
   }
   
   .success-modal-button {

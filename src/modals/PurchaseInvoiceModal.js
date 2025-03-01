@@ -56,7 +56,6 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
   const customerId = Number(localStorage.getItem("customerId"));
   const purchaseId = localStorage.getItem("purchaseId"); 
-  const counterSessionId = localStorage.getItem("counterSessionId");
   const docNo = localStorage.getItem("docNo");
 
   useEffect(() => {
@@ -474,7 +473,6 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       },
       purchaseId,
       docNo,
-      counterSessionId,
       creditorId: formData.creditorId,
       docDate: localISOTime,
       locationId: formData.locationId,
@@ -687,12 +685,12 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
             )}
           </div>
           <ConfirmationModal isOpen={confirmationModal} onConfirm={handleSubmit} onCancel={() => setConfirmationModal(false)} />
-          <SuccessModal 
-              isOpen={successModal.isOpen} 
-              title={successModal.title} 
-              message={successModal.message} 
-              onClose={handleSuccessModalClose} 
-            />         
+            <SuccessModal 
+                isOpen={successModal.isOpen} 
+                title={successModal.title} 
+                message={successModal.message} 
+                onClose={handleSuccessModalClose} 
+              />         
             <ErrorModal isOpen={errorModal.isOpen} title={errorModal.title} message={errorModal.message} onClose={() => setErrorModal({ isOpen: false })} />
           </div>
       </div>

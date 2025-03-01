@@ -69,7 +69,6 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
 
     const customerId = localStorage.getItem("customerId");
     const userId = localStorage.getItem("userId");
-    const counterSessionId = localStorage.getItem("counterSessionId");
     const targetDocId = localStorage.getItem("salesId");
 
     const formattedAmount = parseFloat(totalPaid).toFixed(2);
@@ -85,7 +84,6 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
         body: JSON.stringify({
           customerId: Number(customerId),
           userId: userId,
-          counterSessionId: counterSessionId,
           targetDocId: targetDocId,
           docDate: localISOTime,
           remark: remark,

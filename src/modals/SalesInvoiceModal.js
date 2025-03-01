@@ -59,7 +59,6 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
 
   const customerId = Number(localStorage.getItem("customerId"));
   const salesId = localStorage.getItem("salesId"); 
-  const counterSessionId = localStorage.getItem("counterSessionId");
   const docNo = localStorage.getItem("docNo");
 
   useEffect(() => {
@@ -611,7 +610,6 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       },
       salesId,
       docNo,
-      counterSessionId,
       debtorId: formData.debtorId,
       docDate: localISOTime,
       locationId: formData.locationId,

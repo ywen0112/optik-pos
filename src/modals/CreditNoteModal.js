@@ -52,7 +52,6 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const customerId = Number(localStorage.getItem("customerId"));
   const creditNoteId = localStorage.getItem("creditNoteId"); 
-  const counterSessionId = localStorage.getItem("counterSessionId");
   const docNo = localStorage.getItem("docNo");
 
   useEffect(() => {
@@ -440,7 +439,6 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
       },
       creditNoteId,
       docNo,
-      counterSessionId,
       debtorId: formData.debtorId,
       docDate: localISOTime,
       locationId: formData.locationId,

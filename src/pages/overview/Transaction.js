@@ -134,15 +134,24 @@ const Transaction = () => {
       });
 
       const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        if (data.errorMessage === "There is currently no active counter session.") {
+          setIsCounterOpen(false);
+          setCounterSessionId(null);
+          setOpenCounterAmount("");
+          localStorage.removeItem("counterSessionId");
+          localStorage.removeItem("openingBal");
+          localStorage.removeItem("isCounterOpen");
+        }
+        throw new Error(data.errorMessage || "Failed to process transaction.");
+      }
+
       setSuccessModal({
         isOpen: true,
         title: "Cash Transaction Saved",
         message: "The cash transaction has been successfully saved.",
       });
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.errorMessage || "Failed to process transaction.");
-      }
     } catch (error) {
       setErrorModal({ isOpen: true, title: "Error Processing Transaction", message: error.message });
     }

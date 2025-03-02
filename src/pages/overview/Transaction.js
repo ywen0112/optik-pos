@@ -120,6 +120,7 @@ const Transaction = () => {
       }
 
       setCounterSummary(data.data); 
+      setSuccessModal({isOpen: true, title: "Close Counter Success", onExportReport: handleExportReport(counterSessionId)})
       setIsCounterOpen(false);
       setCounterSessionId(null);
       setOpenCounterAmount("");
@@ -257,9 +258,9 @@ const Transaction = () => {
     }
   };
 
-  const handleExportReport = async() =>{
+  const handleExportReport = async(id) =>{
     try{
-      const response = await fetch(`https://optikposbackend.absplt.com/CashCounter/GetCounterSummaryReport?CounterSessionId=${counterSessionId}`);
+      const response = await fetch(`https://optikposbackend.absplt.com/CashCounter/GetCounterSummaryReport?CounterSessionId=${id}`);
       const data = await response.json();
 
       if (response.ok && data.success) {
@@ -355,7 +356,7 @@ const Transaction = () => {
       <PurchaseInvoiceModal isOpen={isPurchaseInvoiceOpen} onClose={() => setIsPurchanseInvoiceOpen(false)} onReset={handleResetAndCloseState}/>
       <CreditNoteModal isOpen={isCreditNoteOpen} onClose={() => setIsCreditNoteOpen(false)} onReset={handleResetAndCloseState}/>
       <CloseCounterModal isOpen={isCloseCounterOpen} onClose={() => setIsCloseCounterOpen(false)} onCloseCounter={handleCloseCounter}/>
-      <CloseCounterSummaryModal isOpen={!!counterSummary} summary={counterSummary} onClose={() => {setCounterSummary(null)}} onExportReport={handleExportReport}/>
+      <CloseCounterSummaryModal isOpen={!!counterSummary} summary={counterSummary} onClose={() => {setCounterSummary(null)}}/>
       <ErrorModal isOpen={errorModal.isOpen} title={errorModal.title} message={errorModal.message} onClose={()=> setErrorModal({ isOpen: false, title: "", message: "" })}/>
       <SuccessModal  isOpen={successModal.isOpen} title={successModal.title} message={successModal.message} onClose={() => setSuccessModal({ isOpen: false, title: "", message: "" })}/>
     </div>

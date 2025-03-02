@@ -84,6 +84,7 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit, onReset }) => {
         body: JSON.stringify({
           customerId: Number(customerId),
           userId: userId,
+          isFirstPayment: true,
           targetDocId: targetDocId,
           docDate: localISOTime,
           remark: remark,

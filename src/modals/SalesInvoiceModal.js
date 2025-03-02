@@ -647,7 +647,8 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
             isOpen: true,
             title: "Sales Invoice Saved",
             message: "The sales invoice has been successfully saved.",
-            salesId: salesId,
+            
+            onExportReport: handleExportReport(salesId),
         });
 
       await handleSaveEyePower(); 
@@ -1069,7 +1070,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
     </div>
 
       <ConfirmationModal isOpen={confirmationModal} onConfirm={handleSubmit} onCancel={() => setConfirmationModal(false)} />
-      <SuccessModal isOpen={successModal.isOpen} title={successModal.title} message={successModal.message} onClose={handleSuccessModalClose} onExportReport={handleExportReport} />         
+      <SuccessModal isOpen={successModal.isOpen} title={successModal.title} message={successModal.message} onClose={handleSuccessModalClose} />         
       <ErrorModal isOpen={errorModal.isOpen} title={errorModal.title} message={errorModal.message} onClose={() => setErrorModal({ isOpen: false })} />
       </div>
     </div>

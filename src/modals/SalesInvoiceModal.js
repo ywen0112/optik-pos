@@ -7,7 +7,7 @@ import PaymentModal from "./PaymentModal"
 import Select from "react-select";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-const SalesInvoiceModal = ({ isOpen, onClose }) => {
+const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
   const [formData, setFormData] = useState({
     debtorId: "",
     debtorCode: "",
@@ -101,6 +101,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
 
       setIsPaymentConfirmed(false); 
       setPreviousEyeRecord(null);
+      setPaymentModal({ isOpen: false, type: ""})
 
       fetchDebtors();
       fetchLocations();
@@ -130,7 +131,7 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
             throw new Error(data.errorMessage || "Failed to fetch new eye power data.");
           }
         } catch (error) {
-          setErrorModal({ isOpen: true, title: "Error", message: error.message });
+          setErrorModal({ isOpen: true, title: "Error Fetching New Eye Power.", message: error.message });
         }
       };
       fetchNewEyePower();
@@ -488,10 +489,6 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleClosePaymentModal = () => {
-    setPaymentModal({ isOpen: false, type: "" });
-  };
-
   const handleSubmitPayment = (payments, outstandingBalance, changes) => {
     setFormData((prev) => ({
       ...prev,
@@ -519,8 +516,8 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       eyePowerId: eyePowerData.eyePowerId, 
       debtorId: formData.debtorId,
       salesId: salesId,
-      opticalHeight: eyePowerData.opticalHeight,
-      segmentHeight: eyePowerData.segmentHeight,
+      opticalHeight: eyePowerData?.opticalHeight,
+      segmentHeight: eyePowerData?.segmentHeight,
       lensProfile: {
         lens_R_SPH: eyePowerData.lensProfile?.lens_R_SPH ,
         lens_R_CYL: eyePowerData.lensProfile?.lens_R_CYL ,
@@ -588,25 +585,25 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
   };  
 
   const handleSubmit = async () => {
-    if (!formData.debtorId || formData.items.length === 0) {
+  if (!formData.debtorId || formData.items.length === 0) {
       setErrorModal({
-        isOpen: true,
-        title: "Missing Information",
-        message: "Please ensure debtor, and at least one item are selected.",
+          isOpen: true,
+          title: "Missing Information",
+          message: "Please ensure debtor, and at least one item are selected.",
       });
       return;
-    }
-  
-    const userId = formData.agentId || localStorage.getItem("userId");
-    const now = new Date();
-    const offset = now.getTimezoneOffset() * 60000;
-    const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
-  
-    const payload = {
+  }
+
+  const userId = formData.agentId || localStorage.getItem("userId");
+  const now = new Date();
+  const offset = now.getTimezoneOffset() * 60000;
+  const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
+
+  const payload = {
       actionData: {
-        customerId,
-        userId,
-        id: salesId,
+          customerId,
+          userId,
+          id: salesId,
       },
       salesId,
       docNo,
@@ -616,51 +613,57 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
       remark: "",
       total: formData.total,
       details: formData.items.map(item => ({
-        itemId: item.itemId,
-        itemUOMId: item.itemUOMId,
-        description: item.description,
-        desc2: item.desc2,
-        itemBatchId: "",
-        qty: item.qty,
-        unitPrice: item.unitPrice,
-        discount: item.discount,
-        discountAmount: item.discountAmount,
-        subTotal: item.subtotal,
+          itemId: item.itemId,
+          itemUOMId: item.itemUOMId,
+          description: item.description,
+          desc2: item.desc2,
+          itemBatchId: "",
+          qty: item.qty,
+          unitPrice: item.unitPrice,
+          discount: item.discount,
+          discountAmount: item.discountAmount,
+          subTotal: item.subtotal,
       })),
-    };
-  
-    try {
+  };
+
+  try {
       const response = await fetch("https://optikposbackend.absplt.com/Sales/Save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
       });
-  
+
       const data = await response.json();
-      console.log("Sales Save Response:", data);
-  
+
+      if (!response.ok || !data.success) {
+        if (data.errorMessage === "There is currently no active counter session.") {
+            onReset(data);
+        }
+        return;
+      }
+
       if (response.ok && data.success) {
         setSuccessModal({
-          isOpen: true,
-          title: "Sales Invoice Saved",
-          message: "The sales invoice has been successfully saved.",
-          salesId: salesId,
+            isOpen: true,
+            title: "Sales Invoice Saved",
+            message: "The sales invoice has been successfully saved.",
+            salesId: salesId,
         });
-  
-        await handleSaveEyePower();
-        setIsPaymentConfirmed(true); 
+
+      await handleSaveEyePower(); 
+      setIsPaymentConfirmed(true);
       } else {
         throw new Error(data.errorMessage || "Failed to save sales invoice.");
       }
     } catch (error) {
-      setErrorModal({
-        isOpen: true,
-        title: "Error Saving Sales Invoice",
-        message: error.message,
-      });
+        setErrorModal({
+            isOpen: true,
+            title: "Error Saving Sales Invoice",
+            message: error.message,
+        });
     }
   };
-  
+
   const handleExportReport = async () => {
     try {
       const response = await fetch(`https://optikposbackend.absplt.com/Sales/GetSalesReport?SalesId=${salesId}`);
@@ -1059,22 +1062,17 @@ const SalesInvoiceModal = ({ isOpen, onClose }) => {
           type={paymentModal.type} 
           total={outstandingBalance} 
           onSubmit={handleSubmitPayment} 
-          onClose={handleClosePaymentModal} 
+          onClose={() => setPaymentModal({ isOpen: false, type: "" })} 
+          onReset={onReset}
         />
       )}
     </div>
 
       <ConfirmationModal isOpen={confirmationModal} onConfirm={handleSubmit} onCancel={() => setConfirmationModal(false)} />
-      <SuccessModal 
-          isOpen={successModal.isOpen} 
-          title={successModal.title} 
-          message={successModal.message} 
-          onClose={handleSuccessModalClose} 
-          onExportReport={handleExportReport} 
-        />         
-        <ErrorModal isOpen={errorModal.isOpen} title={errorModal.title} message={errorModal.message} onClose={() => setErrorModal({ isOpen: false })} />
-        </div>
+      <SuccessModal isOpen={successModal.isOpen} title={successModal.title} message={successModal.message} onClose={handleSuccessModalClose} onExportReport={handleExportReport} />         
+      <ErrorModal isOpen={errorModal.isOpen} title={errorModal.title} message={errorModal.message} onClose={() => setErrorModal({ isOpen: false })} />
       </div>
+    </div>
     );
   };
 

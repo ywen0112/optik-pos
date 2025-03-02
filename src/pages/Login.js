@@ -46,6 +46,9 @@ const Login = ({ logo }) => {
       if (response.ok && data.success && data.data.length > 0) {
         setCompanies(data.data);
 
+        // Store companies in localStorage for Sidebar use
+        localStorage.setItem("companies", JSON.stringify(data.data));
+
         if (data.data.length === 1) {
           handleCompanySelection(data.data[0]);
         } else {
@@ -71,6 +74,7 @@ const Login = ({ logo }) => {
     localStorage.setItem("customerId", company.customerId);
     localStorage.setItem("isLoggedIn", "true");
     localStorage.setItem("accessRights", JSON.stringify(company.accessRight));
+    localStorage.setItem("selectedCompany", JSON.stringify(company));
 
     setIsCompanyModalOpen(false);
     navigate("/dashboard");

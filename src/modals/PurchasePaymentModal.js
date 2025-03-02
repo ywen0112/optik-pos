@@ -9,7 +9,7 @@ const paymentMethods = [
   { value: "bank", label: "Bank Transfer" }
 ];
 
-const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
+const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit, onReset }) => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
@@ -98,11 +98,18 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit }) => {
 
       const data = await response.json();
       if (!response.ok || !data.success) {
-        throw new Error(data.errorMessage || "Failed to save payment.");
+        if (data.errorMessage === "There is currently no active counter session.") {
+          onReset(data);
+        }
+        return;
       }
 
-      onSubmit(payments, outstandingBalance, changes); 
-      onClose();
+      if (response.ok && data.success) {
+        onSubmit(payments, outstandingBalance, changes); 
+        onClose();
+      } else {
+        throw new Error(data.errorMessage || "Failed to save payment.");
+      }
     } catch (error) {
       setErrorModal({ isOpen: true, title: "Error Save Payment", message: error.message });
     } finally {

@@ -7,7 +7,7 @@ import PurchasePaymentModal from "./PurchasePaymentModal";
 import Select from "react-select";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
+const PurchaseInvoiceModal = ({ isOpen, onClose, onReset }) => {
   const [formData, setFormData] = useState({
     creditorId: "",
     creditorCode: "",
@@ -97,6 +97,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       });
 
       setIsPaymentConfirmed(false); 
+      setPaymentModal({ isOpen: false, type: ""})
 
       fetchCreditors();
       fetchLocations();
@@ -429,11 +430,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       setPaymentModal({ isOpen: true, type });
     }
   };
-
-  const handleClosePaymentModal = () => {
-    setPaymentModal({ isOpen: false, type: "" });
-  };
-
+  
   const handleSubmitPayment = (payments, outstandingBalance, changes) => {
     setFormData((prev) => ({
       ...prev,
@@ -500,8 +497,14 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
       });
   
       const data = await response.json();
-      console.log("Purchase Save Response:", data);
-  
+      
+      if (!response.ok || !data.success) {
+        if (data.errorMessage === "There is currently no active counter session.") {
+            onReset(data);
+        }
+        return;
+      }
+
       if (response.ok && data.success) {
         setSuccessModal({
           isOpen: true,
@@ -680,7 +683,8 @@ const PurchaseInvoiceModal = ({ isOpen, onClose }) => {
                 type={paymentModal.type} 
                 total={outstandingBalance} 
                 onSubmit={handleSubmitPayment} 
-                onClose={handleClosePaymentModal} 
+                onClose={() => setPaymentModal({ isOpen: false, type: "" })} 
+                onReset={onReset}
               />
             )}
           </div>

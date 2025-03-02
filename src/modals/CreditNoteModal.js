@@ -6,7 +6,7 @@ import ConfirmationModal from "./ConfirmationModal";
 import Select from "react-select";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-const CreditNoteModal = ({ isOpen, onClose }) => {
+const CreditNoteModal = ({ isOpen, onClose, onReset }) => {
   const [formData, setFormData] = useState({
     debtorId: "",
     debtorCode: "",
@@ -466,17 +466,24 @@ const CreditNoteModal = ({ isOpen, onClose }) => {
       });
   
       const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        if (data.errorMessage === "There is currently no active counter session.") {
+            onReset(data);
+        }
+        return;
+      }
   
       if (response.ok && data.success) {
         setSuccessModal({
           isOpen: true,
           title: "Credit Note Saved",
-          message: "The credit Note has been successfully saved.",
+          message: "The credit note has been successfully saved.",
           creditNoteId: creditNoteId,
         });
   
       } else {
-        throw new Error(data.errorMessage || "Failed to save credit Note.");
+        throw new Error(data.errorMessage || "Failed to save credit note.");
       }
     } catch (error) {
       setErrorModal({

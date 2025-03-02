@@ -16,7 +16,6 @@ const Transaction = () => {
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: "", message: "" });
   const [counterSessionId, setCounterSessionId] = useState(null);
   const [counterSummary, setCounterSummary] = useState(null);
-
   const [modalType, setModalType] = useState(null); 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSalesInvoiceOpen, setIsSalesInvoiceOpen] = useState(false); 
@@ -32,7 +31,6 @@ const Transaction = () => {
   const creditNoteRights = accessRights.find((item) => item.module === "Transaction Credit Note") || {};
   const [counterOpenedModal, setCounterOpenedModal] = useState({ isOpen: false, openingBal: 0, isExist: false  });
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: "", message: "" });
-
 
   useEffect(() => {
     const storedCounterSessionId = localStorage.getItem("counterSessionId");
@@ -86,6 +84,20 @@ const Transaction = () => {
     }
   };
 
+  const handleResetAndCloseState = (data) => {
+    setIsCounterOpen(false);
+    setCounterSessionId(null);
+    setOpenCounterAmount("");
+    localStorage.removeItem("counterSessionId");
+    localStorage.removeItem("openingBal");
+    localStorage.removeItem("isCounterOpen");
+
+    setIsSalesInvoiceOpen(false);
+    setIsPurchanseInvoiceOpen(false);
+    setIsCreditNoteOpen(false);
+    setErrorModal({ isOpen: true, title: "Error Processing Transaction", message: data.errorMessage });
+  }
+
   const handleCloseCounter = async ({ amount }) => {
     try {
       const response = await fetch("https://optikposbackend.absplt.com/CashCounter/CloseCounterSession", {
@@ -99,25 +111,27 @@ const Transaction = () => {
       });
 
       const data = await response.json();
-      console.log("Close Counter Response:", data);
 
-      if (response.ok && data.success) {
-        localStorage.removeItem("counterSessionId");
-        localStorage.removeItem("openingBal");
-        localStorage.removeItem("isCounterOpen");
-        setCounterSummary(data.data); 
-        setIsCounterOpen(false);
-        setOpenCounterAmount("");
-        setIsCloseCounterOpen(false);
-        navigate("/main/transaction");
-      } else {
-        throw new Error(data.errorMessage || "Failed to close counter.");
+      if (!response.ok || !data.success) {
+        if (data.errorMessage === "There is currently no active counter session.") {
+          handleResetAndCloseState(data);
+          throw new Error(data.errorMessage || "Failed to process transaction.");
+        }
       }
+
+      setCounterSummary(data.data); 
+      handleResetAndCloseState();
+      setIsCloseCounterOpen(false);
+      navigate("/main/transaction");
     } catch (error) {
       setErrorModal({ isOpen: true, title: "Error Closing Counter", message: error.message });
     }
   };
 
+  const handleOpenModal = (type) => {
+    setModalType(type);
+    setIsModalOpen(true);
+  };
 
   const handleAddCashTransaction = async ({ type, amount, description }) => {
     try {
@@ -137,14 +151,9 @@ const Transaction = () => {
 
       if (!response.ok || !data.success) {
         if (data.errorMessage === "There is currently no active counter session.") {
-          setIsCounterOpen(false);
-          setCounterSessionId(null);
-          setOpenCounterAmount("");
-          localStorage.removeItem("counterSessionId");
-          localStorage.removeItem("openingBal");
-          localStorage.removeItem("isCounterOpen");
+          handleResetAndCloseState(data);
+          throw new Error(data.errorMessage || "Failed to process transaction.");
         }
-        throw new Error(data.errorMessage || "Failed to process transaction.");
       }
 
       setSuccessModal({
@@ -155,15 +164,6 @@ const Transaction = () => {
     } catch (error) {
       setErrorModal({ isOpen: true, title: "Error Processing Transaction", message: error.message });
     }
-  };
-
-  const handleOpenModal = (type) => {
-    setModalType(type);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
   };
 
   const handleOpenSalesInvoice = async () => {
@@ -179,14 +179,11 @@ const Transaction = () => {
       });
 
       const data = await response.json();
-      console.log("Sales Invoice API Response:", data);
 
       if (response.ok && data.success) {
         const { salesId, docNo } = data.data;
-
         localStorage.setItem("salesId", salesId);
         localStorage.setItem("docNo", docNo);
-
         setIsSalesInvoiceOpen(true);
       } else {
         throw new Error(data.errorMessage || "Failed to create sales invoice.");
@@ -194,10 +191,6 @@ const Transaction = () => {
     } catch (error) {
       setErrorModal({ isOpen: true, title: "Sales Invoice Error", message: error.message });
     }
-  };
-
-  const handleCloseSalesInvoice = () => {
-    setIsSalesInvoiceOpen(false);
   };
 
   const handleOpenPurchaseInvoice = async () => {
@@ -230,10 +223,6 @@ const Transaction = () => {
   };
 ;
 
-  const handleClosePurchaseInvoice = () => {
-    setIsPurchanseInvoiceOpen(false);
-  };
-
   const handleOpenCreditNote = async () => {
     try {
       const response = await fetch("https://optikposbackend.absplt.com/CreditNote/New", {
@@ -261,18 +250,6 @@ const Transaction = () => {
     } catch (error) {
       setErrorModal({ isOpen: true, title: "Credit Note Error", message: error.message });
     }
-  };
-
-  const handleCloseCreditNote = () => {
-    setIsCreditNoteOpen(false);
-  };
-
-  const handleOpenCloseCounter = () => {
-    setIsCloseCounterOpen(true);
-  };
-
-  const handleCloseCloseCounter = () => {
-    setIsCloseCounterOpen(false);
   };
 
   const handleExportReport = async() =>{
@@ -309,21 +286,9 @@ const Transaction = () => {
     }
   };
 
-  const handleCloseErrorModal = () => {
-    setErrorModal({ isOpen: false, title: "", message: "" });
-  };
-
-  const handleCloseCounterOpenedModal = () => {
-    setCounterOpenedModal({ isOpen: false, openingBal: 0 });
-  };
-
-  const handleSuccessModalClose = () => {
-    setSuccessModal({ isOpen: false, title: "", message: "" });
-  };
-
   return (
     <div className="open-counter-container">
-      <h2>Transaction</h2>
+      <h3>Transaction</h3>
       <div className="open-counter-form">
         <input
           className="open-counter-input"
@@ -363,7 +328,7 @@ const Transaction = () => {
             Credit Note
           </button>  
           )}
-          <button className="transaction-button close-counter-button" onClick={handleOpenCloseCounter}>Close Counter</button>
+          <button className="transaction-button close-counter-button" onClick={() => setIsCloseCounterOpen(true)}>Close Counter</button>
         </div>
       )}
 
@@ -376,45 +341,19 @@ const Transaction = () => {
               ? `Counter is opened. Opening Balance: ${counterOpenedModal.openingBal}`
               : `Counter open successfully. Opening Balance is ${counterOpenedModal.openingBal}`
           }
-          onClose={handleCloseCounterOpenedModal}
+          onClose={() => setCounterOpenedModal({ isOpen: false, openingBal: 0 })}
         />
       )}
 
-      <ErrorModal
-        isOpen={errorModal.isOpen}
-        title={errorModal.title}
-        message={errorModal.message}
-        onClose={handleCloseErrorModal}
-      />
-
-      <CashSaleModal
-        isOpen={isModalOpen}
-        type={modalType}
-        onClose={handleCloseModal}
-        onAdd={handleAddCashTransaction}
-      />
-
-      <SuccessModal 
-          isOpen={successModal.isOpen} 
-          title={successModal.title} 
-          message={successModal.message} 
-          onClose={handleSuccessModalClose} 
-        />
-
-    <SalesInvoice isOpen={isSalesInvoiceOpen} onClose={handleCloseSalesInvoice} />
-    <PurchaseInvoiceModal isOpen={isPurchaseInvoiceOpen} onClose={handleClosePurchaseInvoice} />
-    <CreditNoteModal isOpen={isCreditNoteOpen} onClose={handleCloseCreditNote} />
-    <CloseCounterModal isOpen={isCloseCounterOpen} onClose={handleCloseCloseCounter} onCloseCounter={handleCloseCounter}/>
-    <CloseCounterSummaryModal 
-      isOpen={!!counterSummary} 
-      summary={counterSummary} 
-      onClose={() => {
-        setCounterSummary(null)
-      }} 
-      onExportReport={handleExportReport}
-    />
-
-</div>
+      <CashSaleModal isOpen={isModalOpen} type={modalType} onClose={()=> setIsModalOpen(false)} onAdd={handleAddCashTransaction}/>
+      <SalesInvoice isOpen={isSalesInvoiceOpen} onClose={() => setIsSalesInvoiceOpen(false)} onReset={handleResetAndCloseState}/>
+      <PurchaseInvoiceModal isOpen={isPurchaseInvoiceOpen} onClose={() => setIsPurchanseInvoiceOpen(false)} onReset={handleResetAndCloseState}/>
+      <CreditNoteModal isOpen={isCreditNoteOpen} onClose={() => setIsCreditNoteOpen(false)} onReset={handleResetAndCloseState}/>
+      <CloseCounterModal isOpen={isCloseCounterOpen} onClose={() => setIsCloseCounterOpen(false)} onCloseCounter={handleCloseCounter}/>
+      <CloseCounterSummaryModal isOpen={!!counterSummary} summary={counterSummary} onClose={() => {setCounterSummary(null)}} onExportReport={handleExportReport}/>
+      <ErrorModal isOpen={errorModal.isOpen} title={errorModal.title} message={errorModal.message} onClose={()=> setErrorModal({ isOpen: false, title: "", message: "" })}/>
+      <SuccessModal  isOpen={successModal.isOpen} title={successModal.title} message={successModal.message} onClose={() => setSuccessModal({ isOpen: false, title: "", message: "" })}/>
+    </div>
   );
 };
 

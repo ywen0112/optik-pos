@@ -23,6 +23,66 @@
   cursor: pointer;
 }
 
+.company-selection {
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.company-label {
+  display: block;
+  font-weight: bold;
+  color: #F8F9FA;
+  margin-bottom: 8px;
+}
+
+.company-dropdown {
+  width: 100%;
+}
+
+.company-select__control {
+  background-color: #ffffff;
+  border: none;
+  box-shadow: none;
+  min-height: 40px;
+}
+
+.company-select__placeholder,
+.company-select__input input {
+  color: #333;
+}
+
+.company-select__menu {
+  background-color: white;
+  color: #333;
+}
+
+.company-select__option {
+  padding: 10px;
+}
+
+.company-select__option--is-focused {
+  background-color: #1e90ff;
+  color: white;
+}
+
+.company-select__option--is-selected {
+  background-color: #1C86EE;
+  color: white;
+}
+
+.company-select__single-value {
+  color: #333;
+}
+
+.company-select__indicator {
+  color: #1e90ff;
+}
+
+.company-select__control--is-focused {
+  border-color: #1e90ff;
+  box-shadow: 0 0 0 1px #1e90ff;
+}
+
 .menu-list {
   list-style: none;
   padding: 0;
@@ -35,7 +95,6 @@
   color: #F8F9FA;
   text-transform: uppercase;
   font-weight: bold;
-  margin-top: 35px;
 }
 
 .menu-item {

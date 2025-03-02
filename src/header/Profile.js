@@ -206,6 +206,7 @@ const Profile = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          customerId: customerId,
           userName: userData.username, 
           userEmail: userData.email,
           userPassword: oldPassword, 
@@ -253,7 +254,7 @@ const Profile = () => {
                 disabled
               />
             ) : (
-              <p>{userData.username}</p>
+              <p>{userData.username != null ? userData.username : "-"}</p>
             )}
           </div>
         </div>
@@ -272,7 +273,7 @@ const Profile = () => {
                 isSearchable
               />
             ) : (
-              <p>{userData.role.label}</p>
+              <p>{userData.role.label != null ? userData.role.label : "-"}</p>
             )}
           </div>
         </div>
@@ -289,7 +290,7 @@ const Profile = () => {
                 className={errors.email ? "input-error" : ""}
               />
             ) : (
-              <p>{userData.email}</p>
+              <p>{userData.email != null ? userData.email : "-"}</p>
             )}
           </div>
         </div>
@@ -308,7 +309,7 @@ const Profile = () => {
                 isSearchable
               />
             ) : (
-              <p>{userData.location?.label}</p>
+              <p>{userData?.location?.label != null ? userData?.location?.label : "-"}</p>
             )}
           </div>
         </div>

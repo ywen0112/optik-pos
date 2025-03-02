@@ -86,8 +86,6 @@ const CrudModal = ({
       setErrorModal({ isOpen: true, title: "Error Adding UOM", message: error.message });
     }
   };
-  
-  
 
   const handleRemoveUOM = (index) => {
     const updatedUOMs = [...data.itemUOMs];

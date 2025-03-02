@@ -8,6 +8,7 @@ import Dashboard from "../pages/overview/Dashboard";
 import AuditLogs from "../pages/overview/AuditLogs";
 import InquiryScreen from "../pages/overview/InquiryScreen";
 import Transaction from "../pages/overview/Transaction";
+import CompanyProfile from "../pages/overview/CompanyProfile";
 
 import Maintenance from "../pages/maintenance/Maintenance";
 import UserMaintenance from "../pages/maintenance/UserMaintenance";
@@ -40,6 +41,7 @@ const MainLayout = () => {
     "/main/audit-logs": "Audit Logs",
     "/main/transaction-inquiry": "Inquiry Screen",
     "/main/transaction": "Transaction",
+    "/main/company-profile": "Company Profile",
     "/maintenance": "Maintenance",
     "/maintenance/user-maintenance": "User Maintenance",
     "/maintenance/access-right-maintenance": "Access Right Maintenance",
@@ -86,8 +88,12 @@ const MainLayout = () => {
               <Route path="/main/audit-logs" element={<AuditLogs />} />
               <Route path="/main/transaction-inquiry" element={<InquiryScreen />} />
               <Route path="/main/transaction" element={<Transaction />} />
+              <Route path="/main/company-profile" element={<CompanyProfile />} />
+
               <Route path="/maintenance" element={<Maintenance />} />
+              <Route path="/report" element={<Report />} />
               <Route path="/profile" element={<Profile />} />
+
               <Route path="/maintenance/user-maintenance" element={<UserMaintenance />} />
               <Route path="/maintenance/access-right-maintenance" element={<AccessRightMaintenance />} />
               <Route path="/maintenance/debtor-maintenance" element={<DebtorMaintenance />} />
@@ -96,8 +102,7 @@ const MainLayout = () => {
               <Route path="/maintenance/member-maintenance" element={<MemberMaintenance />} />
               <Route path="/maintenance/location-maintenance" element={<LocationMaintenance />} />
               <Route path="/maintenance/pwp-maintenance" element={<PWPMaintenance />} />
-              {/* Report Routes */}
-              <Route path="/report" element={<Report />} />
+
               <Route path="/report/debtor-report" element={<DebtorReport />} />
               <Route path="/report/creditor-report" element={<CreditorReport />} />
               <Route path="/report/item-report" element={<ItemReport />} />

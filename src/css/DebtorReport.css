@@ -19,7 +19,7 @@
   
   .debtor-search-container button {
     padding: 8px 15px;
-    background-color: #002462;
+    background-color: #1e90ff;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -28,7 +28,7 @@
   }
   
   .debtor-search-container button:hover {
-    background-color: #002462;
+    background-color: #1e90ff;
   }
   
   /* Table Styles */
@@ -47,7 +47,7 @@
   }
   
   .debtor-report-table th {
-    background-color: #002462;
+    background-color: #1e90ff;
     color: #fff;
     font-size: 0.7rem;
   }

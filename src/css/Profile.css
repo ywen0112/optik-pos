@@ -10,7 +10,7 @@
 .profile-header {
   display: flex;
   justify-content: center;
-  padding-bottom: 15px;
+  padding-bottom: 5px;
   border-bottom: 2px solid #ddd;
 }
 
@@ -21,10 +21,10 @@
 }
 
 .profile-details {
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  margin-top: 10px;
+  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
 }
 
 .profile-info {
@@ -33,7 +33,6 @@
 }
 
 .profile-info label {
-  font-weight: bold;
   flex: 3;
 }
 
@@ -47,7 +46,6 @@
 
 .profile-info-input {
   flex: 7;
-  width: 85vh;
 }
 
 .profile-info input {
@@ -56,7 +54,6 @@
   padding: 8px;
   border-radius: 5px;
   font-size: 14px;
-  width: 35vh;
 }
 
 .profile-info .profile-select .react-select__control {

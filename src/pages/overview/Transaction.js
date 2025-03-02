@@ -120,7 +120,12 @@ const Transaction = () => {
       }
 
       setCounterSummary(data.data); 
-      handleResetAndCloseState();
+      setIsCounterOpen(false);
+      setCounterSessionId(null);
+      setOpenCounterAmount("");
+      localStorage.removeItem("counterSessionId");
+      localStorage.removeItem("openingBal");
+      localStorage.removeItem("isCounterOpen");
       setIsCloseCounterOpen(false);
       navigate("/main/transaction");
     } catch (error) {

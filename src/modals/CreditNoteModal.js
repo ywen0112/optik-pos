@@ -224,7 +224,7 @@ const CreditNoteModal = ({ isOpen, onClose, onReset }) => {
       if (response.ok && data.success) {
         const options = data.data.map((item) => ({
           value: item.itemId,
-          label: item.itemCode,
+          label: `${item.itemCode} - ${item.description}`,
           description: item.description,
           desc2: item.desc2,
           itemUOMs: item.itemUOMs,
@@ -241,23 +241,23 @@ const CreditNoteModal = ({ isOpen, onClose, onReset }) => {
   const handleItemChange = (selectedOption, rowIndex) => {
       setFormData((prev) => {
         const updatedItems = [...prev.items];
-    
+        const defaultUOM = selectedOption.itemUOMs.length === 1 ? selectedOption.itemUOMs[0] : null;
+
         updatedItems[rowIndex] = {
           ...updatedItems[rowIndex],
           itemId: selectedOption.value,
           itemCode: selectedOption.label,
           description: selectedOption.description,
           desc2: selectedOption.desc2,
-          itemUOMId: "",
-          unitPrice: "",
-          subtotal: 0, 
+          itemUOMId: defaultUOM ? defaultUOM.itemUOMId : "",
+          unitPrice: defaultUOM ? defaultUOM.unitPrice : "",
+          subtotal: 0,
           availableUOMs: selectedOption.itemUOMs.map(uom => ({ 
             value: uom.itemUOMId,
             label: uom.uom,
             unitPrice: uom.unitPrice,
           })),
         };
-    
         const newTotal = updatedItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
         
         return { ...prev, items: updatedItems, total: newTotal };
@@ -526,7 +526,9 @@ const CreditNoteModal = ({ isOpen, onClose, onReset }) => {
               <label>Agent</label>
               <Select
                 options={agents}
-                value={agents.find((agent) => agent.value === formData.agentId) || ""}
+                value={agents.find((agent) => agent.value === formData.agentId) ||
+                  agents.find((agent) => agent.value === localStorage.getItem("userId")) ||
+                  ""}
                 onChange={handleAgentChange}
                 isSearchable
                 placeholder="Select Agent"

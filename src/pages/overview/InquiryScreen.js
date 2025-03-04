@@ -722,8 +722,13 @@ const InquiryScreen = () => {
 
   const handleExportReport = async (id) => {
     try {
+
+      const apiEndpoint = activeTab === "counterSession"
+        ? `https://optikposbackend.absplt.com/CashCounter/GetCounterSummaryReport?CounterSessionId=${id}`
+        : `https://optikposbackend.absplt.com/Sales/GetSalesReport?SalesId=${id}`
+
       const response = await fetch(
-        `https://optikposbackend.absplt.com/Sales/GetSalesReport?SalesId=${id}`
+        apiEndpoint
       );
       const data = await response.json();
 
@@ -890,9 +895,9 @@ const InquiryScreen = () => {
                           >
                             {isExpanded ? "Hide" : "View"}
                           </button>
-                          <button className="pay-button" onClick={() => {handleExportReport(txn.counterSessionId)}}>
+                          {txn.closeTime && <button className="pay-button" onClick={() => {handleExportReport(txn.counterSessionId)}}>
                             Latest Report
-                          </button>
+                          </button>}
                         </td>
                       </tr>
 

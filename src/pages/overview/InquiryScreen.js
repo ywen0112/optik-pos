@@ -31,7 +31,8 @@ const InquiryScreen = () => {
   const [purchaseTransactions, setPurchaseTransactions] = useState([]);
   const [expandedPurchaseRow, setExpandedPurchaseRow] = useState(null);
   const [isPurchaseVoid, setIsPurchaseVoid] = useState(false);
-  const [isPurchaseVoidAndCompleted, setIsPurchaseVoidAndCompleted] = useState(false);
+  const [isPurchaseVoidAndCompleted, setIsPurchaseVoidAndCompleted] =
+    useState(false);
   const [showAllPurchases, setShowAllPurchases] = useState(true);
   const [creditorCode, setCreditorCode] = useState("");
   const [creditNote, setCreditNote] = useState([]);
@@ -73,27 +74,38 @@ const InquiryScreen = () => {
   const fetchCounterSessions = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/CashCounter/GetCounterSessionRecords", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: customerId,
-          keyword: "",
-          offset: (pagination.counterSession.currentPage - 1) * pagination.counterSession.itemsPerPage,
-          limit: pagination.counterSession.itemsPerPage,
-        }),
-      });
+      const response = await fetch(
+        "https://optikposbackend.absplt.com/CashCounter/GetCounterSessionRecords",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: customerId,
+            keyword: "",
+            offset:
+              (pagination.counterSession.currentPage - 1) *
+              pagination.counterSession.itemsPerPage,
+            limit: pagination.counterSession.itemsPerPage,
+          }),
+        }
+      );
 
       const data = await response.json();
       if (response.ok && data.success) {
         setSessionCounters([...data.data]);
         fetchUserNames(data.data);
-        setTotalRecords(Math.ceil(data.data.length === pagination.counterSession.itemsPerPage));
+        setTotalRecords(
+          Math.ceil(data.data.length === pagination.counterSession.itemsPerPage)
+        );
       } else {
         throw new Error(data.errorMessage || "Failed to fetch transactions.");
       }
     } catch (error) {
-      setErrorModal({ isOpen: true, title: "Fetch Error", message: error.message });
+      setErrorModal({
+        isOpen: true,
+        title: "Fetch Error",
+        message: error.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -102,27 +114,40 @@ const InquiryScreen = () => {
   const fetchTransactions = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/CashCounter/GetCashTransactionsRecords", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: customerId,
-          keyword: "",
-          offset: (pagination.cashTransaction.currentPage - 1) * pagination.cashTransaction.itemsPerPage,
-          limit: pagination.cashTransaction.itemsPerPage,
-        }),
-      });
+      const response = await fetch(
+        "https://optikposbackend.absplt.com/CashCounter/GetCashTransactionsRecords",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: customerId,
+            keyword: "",
+            offset:
+              (pagination.cashTransaction.currentPage - 1) *
+              pagination.cashTransaction.itemsPerPage,
+            limit: pagination.cashTransaction.itemsPerPage,
+          }),
+        }
+      );
 
       const data = await response.json();
       if (response.ok && data.success) {
         setTransactions([...data.data]);
         fetchUserNames(data.data);
-        setTotalRecords(Math.ceil(data.data.length === pagination.cashTransaction.itemsPerPage));
+        setTotalRecords(
+          Math.ceil(
+            data.data.length === pagination.cashTransaction.itemsPerPage
+          )
+        );
       } else {
         throw new Error(data.errorMessage || "Failed to fetch transactions.");
       }
     } catch (error) {
-      setErrorModal({ isOpen: true, title: "Fetch Error", message: error.message });
+      setErrorModal({
+        isOpen: true,
+        title: "Fetch Error",
+        message: error.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -132,7 +157,8 @@ const InquiryScreen = () => {
     setConfirmModal({
       isOpen: true,
       transactionId,
-      message: "Are you sure you want to void this transaction? This action cannot be undone.",
+      message:
+        "Are you sure you want to void this transaction? This action cannot be undone.",
     });
   };
 
@@ -141,15 +167,18 @@ const InquiryScreen = () => {
     setConfirmModal({ isOpen: false, transactionId: null, message: "" });
     try {
       const userId = localStorage.getItem("userId");
-      const response = await fetch("https://optikposbackend.absplt.com/CashCounter/VoidCashTransaction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: customerId,
-          id: confirmModal.transactionId,
-          userId,
-        }),
-      });
+      const response = await fetch(
+        "https://optikposbackend.absplt.com/CashCounter/VoidCashTransaction",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: customerId,
+            id: confirmModal.transactionId,
+            userId,
+          }),
+        }
+      );
       const data = await response.json();
       if (response.ok && data.success) {
         fetchTransactions();
@@ -171,7 +200,8 @@ const InquiryScreen = () => {
   const filteredTransactions = transactions.filter((txn) => {
     const lowerDocNo = docNo.toLowerCase();
 
-    const matchesDocNo = !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
+    const matchesDocNo =
+      !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
 
     if (isVoidAndCashOut) {
       return txn.isVoid === true && txn.isCashOut === true && matchesDocNo;
@@ -191,26 +221,39 @@ const InquiryScreen = () => {
   const fetchSalesTransactions = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Sales/GetRecords", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: customerId,
-          keyword: "",
-          offset: (pagination.salesInvoice.currentPage - 1) * pagination.salesInvoice.itemsPerPage,
-          limit: pagination.salesInvoice.itemsPerPage,
-        }),
-      });
+      const response = await fetch(
+        "https://optikposbackend.absplt.com/Sales/GetRecords",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: customerId,
+            keyword: "",
+            offset:
+              (pagination.salesInvoice.currentPage - 1) *
+              pagination.salesInvoice.itemsPerPage,
+            limit: pagination.salesInvoice.itemsPerPage,
+          }),
+        }
+      );
 
       const data = await response.json();
       if (response.ok && data.success) {
         setSalesTransactions([...data.data]);
-        setTotalRecords(Math.ceil(data.data.length === pagination.salesInvoice.itemsPerPage));
+        setTotalRecords(
+          Math.ceil(data.data.length === pagination.salesInvoice.itemsPerPage)
+        );
       } else {
-        throw new Error(data.errorMessage || "Failed to fetch sales transactions.");
+        throw new Error(
+          data.errorMessage || "Failed to fetch sales transactions."
+        );
       }
     } catch (error) {
-      setErrorModal({ isOpen: true, title: "Fetch Error", message: error.message });
+      setErrorModal({
+        isOpen: true,
+        title: "Fetch Error",
+        message: error.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -220,7 +263,8 @@ const InquiryScreen = () => {
     setConfirmSalesModal({
       isOpen: true,
       salesId,
-      message: "Are you sure you want to void this transaction? This action cannot be undone.",
+      message:
+        "Are you sure you want to void this transaction? This action cannot be undone.",
     });
   };
 
@@ -229,15 +273,18 @@ const InquiryScreen = () => {
     setConfirmSalesModal({ isOpen: false, salesId: null, message: "" });
     try {
       const userId = localStorage.getItem("userId");
-      const response = await fetch("https://optikposbackend.absplt.com/Sales/Void", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: customerId,
-          id: confirmSalesModal.salesId,
-          userId,
-        }),
-      });
+      const response = await fetch(
+        "https://optikposbackend.absplt.com/Sales/Void",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: customerId,
+            id: confirmSalesModal.salesId,
+            userId,
+          }),
+        }
+      );
       const data = await response.json();
       if (response.ok && data.success) {
         fetchSalesTransactions();
@@ -260,8 +307,12 @@ const InquiryScreen = () => {
     const lowerDocNo = docNo.toLowerCase();
     const lowerDebtorCode = debtorCode.toLowerCase();
 
-    const matchesDocNo = !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
-    const matchesDebtorCode = !debtorCode || (txn.debtorCode && txn.debtorCode.toLowerCase().includes(lowerDebtorCode));
+    const matchesDocNo =
+      !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
+    const matchesDebtorCode =
+      !debtorCode ||
+      (txn.debtorCode &&
+        txn.debtorCode.toLowerCase().includes(lowerDebtorCode));
 
     if (isSalesVoid) {
       return txn.isVoid === true && matchesDocNo && matchesDebtorCode;
@@ -270,7 +321,12 @@ const InquiryScreen = () => {
       return txn.isComplete === true && matchesDocNo && matchesDebtorCode;
     }
     if (isSalesVoidAndCompleted) {
-      return txn.isVoid === true && txn.isComplete === true && matchesDocNo && matchesDebtorCode;
+      return (
+        txn.isVoid === true &&
+        txn.isComplete === true &&
+        matchesDocNo &&
+        matchesDebtorCode
+      );
     }
     if (showAllSales) {
       return matchesDocNo && matchesDebtorCode;
@@ -281,26 +337,41 @@ const InquiryScreen = () => {
   const fetchPurchaseTransactions = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Purchases/GetRecords", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: customerId,
-          keyword: "",
-          offset: (pagination.purchaseInvoice.currentPage - 1) * pagination.purchaseInvoice.itemsPerPage,
-          limit: pagination.purchaseInvoice.itemsPerPage,
-        }),
-      });
+      const response = await fetch(
+        "https://optikposbackend.absplt.com/Purchases/GetRecords",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: customerId,
+            keyword: "",
+            offset:
+              (pagination.purchaseInvoice.currentPage - 1) *
+              pagination.purchaseInvoice.itemsPerPage,
+            limit: pagination.purchaseInvoice.itemsPerPage,
+          }),
+        }
+      );
 
       const data = await response.json();
       if (response.ok && data.success) {
         setPurchaseTransactions([...data.data]);
-        setTotalRecords(Math.ceil(data.data.length === pagination.purchaseInvoice.itemsPerPage));
+        setTotalRecords(
+          Math.ceil(
+            data.data.length === pagination.purchaseInvoice.itemsPerPage
+          )
+        );
       } else {
-        throw new Error(data.errorMessage || "Failed to fetch purchase transactions.");
+        throw new Error(
+          data.errorMessage || "Failed to fetch purchase transactions."
+        );
       }
     } catch (error) {
-      setErrorModal({ isOpen: true, title: "Fetch Error", message: error.message });
+      setErrorModal({
+        isOpen: true,
+        title: "Fetch Error",
+        message: error.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -310,7 +381,8 @@ const InquiryScreen = () => {
     setConfirmPurchasesModal({
       isOpen: true,
       purchaseId,
-      message: "Are you sure you want to void this transaction? This action cannot be undone.",
+      message:
+        "Are you sure you want to void this transaction? This action cannot be undone.",
     });
   };
 
@@ -319,15 +391,18 @@ const InquiryScreen = () => {
     setConfirmPurchasesModal({ isOpen: false, purchaseId: null, message: "" });
     try {
       const userId = localStorage.getItem("userId");
-      const response = await fetch("https://optikposbackend.absplt.com/Purchases/Void", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: customerId,
-          id: confirmPurchasesModal.purchaseId,
-          userId,
-        }),
-      });
+      const response = await fetch(
+        "https://optikposbackend.absplt.com/Purchases/Void",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: customerId,
+            id: confirmPurchasesModal.purchaseId,
+            userId,
+          }),
+        }
+      );
       const data = await response.json();
       if (response.ok && data.success) {
         fetchPurchaseTransactions();
@@ -350,8 +425,12 @@ const InquiryScreen = () => {
     const lowerDocNo = docNo.toLowerCase();
     const lowerCreditorCode = creditorCode.toLowerCase();
 
-    const matchesDocNo = !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
-    const matchesCreditorCode = !creditorCode || (txn.creditorCode && txn.creditorCode.toLowerCase().includes(lowerCreditorCode));
+    const matchesDocNo =
+      !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
+    const matchesCreditorCode =
+      !creditorCode ||
+      (txn.creditorCode &&
+        txn.creditorCode.toLowerCase().includes(lowerCreditorCode));
 
     if (isPurchaseVoid) {
       return txn.isVoid === true && matchesDocNo && matchesCreditorCode;
@@ -360,7 +439,12 @@ const InquiryScreen = () => {
       return txn.isComplete === true && matchesDocNo && matchesCreditorCode;
     }
     if (isPurchaseVoidAndCompleted) {
-      return txn.isVoid === true && txn.isComplete === true && matchesDocNo && matchesCreditorCode;
+      return (
+        txn.isVoid === true &&
+        txn.isComplete === true &&
+        matchesDocNo &&
+        matchesCreditorCode
+      );
     }
     if (showAllPurchases) {
       return matchesDocNo && matchesCreditorCode;
@@ -371,26 +455,37 @@ const InquiryScreen = () => {
   const fetchCreditNotes = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/GetRecords", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: customerId,
-          keyword: "",
-          offset: (pagination.creditNote.currentPage - 1) * pagination.creditNote.itemsPerPage,
-          limit: pagination.creditNote.itemsPerPage,
-        }),
-      });
+      const response = await fetch(
+        "https://optikposbackend.absplt.com/CreditNote/GetRecords",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: customerId,
+            keyword: "",
+            offset:
+              (pagination.creditNote.currentPage - 1) *
+              pagination.creditNote.itemsPerPage,
+            limit: pagination.creditNote.itemsPerPage,
+          }),
+        }
+      );
 
       const data = await response.json();
       if (response.ok && data.success) {
         setCreditNote([...data.data]);
-        setTotalRecords(Math.ceil(data.data.length === pagination.creditNote.itemsPerPage));
+        setTotalRecords(
+          Math.ceil(data.data.length === pagination.creditNote.itemsPerPage)
+        );
       } else {
         throw new Error(data.errorMessage || "Failed to fetch credit note.");
       }
     } catch (error) {
-      setErrorModal({ isOpen: true, title: "Fetch Error", message: error.message });
+      setErrorModal({
+        isOpen: true,
+        title: "Fetch Error",
+        message: error.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -400,24 +495,32 @@ const InquiryScreen = () => {
     setConfirmCreditNoteModal({
       isOpen: true,
       creditNoteId,
-      message: "Are you sure you want to void this transaction? This action cannot be undone.",
+      message:
+        "Are you sure you want to void this transaction? This action cannot be undone.",
     });
   };
 
   const handleVoidCreditNote = async () => {
     if (!confirmCreditNoteModal.creditNoteId) return;
-    setConfirmCreditNoteModal({ isOpen: false, creditNoteId: null, message: "" });
+    setConfirmCreditNoteModal({
+      isOpen: false,
+      creditNoteId: null,
+      message: "",
+    });
     try {
       const userId = localStorage.getItem("userId");
-      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/Void", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerId: customerId,
-          id: confirmCreditNoteModal.creditNoteId,
-          userId,
-        }),
-      });
+      const response = await fetch(
+        "https://optikposbackend.absplt.com/CreditNote/Void",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: customerId,
+            id: confirmCreditNoteModal.creditNoteId,
+            userId,
+          }),
+        }
+      );
       const data = await response.json();
       if (response.ok && data.success) {
         fetchCreditNotes();
@@ -438,8 +541,12 @@ const InquiryScreen = () => {
     const lowerDocNo = docNo.toLowerCase();
     const lowerDebtorCode = debtorCode.toLowerCase();
 
-    const matchesDocNo = !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
-    const matchesDebtorCode = !debtorCode || (txn.debtorCode && txn.debtorCode.toLowerCase().includes(lowerDebtorCode));
+    const matchesDocNo =
+      !docNo || (txn.docNo && txn.docNo.toLowerCase().includes(lowerDocNo));
+    const matchesDebtorCode =
+      !debtorCode ||
+      (txn.debtorCode &&
+        txn.debtorCode.toLowerCase().includes(lowerDebtorCode));
 
     if (isVoid) {
       return txn.isVoid === true && matchesDocNo && matchesDebtorCode;
@@ -462,15 +569,18 @@ const InquiryScreen = () => {
     for (let userId of userIds) {
       if (!userNames[userId]) {
         try {
-          const response = await fetch("https://optikposbackend.absplt.com/Users/GetSpecificUser", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              customerId: customerId,
-              userId,
-              id: userId,
-            }),
-          });
+          const response = await fetch(
+            "https://optikposbackend.absplt.com/Users/GetSpecificUser",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                customerId: customerId,
+                userId,
+                id: userId,
+              }),
+            }
+          );
 
           const data = await response.json();
           if (response.ok && data.success) {
@@ -490,14 +600,33 @@ const InquiryScreen = () => {
   const formatDateTime = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
-    return date.toLocaleString();
+
+    // Get day, month, and year
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed
+    const year = date.getFullYear();
+
+    // Get hours, minutes, and seconds for 12-hour format
+    let hours = date.getHours();
+    const ampm = hours >= 12 ? "pm" : "am";
+    hours = hours % 12 || 12; // Convert hour '0' to '12'
+    const formattedHours = hours.toString().padStart(2, "0");
+
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+
+    return `${day}/${month}/${year}, ${formattedHours}:${minutes}:${seconds} ${ampm}`;
   };
 
   const handleItemsPerPageChange = (event) => {
     const newItemsPerPage = Number(event.target.value);
     setPagination((prev) => ({
       ...prev,
-      [activeTab]: { ...prev[activeTab], itemsPerPage: newItemsPerPage, currentPage: 1 },
+      [activeTab]: {
+        ...prev[activeTab],
+        itemsPerPage: newItemsPerPage,
+        currentPage: 1,
+      },
     }));
   };
 
@@ -518,15 +647,18 @@ const InquiryScreen = () => {
       const offset = now.getTimezoneOffset() * 60000;
       const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
 
-      const apiEndpoint = type === "sales"
-        ? "https://optikposbackend.absplt.com/Sales/SaveSalesPayment"
-        : "https://optikposbackend.absplt.com/Purchases/SavePurchasePayment";
+      const apiEndpoint =
+        type === "sales"
+          ? "https://optikposbackend.absplt.com/Sales/SaveSalesPayment"
+          : "https://optikposbackend.absplt.com/Purchases/SavePurchasePayment";
 
       const remark = payments
-        .map(payment => {
+        .map((payment) => {
           let details = `Method: ${payment.method.toUpperCase()}`;
           if (payment.method === "card") {
-            details += `, Card No: ${payment.cardNo || "N/A"}, Approval Code: ${payment.approvalCode || "N/A"}`;
+            details += `, Card No: ${payment.cardNo || "N/A"}, Approval Code: ${
+              payment.approvalCode || "N/A"
+            }`;
           }
           if (payment.method === "bank") {
             details += `, Reference No: ${payment.referenceNo || "N/A"}`;
@@ -535,28 +667,29 @@ const InquiryScreen = () => {
         })
         .join(" | ");
 
-      const body = type === "sales"
-        ? JSON.stringify({
-          customerId: customerId,
-          userId: userId,
-          isFirstPayment: false,
-          counterSessionId: counterSessionId,
-          targetDocId: payModal.transactionId,
-          docDate: localISOTime,
-          remark: remark,
-          reference: reference,
-          amount: parseFloat(totalPaid.toFixed(2)),
-        })
-        : JSON.stringify({
-          customerId: customerId,
-          userId: userId,
-          counterSessionId: counterSessionId,
-          targetDocId: payModal.transactionId,
-          docDate: localISOTime,
-          remark: remark,
-          reference: reference,
-          amount: parseFloat(totalPaid.toFixed(2)),
-        })
+      const body =
+        type === "sales"
+          ? JSON.stringify({
+              customerId: customerId,
+              userId: userId,
+              isFirstPayment: false,
+              counterSessionId: counterSessionId,
+              targetDocId: payModal.transactionId,
+              docDate: localISOTime,
+              remark: remark,
+              reference: reference,
+              amount: parseFloat(totalPaid.toFixed(2)),
+            })
+          : JSON.stringify({
+              customerId: customerId,
+              userId: userId,
+              counterSessionId: counterSessionId,
+              targetDocId: payModal.transactionId,
+              docDate: localISOTime,
+              remark: remark,
+              reference: reference,
+              amount: parseFloat(totalPaid.toFixed(2)),
+            });
 
       const response = await fetch(apiEndpoint, {
         method: "POST",
@@ -570,18 +703,28 @@ const InquiryScreen = () => {
       if (!response.ok || !data.success) {
         throw new Error(data.errorMessage || "Payment failed.");
       }
-      setSuccessModal({isOpen: true, title: "Payment Success", onExportReport: handleExportReport(payModal.transactionId)})
+      setSuccessModal({
+        isOpen: true,
+        title: "Payment Success",
+        onExportReport: handleExportReport(payModal.transactionId),
+      });
       setPayModal({ isOpen: false, transactionId: null, outstandingAmount: 0 });
 
       type === "sales" ? fetchSalesTransactions() : fetchPurchaseTransactions();
     } catch (error) {
-      setErrorModal({ isOpen: true, title: "Payment Error", message: error.message });
+      setErrorModal({
+        isOpen: true,
+        title: "Payment Error",
+        message: error.message,
+      });
     }
   };
 
   const handleExportReport = async (id) => {
     try {
-      const response = await fetch(`https://optikposbackend.absplt.com/Sales/GetSalesReport?SalesId=${id}`);
+      const response = await fetch(
+        `https://optikposbackend.absplt.com/Sales/GetSalesReport?SalesId=${id}`
+      );
       const data = await response.json();
 
       if (response.ok && data.success) {
@@ -622,19 +765,34 @@ const InquiryScreen = () => {
       <h3>Transaction Inquiry</h3>
 
       <div className="inquiry-tabs">
-        <button className={activeTab === "counterSession" ? "active" : ""} onClick={() => setActiveTab("counterSession")}>
+        <button
+          className={activeTab === "counterSession" ? "active" : ""}
+          onClick={() => setActiveTab("counterSession")}
+        >
           Counter Session
         </button>
-        <button className={activeTab === "cashTransaction" ? "active" : ""} onClick={() => setActiveTab("cashTransaction")}>
+        <button
+          className={activeTab === "cashTransaction" ? "active" : ""}
+          onClick={() => setActiveTab("cashTransaction")}
+        >
           Cash Transaction
         </button>
-        <button className={activeTab === "salesInvoice" ? "active" : ""} onClick={() => setActiveTab("salesInvoice")}>
+        <button
+          className={activeTab === "salesInvoice" ? "active" : ""}
+          onClick={() => setActiveTab("salesInvoice")}
+        >
           Sales Invoice
         </button>
-        <button className={activeTab === "purchaseInvoice" ? "active" : ""} onClick={() => setActiveTab("purchaseInvoice")}>
+        <button
+          className={activeTab === "purchaseInvoice" ? "active" : ""}
+          onClick={() => setActiveTab("purchaseInvoice")}
+        >
           Purchase Invoice
         </button>
-        <button className={activeTab === "creditNote" ? "active" : ""} onClick={() => setActiveTab("creditNote")}>
+        <button
+          className={activeTab === "creditNote" ? "active" : ""}
+          onClick={() => setActiveTab("creditNote")}
+        >
           Credit Note
         </button>
       </div>
@@ -694,25 +852,46 @@ const InquiryScreen = () => {
               </thead>
               <tbody>
                 {counterSessions.map((txn, index) => {
-                  const isExpanded = expandedCounterRow === txn.counterSessionId;
+                  const isExpanded =
+                    expandedCounterRow === txn.counterSessionId;
                   return (
                     <React.Fragment key={txn.counterSessionId}>
                       <tr>
-                        <td>{(pagination[activeTab].currentPage - 1) * pagination[activeTab].itemsPerPage + index + 1}</td>
+                        <td>
+                          {(pagination[activeTab].currentPage - 1) *
+                            pagination[activeTab].itemsPerPage +
+                            index +
+                            1}
+                        </td>
                         <td>{txn.sessionCode ? txn.sessionCode : "-"}</td>
-                        <td>{txn.openingBal !== null ? txn.openingBal : "-"}</td>
-                        <td>{txn.closingBal !== null ? txn.closingBal : "-"}</td>
+                        <td>
+                          {txn.openingBal !== null ? txn.openingBal : "-"}
+                        </td>
+                        <td>
+                          {txn.closingBal !== null ? txn.closingBal : "-"}
+                        </td>
                         <td>{txn.variance !== null ? txn.variance : "-"}</td>
                         <td>{txn.openBy ? txn.openBy : "-"}</td>
                         <td>{txn.closeBy ? txn.closeBy : "-"}</td>
-                        <td>{txn.openTime ? formatDateTime(txn.openTime) : "-'"}</td>
-                        <td>{txn.closeTime ? formatDateTime(txn.closeTime) : "-"}</td>
+                        <td>
+                          {txn.openTime ? formatDateTime(txn.openTime) : "-'"}
+                        </td>
+                        <td>
+                          {txn.closeTime ? formatDateTime(txn.closeTime) : "-"}
+                        </td>
                         <td>
                           <button
                             className="view-button"
-                            onClick={() => setExpandedCounterRow(isExpanded ? null : txn.counterSessionId)}
+                            onClick={() =>
+                              setExpandedCounterRow(
+                                isExpanded ? null : txn.counterSessionId
+                              )
+                            }
                           >
                             {isExpanded ? "Hide" : "View"}
+                          </button>
+                          <button className="pay-button" onClick={() => {handleExportReport(txn.counterSessionId)}}>
+                            Latest Report
                           </button>
                         </td>
                       </tr>
@@ -725,32 +904,74 @@ const InquiryScreen = () => {
                               <table className="details-table">
                                 <tbody>
                                   <tr>
-                                    <td><strong>Sales Amount:</strong></td>
-                                    <td>{txn.salesAmt !== null ? txn.salesAmt : "-"}</td>
+                                    <td>
+                                      <strong>Sales Amount:</strong>
+                                    </td>
+                                    <td>
+                                      {txn.salesAmt !== null
+                                        ? txn.salesAmt
+                                        : "-"}
+                                    </td>
                                   </tr>
                                   <tr>
-                                    <td><strong>Purchase Amount:</strong></td>
-                                    <td>{txn.purchaseAmt !== null ? txn.purchaseAmt : "-"}</td>
+                                    <td>
+                                      <strong>Purchase Amount:</strong>
+                                    </td>
+                                    <td>
+                                      {txn.purchaseAmt !== null
+                                        ? txn.purchaseAmt
+                                        : "-"}
+                                    </td>
                                   </tr>
                                   <tr>
-                                    <td><strong>Sales Payment Amount:</strong></td>
-                                    <td>{txn.salesPaymentAmt !== null ? txn.salesPaymentAmt : "-"}</td>
+                                    <td>
+                                      <strong>Sales Payment Amount:</strong>
+                                    </td>
+                                    <td>
+                                      {txn.salesPaymentAmt !== null
+                                        ? txn.salesPaymentAmt
+                                        : "-"}
+                                    </td>
                                   </tr>
                                   <tr>
-                                    <td><strong>Purchase Payment Amount:</strong></td>
-                                    <td>{txn.purchasePaymentAmt !== null ? txn.purchasePaymentAmt : "-"}</td>
+                                    <td>
+                                      <strong>Purchase Payment Amount:</strong>
+                                    </td>
+                                    <td>
+                                      {txn.purchasePaymentAmt !== null
+                                        ? txn.purchasePaymentAmt
+                                        : "-"}
+                                    </td>
                                   </tr>
                                   <tr>
-                                    <td><strong>Cash In Amount:</strong></td>
-                                    <td>{txn.cashInAmt !== null ? txn.cashInAmt : "-"}</td>
+                                    <td>
+                                      <strong>Cash In Amount:</strong>
+                                    </td>
+                                    <td>
+                                      {txn.cashInAmt !== null
+                                        ? txn.cashInAmt
+                                        : "-"}
+                                    </td>
                                   </tr>
                                   <tr>
-                                    <td><strong>Cash Out Amount:</strong></td>
-                                    <td>{txn.cashOutAmt !== null ? txn.cashOutAmt : "-"}</td>
+                                    <td>
+                                      <strong>Cash Out Amount:</strong>
+                                    </td>
+                                    <td>
+                                      {txn.cashOutAmt !== null
+                                        ? txn.cashOutAmt
+                                        : "-"}
+                                    </td>
                                   </tr>
                                   <tr>
-                                    <td><strong>Expected Closing Balance:</strong></td>
-                                    <td>{txn.expectedClosingBalance !== null ? txn.expectedClosingBalance : "-"}</td>
+                                    <td>
+                                      <strong>Expected Closing Balance:</strong>
+                                    </td>
+                                    <td>
+                                      {txn.expectedClosingBalance !== null
+                                        ? txn.expectedClosingBalance
+                                        : "-"}
+                                    </td>
                                   </tr>
                                 </tbody>
                               </table>
@@ -767,14 +988,18 @@ const InquiryScreen = () => {
           <div className="pagination">
             <button
               disabled={pagination[activeTab].currentPage === 1}
-              onClick={() => handlePageChange(pagination[activeTab].currentPage - 1)}
+              onClick={() =>
+                handlePageChange(pagination[activeTab].currentPage - 1)
+              }
             >
               Previous
             </button>
             <span>Page {pagination[activeTab].currentPage}</span>
             <button
               disabled={!totalRecords}
-              onClick={() => handlePageChange(pagination[activeTab].currentPage + 1)}
+              onClick={() =>
+                handlePageChange(pagination[activeTab].currentPage + 1)
+              }
             >
               Next
             </button>
@@ -863,9 +1088,16 @@ const InquiryScreen = () => {
               <tbody>
                 {filteredTransactions.map((txn, index) => (
                   <tr key={txn.cashTransactionId}>
-                    <td>{(pagination[activeTab].currentPage - 1) * pagination[activeTab].itemsPerPage + index + 1}</td>
+                    <td>
+                      {(pagination[activeTab].currentPage - 1) *
+                        pagination[activeTab].itemsPerPage +
+                        index +
+                        1}
+                    </td>
                     <td>{txn.docNo || "-"}</td>
-                    <td>{txn.effectedAmount !== null ? txn.effectedAmount : "-"}</td>
+                    <td>
+                      {txn.effectedAmount !== null ? txn.effectedAmount : "-"}
+                    </td>
                     <td>{txn.remarks || "-"}</td>
                     <td>{txn.isVoid ? "Yes" : "No"}</td>
                     <td>{txn.isCashOut ? "Yes" : "No"}</td>
@@ -875,9 +1107,18 @@ const InquiryScreen = () => {
                     <td>{formatDateTime(txn.lastModifiedTimeStamp) || "-"}</td>
                     <td>
                       {txn.isVoid ? (
-                        <button className="disabled-void" disabled>Voided</button>
+                        <button className="disabled-void" disabled>
+                          Voided
+                        </button>
                       ) : (
-                        <button className="void-button" onClick={() => confirmVoidTransaction(txn.cashTransactionId)}>Void</button>
+                        <button
+                          className="void-button"
+                          onClick={() =>
+                            confirmVoidTransaction(txn.cashTransactionId)
+                          }
+                        >
+                          Void
+                        </button>
                       )}
                     </td>
                   </tr>
@@ -888,14 +1129,18 @@ const InquiryScreen = () => {
           <div className="pagination">
             <button
               disabled={pagination[activeTab].currentPage === 1}
-              onClick={() => handlePageChange(pagination[activeTab].currentPage - 1)}
+              onClick={() =>
+                handlePageChange(pagination[activeTab].currentPage - 1)
+              }
             >
               Previous
             </button>
             <span>Page {pagination[activeTab].currentPage}</span>
             <button
               disabled={!totalRecords}
-              onClick={() => handlePageChange(pagination[activeTab].currentPage + 1)}
+              onClick={() =>
+                handlePageChange(pagination[activeTab].currentPage + 1)
+              }
             >
               Next
             </button>
@@ -906,12 +1151,52 @@ const InquiryScreen = () => {
       {activeTab === "salesInvoice" && (
         <>
           <div className="search-inquiry-container">
-            <input type="text" placeholder="Enter Doc No" value={docNo} onChange={(e) => setDocNo(e.target.value)} />
-            <input type="text" placeholder="Enter Debtor Code" value={debtorCode} onChange={(e) => setDebtorCode(e.target.value)} />
-            <label><input type="checkbox" checked={isComplete} onChange={() => handleSalesFilterChange("isComplete")} /> Show Only Completed</label>
-            <label><input type="checkbox" checked={isSalesVoid} onChange={() => handleSalesFilterChange("isSalesVoid")} /> Show Only Voided</label>
-            <label><input type="checkbox" checked={isSalesVoidAndCompleted} onChange={() => handleSalesFilterChange("isSalesVoidAndCompleted")} /> Show Only Voided and Completed</label>
-            <label><input type="checkbox" checked={showAllSales} onChange={() => handleSalesFilterChange("showAllSales")} /> Show All</label>
+            <input
+              type="text"
+              placeholder="Enter Doc No"
+              value={docNo}
+              onChange={(e) => setDocNo(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Enter Debtor Code"
+              value={debtorCode}
+              onChange={(e) => setDebtorCode(e.target.value)}
+            />
+            <label>
+              <input
+                type="checkbox"
+                checked={isComplete}
+                onChange={() => handleSalesFilterChange("isComplete")}
+              />{" "}
+              Show Only Completed
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={isSalesVoid}
+                onChange={() => handleSalesFilterChange("isSalesVoid")}
+              />{" "}
+              Show Only Voided
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={isSalesVoidAndCompleted}
+                onChange={() =>
+                  handleSalesFilterChange("isSalesVoidAndCompleted")
+                }
+              />{" "}
+              Show Only Voided and Completed
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={showAllSales}
+                onChange={() => handleSalesFilterChange("showAllSales")}
+              />{" "}
+              Show All
+            </label>
           </div>
 
           <div className="pagination-controls">
@@ -952,12 +1237,19 @@ const InquiryScreen = () => {
               <tbody>
                 {filteredSalesTransactions.map((txn, index) => {
                   const isExpanded = expandedRow === txn.salesId;
-                  const outstandingView = txn.outstandingBal < 0 ? 0 : txn.outstandingBal;
-                  const changeView = txn.outstandingBal < 0 ? Math.abs(txn.outstandingBal) : 0;
+                  const outstandingView =
+                    txn.outstandingBal < 0 ? 0 : txn.outstandingBal;
+                  const changeView =
+                    txn.outstandingBal < 0 ? Math.abs(txn.outstandingBal) : 0;
                   return (
                     <React.Fragment key={txn.salesId}>
                       <tr>
-                        <td>{(pagination[activeTab].currentPage - 1) * pagination[activeTab].itemsPerPage + index + 1}</td>
+                        <td>
+                          {(pagination[activeTab].currentPage - 1) *
+                            pagination[activeTab].itemsPerPage +
+                            index +
+                            1}
+                        </td>
                         <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.docNo || "-"}</td>
                         <td>{txn.debtorCode || "-"}</td>
@@ -969,11 +1261,15 @@ const InquiryScreen = () => {
                         <td>{txn.locationCode || "-"}</td>
                         <td>
                           {txn.isVoid ? (
-                            <button className="disabled-void" disabled>Voided</button>
+                            <button className="disabled-void" disabled>
+                              Voided
+                            </button>
                           ) : (
                             <button
                               className="void-button"
-                              onClick={() => confirmVoidSalesTransaction(txn.salesId)}
+                              onClick={() =>
+                                confirmVoidSalesTransaction(txn.salesId)
+                              }
                             >
                               Void
                             </button>
@@ -981,7 +1277,9 @@ const InquiryScreen = () => {
 
                           <button
                             className="view-button"
-                            onClick={() => setExpandedRow(isExpanded ? null : txn.salesId)}
+                            onClick={() =>
+                              setExpandedRow(isExpanded ? null : txn.salesId)
+                            }
                           >
                             {isExpanded ? "Hide" : "View"}
                           </button>
@@ -989,12 +1287,23 @@ const InquiryScreen = () => {
                           {!txn.isComplete && !txn.isVoid && (
                             <button
                               className="pay-button"
-                              onClick={() => setPayModal({ isOpen: true, transactionId: txn.salesId, outstandingAmount: txn.outstandingBal, type: "sales" })
+                              onClick={() =>
+                                setPayModal({
+                                  isOpen: true,
+                                  transactionId: txn.salesId,
+                                  outstandingAmount: txn.outstandingBal,
+                                  type: "sales",
+                                })
                               }
                             >
                               Pay
                             </button>
                           )}
+                          <button className="pay-button" onClick={() => {handleExportReport(txn.salesId)}}>
+                            {txn.isComplete
+                              ? "Latest Invoice"
+                              : "Latest Receipt"}
+                          </button>
                         </td>
                       </tr>
 
@@ -1022,11 +1331,25 @@ const InquiryScreen = () => {
                                       <td>{detail.itemCode || "-"}</td>
                                       <td>{detail.description || "-"}</td>
                                       <td>{detail.uom || "-"}</td>
-                                      <td>{detail.qty !== null ? detail.qty : "-"}</td>
-                                      <td>{detail.unitPrice !== null ? detail.unitPrice : "-"}</td>
+                                      <td>
+                                        {detail.qty !== null ? detail.qty : "-"}
+                                      </td>
+                                      <td>
+                                        {detail.unitPrice !== null
+                                          ? detail.unitPrice
+                                          : "-"}
+                                      </td>
                                       <td>{detail.discount || "-"}</td>
-                                      <td>{detail.discountAmount !== null ? detail.discountAmount : "-"}</td>
-                                      <td>{detail.subTotal !== null ? detail.subTotal : "-"}</td>
+                                      <td>
+                                        {detail.discountAmount !== null
+                                          ? detail.discountAmount
+                                          : "-"}
+                                      </td>
+                                      <td>
+                                        {detail.subTotal !== null
+                                          ? detail.subTotal
+                                          : "-"}
+                                      </td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -1047,11 +1370,19 @@ const InquiryScreen = () => {
                                   <tbody>
                                     {txn.paymentHistory.map((payment) => (
                                       <tr key={payment.salesPaymentId}>
-                                        <td>{formatDateTime(payment.paymentDate) || "-"}</td>
+                                        <td>
+                                          {formatDateTime(
+                                            payment.paymentDate
+                                          ) || "-"}
+                                        </td>
                                         <td>{payment.docNo || "-"}</td>
                                         <td>{payment.remark || "-"}</td>
                                         <td>{payment.reference || "-"}</td>
-                                        <td>{payment.amount !== null ? payment.amount : "-"}</td>
+                                        <td>
+                                          {payment.amount !== null
+                                            ? payment.amount
+                                            : "-"}
+                                        </td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -1072,14 +1403,18 @@ const InquiryScreen = () => {
           <div className="pagination">
             <button
               disabled={pagination[activeTab].currentPage === 1}
-              onClick={() => handlePageChange(pagination[activeTab].currentPage - 1)}
+              onClick={() =>
+                handlePageChange(pagination[activeTab].currentPage - 1)
+              }
             >
               Previous
             </button>
             <span>Page {pagination[activeTab].currentPage}</span>
             <button
               disabled={!totalRecords}
-              onClick={() => handlePageChange(pagination[activeTab].currentPage + 1)}
+              onClick={() =>
+                handlePageChange(pagination[activeTab].currentPage + 1)
+              }
             >
               Next
             </button>
@@ -1090,12 +1425,52 @@ const InquiryScreen = () => {
       {activeTab === "purchaseInvoice" && (
         <>
           <div className="search-inquiry-container">
-            <input type="text" placeholder="Enter Doc No" value={docNo} onChange={(e) => setDocNo(e.target.value)} />
-            <input type="text" placeholder="Enter Creditor Code" value={creditorCode} onChange={(e) => setCreditorCode(e.target.value)} />
-            <label><input type="checkbox" checked={isComplete} onChange={() => handlePurchasesFilterChange("isComplete")} /> Show Only Completed</label>
-            <label><input type="checkbox" checked={isPurchaseVoid} onChange={() => handlePurchasesFilterChange("isPurchaseVoid")} /> Show Only Voided</label>
-            <label><input type="checkbox" checked={isPurchaseVoidAndCompleted} onChange={() => handleSalesFilterChange("isPurchaseVoidAndCompleted")} /> Show Only Voided and Completed</label>
-            <label><input type="checkbox" checked={showAllPurchases} onChange={() => handlePurchasesFilterChange("showAllPurchases")} /> Show All</label>
+            <input
+              type="text"
+              placeholder="Enter Doc No"
+              value={docNo}
+              onChange={(e) => setDocNo(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Enter Creditor Code"
+              value={creditorCode}
+              onChange={(e) => setCreditorCode(e.target.value)}
+            />
+            <label>
+              <input
+                type="checkbox"
+                checked={isComplete}
+                onChange={() => handlePurchasesFilterChange("isComplete")}
+              />{" "}
+              Show Only Completed
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={isPurchaseVoid}
+                onChange={() => handlePurchasesFilterChange("isPurchaseVoid")}
+              />{" "}
+              Show Only Voided
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={isPurchaseVoidAndCompleted}
+                onChange={() =>
+                  handleSalesFilterChange("isPurchaseVoidAndCompleted")
+                }
+              />{" "}
+              Show Only Voided and Completed
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={showAllPurchases}
+                onChange={() => handlePurchasesFilterChange("showAllPurchases")}
+              />{" "}
+              Show All
+            </label>
           </div>
 
           <div className="pagination-controls">
@@ -1136,12 +1511,19 @@ const InquiryScreen = () => {
               <tbody>
                 {filteredPurchasesTransactions.map((txn, index) => {
                   const isExpanded = expandedPurchaseRow === txn.purchaseId;
-                  const outstandingView = txn.outstandingBal < 0 ? 0 : txn.outstandingBal;
-                  const changeView = txn.outstandingBal < 0 ? Math.abs(txn.outstandingBal) : 0;
+                  const outstandingView =
+                    txn.outstandingBal < 0 ? 0 : txn.outstandingBal;
+                  const changeView =
+                    txn.outstandingBal < 0 ? Math.abs(txn.outstandingBal) : 0;
                   return (
                     <React.Fragment key={txn.purchaseId}>
                       <tr>
-                        <td>{(pagination[activeTab].currentPage - 1) * pagination[activeTab].itemsPerPage + index + 1}</td>
+                        <td>
+                          {(pagination[activeTab].currentPage - 1) *
+                            pagination[activeTab].itemsPerPage +
+                            index +
+                            1}
+                        </td>
                         <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.docNo || "-"}</td>
                         <td>{txn.creditorCode || "-"}</td>
@@ -1153,11 +1535,15 @@ const InquiryScreen = () => {
                         <td>{txn.locationCode || "-"}</td>
                         <td>
                           {txn.isVoid ? (
-                            <button className="disabled-void" disabled>Voided</button>
+                            <button className="disabled-void" disabled>
+                              Voided
+                            </button>
                           ) : (
                             <button
                               className="void-button"
-                              onClick={() => confirmVoidPurchasesTransaction(txn.purchaseId)}
+                              onClick={() =>
+                                confirmVoidPurchasesTransaction(txn.purchaseId)
+                              }
                             >
                               Void
                             </button>
@@ -1165,7 +1551,11 @@ const InquiryScreen = () => {
 
                           <button
                             className="view-button"
-                            onClick={() => setExpandedPurchaseRow(isExpanded ? null : txn.purchaseId)}
+                            onClick={() =>
+                              setExpandedPurchaseRow(
+                                isExpanded ? null : txn.purchaseId
+                              )
+                            }
                           >
                             {isExpanded ? "Hide" : "View"}
                           </button>
@@ -1173,7 +1563,14 @@ const InquiryScreen = () => {
                           {!txn.isComplete && !txn.isVoid && (
                             <button
                               className="pay-button"
-                              onClick={() => setPayModal({ isOpen: true, transactionId: txn.purchaseId, outstandingAmount: txn.outstandingBal, type: "purchase" })}
+                              onClick={() =>
+                                setPayModal({
+                                  isOpen: true,
+                                  transactionId: txn.purchaseId,
+                                  outstandingAmount: txn.outstandingBal,
+                                  type: "purchase",
+                                })
+                              }
                             >
                               Pay
                             </button>
@@ -1205,11 +1602,25 @@ const InquiryScreen = () => {
                                       <td>{detail.itemCode || "-"}</td>
                                       <td>{detail.description | "-"}</td>
                                       <td>{detail.uom || "-"}</td>
-                                      <td>{detail.qty !== null ? detail.qty : "-"}</td>
-                                      <td>{detail.unitPrice !== null ? detail.unitPrice : "-"}</td>
+                                      <td>
+                                        {detail.qty !== null ? detail.qty : "-"}
+                                      </td>
+                                      <td>
+                                        {detail.unitPrice !== null
+                                          ? detail.unitPrice
+                                          : "-"}
+                                      </td>
                                       <td>{detail.discount || "-"}</td>
-                                      <td>{detail.discountAmount !== null ? detail.discountAmount : "-"}</td>
-                                      <td>{detail.subTotal !== null ? detail.subTotal : "-"}</td>
+                                      <td>
+                                        {detail.discountAmount !== null
+                                          ? detail.discountAmount
+                                          : "-"}
+                                      </td>
+                                      <td>
+                                        {detail.subTotal !== null
+                                          ? detail.subTotal
+                                          : "-"}
+                                      </td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -1229,10 +1640,18 @@ const InquiryScreen = () => {
                                   <tbody>
                                     {txn.paymentHistory.map((payment) => (
                                       <tr key={payment.purchasePaymentId}>
-                                        <td>{formatDateTime(payment.paymentDate) || "-"}</td>
+                                        <td>
+                                          {formatDateTime(
+                                            payment.paymentDate
+                                          ) || "-"}
+                                        </td>
                                         <td>{payment.remark || "-"}</td>
                                         <td>{payment.reference || "-"}</td>
-                                        <td>{payment.amount !== null ? payment.amount : "-"}</td>
+                                        <td>
+                                          {payment.amount !== null
+                                            ? payment.amount
+                                            : "-"}
+                                        </td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -1253,14 +1672,18 @@ const InquiryScreen = () => {
           <div className="pagination">
             <button
               disabled={pagination[activeTab].currentPage === 1}
-              onClick={() => handlePageChange(pagination[activeTab].currentPage - 1)}
+              onClick={() =>
+                handlePageChange(pagination[activeTab].currentPage - 1)
+              }
             >
               Previous
             </button>
             <span>Page {pagination[activeTab].currentPage}</span>
             <button
               disabled={!totalRecords}
-              onClick={() => handlePageChange(pagination[activeTab].currentPage + 1)}
+              onClick={() =>
+                handlePageChange(pagination[activeTab].currentPage + 1)
+              }
             >
               Next
             </button>
@@ -1271,10 +1694,36 @@ const InquiryScreen = () => {
       {activeTab === "creditNote" && (
         <>
           <div className="search-inquiry-container">
-            <input type="text" placeholder="Enter Doc No" value={docNo} onChange={(e) => setDocNo(e.target.value)} />
-            <input type="text" placeholder="Enter Debtor Code" value={debtorCode} onChange={(e) => setDebtorCode(e.target.value)} />
-            <label><input type="checkbox" checked={isVoid} onChange={() => handleCreditNoteFilterChange("isVoid")} /> Show Only Voided</label>
-            <label><input type="checkbox" checked={showAllCreditNote} onChange={() => handleCreditNoteFilterChange("showAllCreditNote")} /> Show All</label>
+            <input
+              type="text"
+              placeholder="Enter Doc No"
+              value={docNo}
+              onChange={(e) => setDocNo(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Enter Debtor Code"
+              value={debtorCode}
+              onChange={(e) => setDebtorCode(e.target.value)}
+            />
+            <label>
+              <input
+                type="checkbox"
+                checked={isVoid}
+                onChange={() => handleCreditNoteFilterChange("isVoid")}
+              />{" "}
+              Show Only Voided
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={showAllCreditNote}
+                onChange={() =>
+                  handleCreditNoteFilterChange("showAllCreditNote")
+                }
+              />{" "}
+              Show All
+            </label>
           </div>
 
           <div className="pagination-controls">
@@ -1315,7 +1764,12 @@ const InquiryScreen = () => {
                   return (
                     <React.Fragment key={txn.creditNoteId}>
                       <tr>
-                        <td>{(pagination[activeTab].currentPage - 1) * pagination[activeTab].itemsPerPage + index + 1}</td>
+                        <td>
+                          {(pagination[activeTab].currentPage - 1) *
+                            pagination[activeTab].itemsPerPage +
+                            index +
+                            1}
+                        </td>
                         <td>{formatDateTime(txn.docDate) || "-"}</td>
                         <td>{txn.docNo || "-"}</td>
                         <td>{txn.debtorCode || "-"}</td>
@@ -1324,11 +1778,15 @@ const InquiryScreen = () => {
                         <td>{txn.locationCode || "-"}</td>
                         <td>
                           {txn.isVoid ? (
-                            <button className="disabled-void" disabled>Voided</button>
+                            <button className="disabled-void" disabled>
+                              Voided
+                            </button>
                           ) : (
                             <button
                               className="void-button"
-                              onClick={() => confirmVoidCreditNote(txn.creditNoteId)}
+                              onClick={() =>
+                                confirmVoidCreditNote(txn.creditNoteId)
+                              }
                             >
                               Void
                             </button>
@@ -1336,7 +1794,11 @@ const InquiryScreen = () => {
 
                           <button
                             className="view-button"
-                            onClick={() => setExpandedCreditNoteRow(isExpanded ? null : txn.creditNoteId)}
+                            onClick={() =>
+                              setExpandedCreditNoteRow(
+                                isExpanded ? null : txn.creditNoteId
+                              )
+                            }
                           >
                             {isExpanded ? "Hide" : "View"}
                           </button>
@@ -1366,10 +1828,24 @@ const InquiryScreen = () => {
                                       <td>{detail.itemCode || "-"}</td>
                                       <td>{detail.description || "-"}</td>
                                       <td>{detail.uom || "-"}</td>
-                                      <td>{detail.qty !== null ? detail.qty : "-"}</td>
-                                      <td>{detail.unitPrice !== null ? detail.unitPrice : "-"}</td>
-                                      <td>{detail.discountAmount !== null ? detail.discountAmount : "-"}</td>
-                                      <td>{detail.subTotal !== null ? detail.subTotal : "-"}</td>
+                                      <td>
+                                        {detail.qty !== null ? detail.qty : "-"}
+                                      </td>
+                                      <td>
+                                        {detail.unitPrice !== null
+                                          ? detail.unitPrice
+                                          : "-"}
+                                      </td>
+                                      <td>
+                                        {detail.discountAmount !== null
+                                          ? detail.discountAmount
+                                          : "-"}
+                                      </td>
+                                      <td>
+                                        {detail.subTotal !== null
+                                          ? detail.subTotal
+                                          : "-"}
+                                      </td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -1387,14 +1863,18 @@ const InquiryScreen = () => {
           <div className="pagination">
             <button
               disabled={pagination[activeTab].currentPage === 1}
-              onClick={() => handlePageChange(pagination[activeTab].currentPage - 1)}
+              onClick={() =>
+                handlePageChange(pagination[activeTab].currentPage - 1)
+              }
             >
               Previous
             </button>
             <span>Page {pagination[activeTab].currentPage}</span>
             <button
               disabled={!totalRecords}
-              onClick={() => handlePageChange(pagination[activeTab].currentPage + 1)}
+              onClick={() =>
+                handlePageChange(pagination[activeTab].currentPage + 1)
+              }
             >
               Next
             </button>
@@ -1407,7 +1887,9 @@ const InquiryScreen = () => {
           title="Confirm Void"
           message={confirmModal.message}
           onConfirm={handleVoidTransaction}
-          onCancel={() => setConfirmModal({ isOpen: false, transactionId: null, message: "" })}
+          onCancel={() =>
+            setConfirmModal({ isOpen: false, transactionId: null, message: "" })
+          }
         />
       )}
       {confirmSalesModal.isOpen && (
@@ -1416,7 +1898,9 @@ const InquiryScreen = () => {
           title="Confirm Void"
           message={confirmSalesModal.message}
           onConfirm={handleVoidSalesTransaction}
-          onCancel={() => setConfirmSalesModal({ isOpen: false, salesId: null, message: "" })}
+          onCancel={() =>
+            setConfirmSalesModal({ isOpen: false, salesId: null, message: "" })
+          }
         />
       )}
       {confirmPurchasesModal.isOpen && (
@@ -1425,7 +1909,13 @@ const InquiryScreen = () => {
           title="Confirm Void"
           message={confirmPurchasesModal.message}
           onConfirm={handleVoidPurchasesTransaction}
-          onCancel={() => setConfirmPurchasesModal({ isOpen: false, purchaseId: null, message: "" })}
+          onCancel={() =>
+            setConfirmPurchasesModal({
+              isOpen: false,
+              purchaseId: null,
+              message: "",
+            })
+          }
         />
       )}
       {confirmCreditNoteModal.isOpen && (
@@ -1434,14 +1924,22 @@ const InquiryScreen = () => {
           title="Confirm Void"
           message={confirmCreditNoteModal.message}
           onConfirm={handleVoidCreditNote}
-          onCancel={() => setConfirmCreditNoteModal({ isOpen: false, creditNoteId: null, message: "" })}
+          onCancel={() =>
+            setConfirmCreditNoteModal({
+              isOpen: false,
+              creditNoteId: null,
+              message: "",
+            })
+          }
         />
       )}
       {errorModal.isOpen && (
         <ErrorModal
           title={errorModal.title}
           message={errorModal.message}
-          onClose={() => setErrorModal({ isOpen: false, title: "", message: "" })}
+          onClose={() =>
+            setErrorModal({ isOpen: false, title: "", message: "" })
+          }
         />
       )}
       {successModal.isOpen && (
@@ -1449,18 +1947,20 @@ const InquiryScreen = () => {
           isOpen={successModal.isOpen}
           title={successModal.title}
           message={successModal.message}
-          onClose={handleSuccessModalClose} />
+          onClose={handleSuccessModalClose}
+        />
       )}
       {payModal.isOpen && (
         <OutstandingPaymentModal
           isOpen={payModal.isOpen}
           onClose={() => setPayModal({ isOpen: false, transactionId: null })}
-          onConfirm={(payments, totalPaid, type, reference) => handlePaymentConfirm(payments, totalPaid, type, reference)}
+          onConfirm={(payments, totalPaid, type, reference) =>
+            handlePaymentConfirm(payments, totalPaid, type, reference)
+          }
           outstandingAmount={payModal.outstandingAmount}
           type={payModal.type}
         />
       )}
-
     </div>
   );
 };

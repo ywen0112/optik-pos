@@ -23,6 +23,8 @@ const Sidebar = ({ onMenuClick }) => {
         localStorage.setItem("customerId", selectedCompany.customerId);
         localStorage.setItem("accessRights", JSON.stringify(selectedCompany.accessRight));
         localStorage.setItem("selectedCompany", JSON.stringify(selectedCompany));
+        localStorage.setItem("isCounterOpen", false);
+        localStorage.setItem("counterSessionId", "");
         window.location.reload();
       }
     }

@@ -33,16 +33,31 @@ const Transaction = () => {
   const [successModal, setSuccessModal] = useState({ isOpen: false, title: "", message: "" });
 
   useEffect(() => {
+    checkCounterStatus();
     const storedCounterSessionId = localStorage.getItem("counterSessionId");
     const storedOpeningBal = localStorage.getItem("openingBal");
     const storedIsCounterOpen = localStorage.getItem("isCounterOpen") === "true";
-
+    
     if (storedCounterSessionId && storedOpeningBal && storedIsCounterOpen) {
       setCounterSessionId(storedCounterSessionId);
       setOpenCounterAmount(parseFloat(storedOpeningBal));
       setIsCounterOpen(true);
     }
   }, []);
+
+  const checkCounterStatus = async () =>{
+    const response = await fetch(`https://optikposbackend.absplt.com/CashCounter/CheckCounterSession?customerId=${customerId}&userId=${userId}`);
+    const data = await response.json();
+    if(response.ok && data.success && data.data.isExist){
+      setCounterSessionId(data.data.counterSessionId);
+      setOpenCounterAmount(data.data.openingBal);
+      setIsCounterOpen(data.data.isExist);
+      setOpenCounterAmount(data.data.openingBal);
+      localStorage.setItem("counterSessionId", data.data.counterSessionId);
+      localStorage.setItem("openingBal", data.data.openingBal);
+      localStorage.setItem("isCounterOpen", data.data.isCounterExist);
+    }
+  };
 
   const handleOpenCounter = async () => {
     if (!openCounterAmount || parseFloat(openCounterAmount) < 0) {

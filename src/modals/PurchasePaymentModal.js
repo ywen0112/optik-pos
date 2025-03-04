@@ -4,9 +4,9 @@ import "../css/Transaction.css";
 import ErrorModal from "./ErrorModal";
 
 const paymentMethods = [
-  { value: "cash", label: "Cash Payment" },
-  { value: "card", label: "Card Payment" },
-  { value: "bank", label: "Bank Transfer" }
+  { value: "Cash", label: "Cash Payment" },
+  { value: "Card", label: "Card Payment" },
+  { value: "Bank", label: "Bank Transfer" }
 ];
 
 const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit, onReset }) => {
@@ -101,7 +101,6 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit, onReset 
         if (data.errorMessage === "There is currently no active counter session.") {
           onReset(data);
         }
-        return;
       }
 
       if (response.ok && data.success) {

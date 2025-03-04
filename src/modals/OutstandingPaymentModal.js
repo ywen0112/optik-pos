@@ -45,7 +45,6 @@ const OutstandingPaymentModal = ({ isOpen, onClose, onConfirm, outstandingAmount
         }
         onClose();
     };
-    
   
     if (!isOpen) return null;
   

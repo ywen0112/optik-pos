@@ -186,7 +186,7 @@ const InquiryScreen = () => {
         throw new Error(data.errorMessage || "Failed to void transaction.");
       }
     } catch (error) {
-      setErrorModal({ isOpen: true, title: "Error", message: error.message });
+      setErrorModal({ isOpen: true, title: "Error Voiding Transaction", message: error.message });
     }
   };
 
@@ -292,7 +292,7 @@ const InquiryScreen = () => {
         throw new Error(data.errorMessage || "Failed to void transaction.");
       }
     } catch (error) {
-      setErrorModal({ isOpen: true, title: "Error", message: error.message });
+      setErrorModal({ isOpen: true, title: "Error Voiding Transaction", message: error.message });
     }
   };
 
@@ -410,7 +410,7 @@ const InquiryScreen = () => {
         throw new Error(data.errorMessage || "Failed to void transaction.");
       }
     } catch (error) {
-      setErrorModal({ isOpen: true, title: "Error", message: error.message });
+      setErrorModal({ isOpen: true, title: "Error Voiding Transaction", message: error.message });
     }
   };
 
@@ -528,7 +528,7 @@ const InquiryScreen = () => {
         throw new Error(data.errorMessage || "Failed to void transaction.");
       }
     } catch (error) {
-      setErrorModal({ isOpen: true, title: "Error", message: error.message });
+      setErrorModal({ isOpen: true, title: "Error Voiding Transaction", message: error.message });
     }
   };
 
@@ -601,15 +601,13 @@ const InquiryScreen = () => {
     if (!dateString) return "-";
     const date = new Date(dateString);
 
-    // Get day, month, and year
     const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
 
-    // Get hours, minutes, and seconds for 12-hour format
     let hours = date.getHours();
     const ampm = hours >= 12 ? "pm" : "am";
-    hours = hours % 12 || 12; // Convert hour '0' to '12'
+    hours = hours % 12 || 12; 
     const formattedHours = hours.toString().padStart(2, "0");
 
     const minutes = date.getMinutes().toString().padStart(2, "0");
@@ -667,46 +665,40 @@ const InquiryScreen = () => {
         })
         .join(" | ");
 
-      const body =
-        type === "sales"
-          ? JSON.stringify({
-              customerId: customerId,
-              userId: userId,
-              isFirstPayment: false,
-              counterSessionId: counterSessionId,
-              targetDocId: payModal.transactionId,
-              docDate: localISOTime,
-              remark: remark,
-              reference: reference,
-              amount: parseFloat(totalPaid.toFixed(2)),
-            })
-          : JSON.stringify({
-              customerId: customerId,
-              userId: userId,
-              counterSessionId: counterSessionId,
-              targetDocId: payModal.transactionId,
-              docDate: localISOTime,
-              remark: remark,
-              reference: reference,
-              amount: parseFloat(totalPaid.toFixed(2)),
-            });
-
+        const body = JSON.stringify({
+          customerId: customerId,
+          userId: userId,
+          counterSessionId: counterSessionId,
+          targetDocId: payModal.transactionId,
+          docDate: localISOTime,
+          remark: remark,
+          reference: reference,
+          amount: parseFloat(totalPaid.toFixed(2)),
+          isFirstPayment: type === "sales" ? false : undefined,
+      });
+      
       const response = await fetch(apiEndpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: body,
       });
 
       const data = await response.json();
-      if (!response.ok || !data.success) {
-        throw new Error(data.errorMessage || "Payment failed.");
+      if (!data.success) {
+        if (data.errorMessage === "There is currently no active counter session.") {
+          setErrorModal({
+              isOpen: true,
+              title: "Error Processing Transaction",
+              message: data.errorMessage || "Failed to process transaction.",
+          });
+        }
+        return false;
       }
+
       setSuccessModal({
-        isOpen: true,
-        title: "Payment Success",
-        onExportReport: handleExportReport(payModal.transactionId),
+          isOpen: true,
+          title: "Payment Success",
+          onExportReport: handleExportReport(payModal.transactionId),
       });
       setPayModal({ isOpen: false, transactionId: null, outstandingAmount: 0 });
 
@@ -715,8 +707,9 @@ const InquiryScreen = () => {
       setErrorModal({
         isOpen: true,
         title: "Payment Error",
-        message: error.message,
+        message: error.message || "An unknown error occurred.",
       });
+      return false; 
     }
   };
 
@@ -896,7 +889,7 @@ const InquiryScreen = () => {
                             {isExpanded ? "Hide" : "View"}
                           </button>
                           {txn.closeTime && <button className="pay-button" onClick={() => {handleExportReport(txn.counterSessionId)}}>
-                            Latest Report
+                            Report
                           </button>}
                         </td>
                       </tr>
@@ -1306,8 +1299,8 @@ const InquiryScreen = () => {
                           )}
                           <button className="pay-button" onClick={() => {handleExportReport(txn.salesId)}}>
                             {txn.isComplete
-                              ? "Latest Invoice"
-                              : "Latest Receipt"}
+                              ? "Invoice / Receipt"
+                              : "Invoice"}
                           </button>
                         </td>
                       </tr>
@@ -1940,10 +1933,10 @@ const InquiryScreen = () => {
       )}
       {errorModal.isOpen && (
         <ErrorModal
+          isOpen={errorModal.isOpen}
           title={errorModal.title}
           message={errorModal.message}
-          onClose={() =>
-            setErrorModal({ isOpen: false, title: "", message: "" })
+          onClose={() => setErrorModal({ isOpen: false, title: "", message: "" })
           }
         />
       )}

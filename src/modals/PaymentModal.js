@@ -98,7 +98,6 @@ const PaymentModal = ({ isOpen, onClose, total, type, onSubmit, onReset }) => {
         if (data.errorMessage === "There is currently no active counter session.") {
           onReset(data);
         }
-        return;
       }
 
       if (response.ok && data.success) {

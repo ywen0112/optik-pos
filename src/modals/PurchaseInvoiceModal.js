@@ -546,8 +546,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose, onReset }) => {
             </div>
             <div className="sales-form-group">
               <label>Company Name</label>
-              <input type="text" value={formData.companyName} 
-                onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
+              <input type="text" value={formData.companyName} readOnly
                 />
             </div>
             <div className="sales-form-group">

@@ -440,6 +440,7 @@ const CreditNoteModal = ({ isOpen, onClose, onReset }) => {
       creditNoteId,
       docNo,
       debtorId: formData.debtorId,
+      debtorName: formData.companyName,
       docDate: localISOTime,
       locationId: formData.locationId,
       remark: "",
@@ -515,8 +516,7 @@ const CreditNoteModal = ({ isOpen, onClose, onReset }) => {
             <div className="sales-form-group">
               <label>Company Name</label>
               <input type="text" value={formData.companyName} 
-              onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
-             />
+              onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}/>
             </div>
             <div className="sales-form-group">
               <label>Location Code</label>

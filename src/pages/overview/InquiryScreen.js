@@ -71,6 +71,39 @@ const InquiryScreen = () => {
     }
   }, [activeTab, pagination[activeTab].currentPage, pagination[activeTab].itemsPerPage]);
 
+  useEffect(() => {
+    setDocNo("");
+    setDebtorCode("");
+    setCreditorCode("");
+  
+    setIsVoid(false);
+    setIsCashOut(false);
+    setIsVoidAndCashOut(false);
+    setShowAll(true);
+  
+    setIsComplete(false);
+    setIsSalesVoid(false);
+    setIsSalesVoidAndCompleted(false);
+    setShowAllSales(true);
+  
+    setIsPurchaseVoid(false);
+    setIsPurchaseVoidAndCompleted(false);
+    setShowAllPurchases(true);
+  
+    setShowAllCreditNote(true);
+  
+    setPagination((prev) => ({
+      ...prev,
+      [activeTab]: { ...prev[activeTab], currentPage: 1 },
+    }));
+  
+    setExpandedCounterRow(null);
+    setExpandedRow(null);
+    setExpandedPurchaseRow(null);
+    setExpandedCreditNoteRow(null);
+  }, [activeTab]);
+  
+
   const fetchCounterSessions = async () => {
     setLoading(true);
     try {

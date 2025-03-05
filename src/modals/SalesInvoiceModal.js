@@ -611,6 +611,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
       salesId,
       docNo,
       debtorId: formData.debtorId,
+      debtorName: formData.companyName,
       docDate: localISOTime,
       locationId: formData.locationId,
       remark: "",
@@ -721,7 +722,8 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
             </div>
             <div className="sales-form-group">
               <label>Company Name</label>
-              <input type="text" value={formData.companyName} readOnly />
+              <input type="text" value={formData.companyName} 
+               onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}/>
             </div>
             <div className="sales-form-group">
               <label>Location Code</label>

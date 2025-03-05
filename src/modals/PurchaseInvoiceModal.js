@@ -472,6 +472,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose, onReset }) => {
       purchaseId,
       docNo,
       creditorId: formData.creditorId,
+      creditorName: formData.companyName,
       docDate: localISOTime,
       locationId: formData.locationId,
       remark: "",
@@ -546,8 +547,8 @@ const PurchaseInvoiceModal = ({ isOpen, onClose, onReset }) => {
             </div>
             <div className="sales-form-group">
               <label>Company Name</label>
-              <input type="text" value={formData.companyName} readOnly
-                />
+              <input type="text" value={formData.companyName}
+               onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}/>
             </div>
             <div className="sales-form-group">
               <label>Location Code</label>

@@ -1255,7 +1255,7 @@ const InquiryScreen = () => {
                   <th>No</th>
                   <th>Doc Date</th>
                   <th>Doc No</th>
-                  <th>Debtor Code</th>
+                  <th>Debtor Name</th>
                   <th>Total</th>
                   <th>Outstanding</th>
                   <th>Change</th>
@@ -1333,7 +1333,7 @@ const InquiryScreen = () => {
                           <button className="pay-button" onClick={() => {handleExportReport(txn.salesId)}}>
                             {txn.isComplete
                               ? "Invoice / Receipt"
-                              : "Invoice"}
+                              : "Receipt"}
                           </button>
                         </td>
                       </tr>
@@ -1529,7 +1529,7 @@ const InquiryScreen = () => {
                   <th>No</th>
                   <th>Doc Date</th>
                   <th>Doc No</th>
-                  <th>Creditor Code</th>
+                  <th>Creditor Name</th>
                   <th>Total</th>
                   <th>Outstanding</th>
                   <th>Change</th>

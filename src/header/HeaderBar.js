@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import logo from "../assets/images/2_1_deep.png";
 import "../css/HeaderBar.css";
 
 const HeaderBar = () => {
@@ -35,7 +36,7 @@ const HeaderBar = () => {
   return (
     <div className="header-bar">
       <div className="header-left">
-        <div className="logo-header"></div>
+        <div className="logo-header"><img src={logo}/></div>
         <h1 className="header-title">OPTIK POS</h1>
       </div>
       <div className="header-right">

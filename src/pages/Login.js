@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import "../css/Login.css";
 import ErrorModal from "../modals/ErrorModal";
 import CompanySelectionModal from "../modals/CompanySelectionModal"; 
+import logo from "../assets/images/2_1.png";
 
-const Login = ({ logo }) => {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -95,7 +96,7 @@ const Login = ({ logo }) => {
           {logo ? <img src={logo} alt="Logo" /> : <div className="logo-circle"></div>}
         </div>
 
-        <h2 className="title">OPTIK POS</h2>
+        {/* <h2 className="title">OPTIK POS</h2> */}
 
         <form onSubmit={handleSubmit}>
           <label htmlFor="email" className="input-label">Email</label>

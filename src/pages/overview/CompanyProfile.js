@@ -17,7 +17,7 @@ const CompanyProfile = () => {
 
   const fetchCompanyData = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Company/GetCompany", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Company/GetCompany", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ customerId, userId, id: localStorage.getItem("customerId") }),
@@ -37,7 +37,7 @@ const CompanyProfile = () => {
   const handleEditToggle = async () => {
     if (!isEditing) {
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Company/Edit", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Company/Edit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ customerId, userId, id: localStorage.getItem("customerId") }),
@@ -64,7 +64,7 @@ const CompanyProfile = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Company/Save", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Company/Save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

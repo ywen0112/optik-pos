@@ -30,7 +30,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Users/GetUserLogins", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/GetUserLogins", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

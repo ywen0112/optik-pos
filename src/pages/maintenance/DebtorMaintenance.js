@@ -41,7 +41,7 @@ const DebtorMaintenance = () => {
     useEffect(() => {
       const fetchDebtorTypes = async () => {
         try {
-          const response = await fetch("https://optikposbackend.absplt.com/DebtorType/GetRecords", {
+          const response = await fetch("https://optikposwebsiteapi.absplt.com/DebtorType/GetRecords", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
@@ -68,7 +68,7 @@ const DebtorMaintenance = () => {
     const fetchDebtors = async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Debtor/GetRecords", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Debtor/GetRecords", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -114,7 +114,7 @@ const DebtorMaintenance = () => {
   const handleOpenModal = async (debtor = {}, title = "", viewing = false) => {
     try {
       if (title === "Add Debtor") {
-        const response = await fetch("https://optikposbackend.absplt.com/Debtor/New", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Debtor/New", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -153,7 +153,7 @@ const DebtorMaintenance = () => {
       }
       
       else if ((title === "Edit Debtor" || title === "View Debtor") && debtor.debtorId) {
-        const response = await fetch("https://optikposbackend.absplt.com/Debtor/Edit", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Debtor/Edit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -214,7 +214,7 @@ const DebtorMaintenance = () => {
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Debtor/Save", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Debtor/Save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -270,7 +270,7 @@ const DebtorMaintenance = () => {
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Debtor/Delete", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Debtor/Delete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

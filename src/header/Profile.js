@@ -44,7 +44,7 @@ const Profile = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Users/GetSpecificUser", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/GetSpecificUser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ customerId, userId, id: userId }),
@@ -55,12 +55,12 @@ const Profile = () => {
         const user = data.data;
 
         const [rolesResponse, locationsResponse] = await Promise.all([
-          fetch("https://optikposbackend.absplt.com/AccessRight/GetRecords", {
+          fetch("https://optikposwebsiteapi.absplt.com/AccessRight/GetRecords", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ customerId, keyword: "", offset: 0, limit: 9999 }),
           }),
-          fetch("https://optikposbackend.absplt.com/Location/GetRecords", {
+          fetch("https://optikposwebsiteapi.absplt.com/Location/GetRecords", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ customerId, keyword: "", offset: 0, limit: 9999 }),
@@ -97,7 +97,7 @@ const Profile = () => {
     setIsConfirmSaveOpen(false);
 
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Users/UpdateUser", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/UpdateUser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -125,7 +125,7 @@ const Profile = () => {
 
   const fetchRoles = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/AccessRight/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/AccessRight/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -149,7 +149,7 @@ const Profile = () => {
 
   const fetchLocations = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Location/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Location/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -202,7 +202,7 @@ const Profile = () => {
 
   const handleConfirmPasswordChange = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Users/ChangePassword", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/ChangePassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

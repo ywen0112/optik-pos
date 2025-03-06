@@ -38,7 +38,7 @@ const CreditorMaintenance = () => {
   useEffect(() => {
     const fetchCreditorTypes = async () => {
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/CreditorType/GetRecords", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/CreditorType/GetRecords", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
@@ -65,7 +65,7 @@ const CreditorMaintenance = () => {
   const fetchCreditors = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Creditor/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Creditor/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -111,7 +111,7 @@ const CreditorMaintenance = () => {
   const handleOpenModal = async (creditor = {}, title = "", viewing = false) => {
     try {
       if (title === "Add Creditor") {
-        const response = await fetch("https://optikposbackend.absplt.com/Creditor/New", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Creditor/New", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -143,7 +143,7 @@ const CreditorMaintenance = () => {
       }
       
       else if ((title === "Edit Creditor" || title === "View Creditor") && creditor.creditorId) {
-        const response = await fetch("https://optikposbackend.absplt.com/Creditor/Edit", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Creditor/Edit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -197,7 +197,7 @@ const CreditorMaintenance = () => {
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Creditor/Save", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Creditor/Save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -247,7 +247,7 @@ const CreditorMaintenance = () => {
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Creditor/Delete", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Creditor/Delete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

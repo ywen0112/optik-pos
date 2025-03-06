@@ -82,7 +82,7 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit, onReset 
     const localISOTime = new Date(now - offset).toISOString().slice(0, 19);
 
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Purchases/SavePurchasePayment", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Purchases/SavePurchasePayment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

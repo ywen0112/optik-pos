@@ -108,7 +108,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose, onReset }) => {
 
   const fetchAgents = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Users/GetUsers", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/GetUsers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -142,7 +142,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose, onReset }) => {
 
   const fetchCreditors = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Creditor/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Creditor/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -172,7 +172,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose, onReset }) => {
 
   const fetchLocations = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Location/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Location/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -217,7 +217,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose, onReset }) => {
 
   const fetchItems = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Item/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Item/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -492,7 +492,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose, onReset }) => {
     };
   
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Purchases/Save", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Purchases/Save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

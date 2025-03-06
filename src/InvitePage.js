@@ -45,7 +45,7 @@ const InvitePage = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Users/RegisterUser", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/RegisterUser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

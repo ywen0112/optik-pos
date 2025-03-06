@@ -89,7 +89,7 @@ const NewEyePowerModal = ({ isOpen, data, onClose, onSave, debtorId }) => {
     };
 
     try {
-      const res = await fetch("https://optikposbackend.absplt.com/EyePower/Save", {
+      const res = await fetch("https://optikposwebsiteapi.absplt.com/EyePower/Save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

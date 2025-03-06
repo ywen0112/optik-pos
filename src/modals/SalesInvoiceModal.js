@@ -117,7 +117,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
       const fetchNewEyePower = async () => {
         try {
           const userId = localStorage.getItem("userId");
-          const response = await fetch("https://optikposbackend.absplt.com/EyePower/New", {
+          const response = await fetch("https://optikposwebsiteapi.absplt.com/EyePower/New", {
             method: "POST",
             headers: { "accept": "text/plain", "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -142,7 +142,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
 
   const fetchAgents = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Users/GetUsers", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/GetUsers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -176,7 +176,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
 
   const fetchDebtors = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Debtor/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Debtor/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -206,7 +206,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
 
   const fetchLocations = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Location/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Location/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -235,7 +235,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
   const fetchEyeRecord = async (debtorId) => {
     try {
       const userId = localStorage.getItem("userId");
-      const response = await fetch("https://optikposbackend.absplt.com/EyePower/GetDebtorPreviousEyeProfile", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/EyePower/GetDebtorPreviousEyeProfile", {
         method: "POST",
         headers: { "accept": "text/plain", "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -276,7 +276,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
 
   const fetchItems = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Item/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Item/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -572,7 +572,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
     };
   
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/EyePower/Save", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/EyePower/Save", {
         method: "POST",
         headers: { "accept": "text/plain", "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -631,7 +631,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
   };
 
   try {
-      const response = await fetch("https://optikposbackend.absplt.com/Sales/Save", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Sales/Save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -671,7 +671,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
 
   const handleExportReport = async () => {
     try {
-      const response = await fetch(`https://optikposbackend.absplt.com/Sales/GetSalesReport?SalesId=${salesId}`);
+      const response = await fetch(`https://optikposwebsiteapi.absplt.com/Sales/GetSalesReport?SalesId=${salesId}`);
       const data = await response.json();
   
       if (response.ok && data.success) {

@@ -26,7 +26,7 @@ const AuditLogs = () => {
   const fetchUsers = async () => {
     try {
       const response = await axios.post(
-        'https://optikposbackend.absplt.com/Users/GetUsers',
+        'https://optikposwebsiteapi.absplt.com/Users/GetUsers',
         {
           customerId: customerId,
           keyword: '',
@@ -50,7 +50,7 @@ const AuditLogs = () => {
   const fetchEventTypes = async () => {
     try {
       const response = await axios.get(
-        `https://optikposbackend.absplt.com/AuditLog/GetAllAuditChangeType?customerId=${customerId}`
+        `https://optikposwebsiteapi.absplt.com/AuditLog/GetAllAuditChangeType?customerId=${customerId}`
       );
       if (response.data.success) {
         setEventTypes(response.data.data.map(type => ({ value: type, label: type })));
@@ -65,7 +65,7 @@ const AuditLogs = () => {
   const fetchAuditLogs = async () => {
     try {
       const response = await axios.post(
-        'https://optikposbackend.absplt.com/AuditLog/GetRecords',
+        'https://optikposwebsiteapi.absplt.com/AuditLog/GetRecords',
         {
           customerId: customerId,
           ...filters,

@@ -36,7 +36,7 @@ const ItemMaintenance = () => {
   useEffect(() => {
     const fetchItemGroups = async () => {
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/ItemGroup/GetRecords", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/ItemGroup/GetRecords", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
@@ -63,7 +63,7 @@ const ItemMaintenance = () => {
   useEffect(() => {
     const fetchItemTypes = async () => {
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/ItemType/GetRecords", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/ItemType/GetRecords", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
@@ -121,7 +121,7 @@ const ItemMaintenance = () => {
     const fetchItems = async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Item/GetRecords", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Item/GetRecords", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -194,7 +194,7 @@ const ItemMaintenance = () => {
   const handleOpenModal = async (item = {}, title = "", viewing = false) => {
     try {
       if (title === "Add Item") {
-        const response = await fetch("https://optikposbackend.absplt.com/Item/New", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Item/New", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -219,7 +219,7 @@ const ItemMaintenance = () => {
           itemUOMs: [], 
         };
 
-        const uomResponse = await fetch("https://optikposbackend.absplt.com/Item/NewDetail", {
+        const uomResponse = await fetch("https://optikposwebsiteapi.absplt.com/Item/NewDetail", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({}),
@@ -274,7 +274,7 @@ const ItemMaintenance = () => {
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Item/Save", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Item/Save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -320,7 +320,7 @@ const ItemMaintenance = () => {
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Item/Delete", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Item/Delete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

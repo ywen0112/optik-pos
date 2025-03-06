@@ -42,7 +42,7 @@ const LocationMaintenance = () => {
   const fetchLocations = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Location/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Location/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -90,7 +90,7 @@ const LocationMaintenance = () => {
   const handleOpenModal = async (location = {}, title = "", viewing = false) => {
     try {
       if (title === "Add Location") {
-        const response = await fetch("https://optikposbackend.absplt.com/Location/New", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Location/New", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -114,7 +114,7 @@ const LocationMaintenance = () => {
       } 
 
       else if ((title === "Edit Location" || title === "View Location") && location.locationId) {
-        const response = await fetch("https://optikposbackend.absplt.com/Location/Edit", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Location/Edit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -173,7 +173,7 @@ const LocationMaintenance = () => {
   
     setConfirmAction(() => async () => {
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Location/Save", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Location/Save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -215,7 +215,7 @@ const LocationMaintenance = () => {
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Location/Delete", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Location/Delete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

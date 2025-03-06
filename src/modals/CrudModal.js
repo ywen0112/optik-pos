@@ -59,7 +59,7 @@ const CrudModal = ({
 
   const handleAddUOM = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Item/NewDetail", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Item/NewDetail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),

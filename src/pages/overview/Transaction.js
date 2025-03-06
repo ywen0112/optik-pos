@@ -46,7 +46,7 @@ const Transaction = () => {
   }, []);
 
   const checkCounterStatus = async () =>{
-    const response = await fetch(`https://optikposbackend.absplt.com/CashCounter/CheckCounterSession?customerId=${customerId}&userId=${userId}`);
+    const response = await fetch(`https://optikposwebsiteapi.absplt.com/CashCounter/CheckCounterSession?customerId=${customerId}&userId=${userId}`);
     const data = await response.json();
     if(response.ok && data.success && data.data.isExist){
       setCounterSessionId(data.data.counterSessionId);
@@ -70,7 +70,7 @@ const Transaction = () => {
     }
 
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/CashCounter/OpenCounterSession", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/CashCounter/OpenCounterSession", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -115,7 +115,7 @@ const Transaction = () => {
 
   const handleCloseCounter = async ({ amount }) => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/CashCounter/CloseCounterSession", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/CashCounter/CloseCounterSession", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -156,7 +156,7 @@ const Transaction = () => {
 
   const handleAddCashTransaction = async ({ type, amount, description }) => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/CashCounter/NewCashTransaction", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/CashCounter/NewCashTransaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -189,7 +189,7 @@ const Transaction = () => {
 
   const handleOpenSalesInvoice = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Sales/New", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Sales/New", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -216,7 +216,7 @@ const Transaction = () => {
 
   const handleOpenPurchaseInvoice = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Purchases/New", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Purchases/New", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -246,7 +246,7 @@ const Transaction = () => {
 
   const handleOpenCreditNote = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/CreditNote/New", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/CreditNote/New", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -275,7 +275,7 @@ const Transaction = () => {
 
   const handleExportReport = async(id) =>{
     try{
-      const response = await fetch(`https://optikposbackend.absplt.com/CashCounter/GetCounterSummaryReport?CounterSessionId=${id}`);
+      const response = await fetch(`https://optikposwebsiteapi.absplt.com/CashCounter/GetCounterSummaryReport?CounterSessionId=${id}`);
       const data = await response.json();
 
       if (response.ok && data.success) {

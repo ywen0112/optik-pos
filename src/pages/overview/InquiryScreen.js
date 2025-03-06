@@ -108,7 +108,7 @@ const InquiryScreen = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://optikposbackend.absplt.com/CashCounter/GetCounterSessionRecords",
+        "https://optikposwebsiteapi.absplt.com/CashCounter/GetCounterSessionRecords",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -148,7 +148,7 @@ const InquiryScreen = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://optikposbackend.absplt.com/CashCounter/GetCashTransactionsRecords",
+        "https://optikposwebsiteapi.absplt.com/CashCounter/GetCashTransactionsRecords",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -201,7 +201,7 @@ const InquiryScreen = () => {
     try {
       const userId = localStorage.getItem("userId");
       const response = await fetch(
-        "https://optikposbackend.absplt.com/CashCounter/VoidCashTransaction",
+        "https://optikposwebsiteapi.absplt.com/CashCounter/VoidCashTransaction",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -255,7 +255,7 @@ const InquiryScreen = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://optikposbackend.absplt.com/Sales/GetRecords",
+        "https://optikposwebsiteapi.absplt.com/Sales/GetRecords",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -307,7 +307,7 @@ const InquiryScreen = () => {
     try {
       const userId = localStorage.getItem("userId");
       const response = await fetch(
-        "https://optikposbackend.absplt.com/Sales/Void",
+        "https://optikposwebsiteapi.absplt.com/Sales/Void",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -371,7 +371,7 @@ const InquiryScreen = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://optikposbackend.absplt.com/Purchases/GetRecords",
+        "https://optikposwebsiteapi.absplt.com/Purchases/GetRecords",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -425,7 +425,7 @@ const InquiryScreen = () => {
     try {
       const userId = localStorage.getItem("userId");
       const response = await fetch(
-        "https://optikposbackend.absplt.com/Purchases/Void",
+        "https://optikposwebsiteapi.absplt.com/Purchases/Void",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -489,7 +489,7 @@ const InquiryScreen = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://optikposbackend.absplt.com/CreditNote/GetRecords",
+        "https://optikposwebsiteapi.absplt.com/CreditNote/GetRecords",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -543,7 +543,7 @@ const InquiryScreen = () => {
     try {
       const userId = localStorage.getItem("userId");
       const response = await fetch(
-        "https://optikposbackend.absplt.com/CreditNote/Void",
+        "https://optikposwebsiteapi.absplt.com/CreditNote/Void",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -603,7 +603,7 @@ const InquiryScreen = () => {
       if (!userNames[userId]) {
         try {
           const response = await fetch(
-            "https://optikposbackend.absplt.com/Users/GetSpecificUser",
+            "https://optikposwebsiteapi.absplt.com/Users/GetSpecificUser",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -680,8 +680,8 @@ const InquiryScreen = () => {
 
       const apiEndpoint =
         type === "sales"
-          ? "https://optikposbackend.absplt.com/Sales/SaveSalesPayment"
-          : "https://optikposbackend.absplt.com/Purchases/SavePurchasePayment";
+          ? "https://optikposwebsiteapi.absplt.com/Sales/SaveSalesPayment"
+          : "https://optikposwebsiteapi.absplt.com/Purchases/SavePurchasePayment";
 
       const remark = payments
         .map((payment) => {
@@ -750,8 +750,8 @@ const InquiryScreen = () => {
     try {
 
       const apiEndpoint = activeTab === "counterSession"
-        ? `https://optikposbackend.absplt.com/CashCounter/GetCounterSummaryReport?CounterSessionId=${id}`
-        : `https://optikposbackend.absplt.com/Sales/GetSalesReport?SalesId=${id}`
+        ? `https://optikposwebsiteapi.absplt.com/CashCounter/GetCounterSummaryReport?CounterSessionId=${id}`
+        : `https://optikposwebsiteapi.absplt.com/Sales/GetSalesReport?SalesId=${id}`
 
       const response = await fetch(
         apiEndpoint

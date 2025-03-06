@@ -44,7 +44,7 @@ const UserMaintenance = () => {
 
   const fetchLocations = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Location/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Location/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
@@ -67,7 +67,7 @@ const UserMaintenance = () => {
 
   const fetchAccessRights = async () => {
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/AccessRight/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/AccessRight/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ customerId: Number(customerId), keyword: "", offset: 0, limit: 9999 }),
@@ -91,7 +91,7 @@ const UserMaintenance = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Users/GetUsers", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/GetUsers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -188,7 +188,7 @@ const UserMaintenance = () => {
   
       try {
         if (!newUser.userId) {
-          const response = await fetch("https://optikposbackend.absplt.com/Users/InviteUser", {
+          const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/InviteUser", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -216,7 +216,7 @@ const UserMaintenance = () => {
             throw new Error(inviteLink || "Failed to invite user.");
           }
         } else {
-          const response = await fetch("https://optikposbackend.absplt.com/Users/UpdateUser", {
+          const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/UpdateUser", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -265,7 +265,7 @@ const UserMaintenance = () => {
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/Users/DeleteUser", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/DeleteUser", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

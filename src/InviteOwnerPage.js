@@ -33,7 +33,7 @@ const InviteOwnerPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/Users/InviteOwner", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/Users/InviteOwner", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

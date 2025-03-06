@@ -71,7 +71,7 @@ const DebtorModal = ({
   const fetchEyePowerRecords = async (debtorId) => {
     try {
       const res = await fetch(
-        "https://optikposbackend.absplt.com/EyePower/GetDebtorEyePowerRecords",
+        "https://optikposwebsiteapi.absplt.com/EyePower/GetDebtorEyePowerRecords",
         {
           method: "POST",
           headers: {
@@ -155,7 +155,7 @@ const DebtorModal = ({
   const handleAddEyePowerRecord = async () => {
     try {
       const res = await fetch(
-        "https://optikposbackend.absplt.com/EyePower/New",
+        "https://optikposwebsiteapi.absplt.com/EyePower/New",
         {
           method: "POST",
           headers: {
@@ -279,7 +279,7 @@ const DebtorModal = ({
 
     try {
       const res = await fetch(
-        "https://optikposbackend.absplt.com/EyePower/Save",
+        "https://optikposwebsiteapi.absplt.com/EyePower/Save",
         {
           method: "POST",
           headers: {
@@ -325,7 +325,7 @@ const DebtorModal = ({
 
     try {
       const res = await fetch(
-        "https://optikposbackend.absplt.com/EyePower/Delete",
+        "https://optikposwebsiteapi.absplt.com/EyePower/Delete",
         {
           method: "POST",
           headers: {

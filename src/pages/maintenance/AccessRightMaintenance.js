@@ -36,7 +36,7 @@ const AccessRightMaintenance = () => {
   const fetchRoles = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://optikposbackend.absplt.com/AccessRight/GetRecords", {
+      const response = await fetch("https://optikposwebsiteapi.absplt.com/AccessRight/GetRecords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -81,7 +81,7 @@ const AccessRightMaintenance = () => {
   const handleOpenModal = async (role = {}, title = "", viewing = false) => {
     try {
       if (title === "Add Role") {
-        const response = await fetch("https://optikposbackend.absplt.com/AccessRight/New", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/AccessRight/New", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -106,7 +106,7 @@ const AccessRightMaintenance = () => {
       } 
       
       else if ((title === "Edit Role" || title === "View Role") && role.accessRightId) {
-        const response = await fetch("https://optikposbackend.absplt.com/AccessRight/Edit", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/AccessRight/Edit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -188,7 +188,7 @@ const AccessRightMaintenance = () => {
           accessRightActions: finalAccessRights, 
         };
     
-        const response = await fetch("https://optikposbackend.absplt.com/AccessRight/Save", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/AccessRight/Save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -222,7 +222,7 @@ const AccessRightMaintenance = () => {
     setConfirmAction(() => async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://optikposbackend.absplt.com/AccessRight/Delete", {
+        const response = await fetch("https://optikposwebsiteapi.absplt.com/AccessRight/Delete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

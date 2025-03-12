@@ -699,9 +699,11 @@ const InquiryScreen = () => {
         .join(" | ");
 
         const body = JSON.stringify({
-          customerId: customerId,
-          userId: userId,
-          counterSessionId: counterSessionId,
+          actionData: {
+            customerId: customerId,
+            userId: userId,
+            locationId: localStorage.getItem("location")
+          },
           targetDocId: payModal.transactionId,
           docDate: localISOTime,
           remark: remark,
@@ -731,7 +733,7 @@ const InquiryScreen = () => {
       setSuccessModal({
           isOpen: true,
           title: "Payment Success",
-          onExportReport: handleExportReport(payModal.transactionId),
+          onExportReport: type === "sales" ? handleExportReport(payModal.transactionId) : undefined,
       });
       setPayModal({ isOpen: false, transactionId: null, outstandingAmount: 0 });
 

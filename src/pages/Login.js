@@ -49,7 +49,6 @@ const Login = () => {
 
         // Store companies in localStorage for Sidebar use
         localStorage.setItem("companies", JSON.stringify(data.data));
-
         if (data.data.length === 1) {
           handleCompanySelection(data.data[0]);
         } else {

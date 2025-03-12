@@ -86,8 +86,11 @@ const PurchasePaymentModal = ({ isOpen, onClose, total, type, onSubmit, onReset 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: customerId,
-          userId: userId,
+          actionData: {
+            customerId: customerId,
+            userId: userId,
+            locationId: localStorage.getItem("location")
+          },
           targetDocId: targetDocId,
           docDate: localISOTime,
           remark: remark,

@@ -30,7 +30,7 @@
   .logo-placeholder img {
     width: 180px;
     height: 180px;
-    border-radius: 50%;
+    border-radius: 0%;
   }
   
   .title {

@@ -46,7 +46,29 @@ const Transaction = () => {
   }, []);
 
   const checkCounterStatus = async () =>{
-    const response = await fetch(`https://optikposwebsiteapi.absplt.com/CashCounter/CheckCounterSession?customerId=${customerId}&userId=${userId}`);
+    const userResponse = await fetch(`https://optikposwebsiteapi.absplt.com/Users/GetSpecificUser`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customerId: Number(customerId),
+        userId: userId,
+        id: userId
+      }),
+    });
+
+    const userData = await userResponse.json();
+    if(userResponse.ok && userData.success){
+      localStorage.setItem("location", userData.data.locationId);
+    }
+    const response = await fetch(`https://optikposwebsiteapi.absplt.com/CashCounter/CheckCounterSession`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customerId: Number(customerId),
+        userId: userId,
+        locationId: localStorage.getItem("location")
+      }),
+    });
     const data = await response.json();
     if(response.ok && data.success && data.data.isExist){
       setCounterSessionId(data.data.counterSessionId);
@@ -68,15 +90,17 @@ const Transaction = () => {
       });
       return;
     }
-
     try {
       const response = await fetch("https://optikposwebsiteapi.absplt.com/CashCounter/OpenCounterSession", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: Number(customerId),
-          userId: userId,
-          openingBalance: parseFloat(openCounterAmount),
+          actionData: {
+            customerId: customerId,
+            userId: userId,
+            locationId: localStorage.getItem("location")
+          },
+          openingBalance: openCounterAmount
         }),
       });
 
@@ -119,9 +143,12 @@ const Transaction = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: Number(customerId),
-          userId: userId,
-          closingBalance: parseFloat(amount),
+          actionData: {
+            customerId: customerId,
+            userId: userId,
+            locationId: localStorage.getItem("location")
+          },
+          closingBalance: parseFloat(amount)
         }),
       });
 
@@ -160,8 +187,11 @@ const Transaction = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: Number(customerId),
-          userId: userId,
+          actionData: {
+            customerId: customerId,
+            userId: userId,
+            locationId: localStorage.getItem("location")
+          },
           isCashOut: type === "cashout",
           remarks: description,
           effectedAmount: parseFloat(amount),

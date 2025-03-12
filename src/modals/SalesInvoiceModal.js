@@ -606,6 +606,7 @@ const SalesInvoiceModal = ({ isOpen, onClose, onReset }) => {
       actionData: {
           customerId,
           userId,
+          locationId: localStorage.getItem("location"),
           id: salesId,
       },
       salesId,

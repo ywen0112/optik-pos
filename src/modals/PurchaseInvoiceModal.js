@@ -467,6 +467,7 @@ const PurchaseInvoiceModal = ({ isOpen, onClose, onReset }) => {
       actionData: {
         customerId,
         userId,
+        locationId: localStorage.getItem("location"),
         id: purchaseId,
       },
       purchaseId,

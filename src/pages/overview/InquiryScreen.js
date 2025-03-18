@@ -753,7 +753,7 @@ const InquiryScreen = () => {
 
       const apiEndpoint = activeTab === "counterSession"
         ? `https://optikposwebsiteapi.absplt.com/CashCounter/GetCounterSummaryReport?CounterSessionId=${id}`
-        : `https://optikposwebsiteapi.absplt.com/Sales/GetSalesReport?SalesId=${id}`
+        : `https://optikposwebsiteapi.absplt.com/Sales/GetSalesReport?SalesId=${id}&ReportType=SalesOrder`
 
       const response = await fetch(
         apiEndpoint
